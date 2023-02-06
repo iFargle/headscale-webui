@@ -832,7 +832,7 @@ function delete_user(user_id, user_name) {
                 M.toast({html: 'User deleted.'});
             } else { 
                 // We errored.  Decipher the error Headscale sent us and display it:
-                load_modal_generic("error", "Error setting user name", "Headscale response:  "+JSON.stringify(response.body.message))
+                load_modal_generic("error", "Error deleting user", "Headscale response:  "+JSON.stringify(response.body.message))
             }
         }
     })
