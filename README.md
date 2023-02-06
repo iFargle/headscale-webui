@@ -1,5 +1,12 @@
 # headscale-webui
-* This is just a simple front-end for a Headscale server.  
+* This is just a simple front-end for a Headscale server.  Allows you to do the following:
+1.  Enable/Disable routes and exit nodes
+2.  Add, move, rename, and remove machines
+3.  Add and remove users/namespaces
+4.  Add and expire PreAuth keys
+5.  Add and remove machine tags
+6.  View machine details (last online, IP addresses, hsotname, PreAuth key in use, enabled/disabled routes, and tags)
+
 Screenshots:
 
 ![Machines](screenshots/machines.png)
