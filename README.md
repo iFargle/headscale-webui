@@ -1,4 +1,13 @@
 # headscale-webui
+* This is just a simple front-end for a Headscale server.  
+Screenshots:
+
+![Machines](screenshots/machines.png)
+![Users](screenshots/users.png)
+![Add a new machine](screenshots/machine_add.png)
+![Machine Details](screenshots/machines-page.JPG)
+![API Key Test](screenshots/key_test.png)
+
 
 ## Installation:
 1.  This assumes you have traefik as your reverse proxy.  I'm sure it will work with others, but I don't have experience with any.
