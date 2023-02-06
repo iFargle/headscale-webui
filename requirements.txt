@@ -1,0 +1,7 @@
+requests        # API requests to Headscale
+flask           # Flask for web development
+cryptography    # Used to encrypt the API key
+python-dateutil # Date / Time utility
+pytz            # Date / Time utility
+Flask-Executor  # Flask threading application
+pyyaml          # Used to read YAML files

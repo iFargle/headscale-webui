@@ -1,0 +1,88 @@
+{% extends 'template.html' %}
+{% set page = "Machines" %}
+{% set machines_active = "active" %}
+
+{% block title  %} {{ page }} {% endblock %}
+{% block header %} {{ page }} {% endblock %}
+
+{% block content %}
+<div class="row"><br>
+    {{ cards }}    
+</div>
+
+<!-- Modals -->
+<div id="card_modal" class="modal">
+    <div class="modal-content">
+        <h4 id="modal_title"></h4>
+        <p id="modal_content"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="modal_confirm" class="hide">Confirm</a>
+        <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </div>
+</div>
+
+<!-- Add new machine modal -->
+<div id="new_machine_card_modal" class="modal">
+    <div class="modal-content">
+        <h4 id="new_machine_modal_title">Add machine to Headscale</h4>
+        <p id="new_machine_modal_content">
+            <div class="row">
+                <div class="col s12">
+                    <ul class="tabs" id="new_machine_tabs">
+                        <li class="tab col s4" id="default_tab" onclick="btn_toggle('show')">
+                            <a href="#default">Default</a>
+                        </li>
+                        <li class="tab col s4" id="preauth_tab" onclick="btn_toggle('hide')">
+                            <a href="#preauth">PreAuth Keys</a>
+                        </li>
+                        <li class="tab col s4" id="oidc_tab"    onclick="btn_toggle('hide')">
+                            <a href="#oidc"   >OIDC        </a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="default" class="col s12">
+                    <ul class="collection">
+                        <li class="collection-item avatar">
+                            <i class="material-icons circle">devices</i>
+                            <span class="title">Information</span>
+                            <p>Install Tailscale on your client.  To use your headscale server, use the flag <code>--login-server={{ headscale_server }}</code></p>
+                        </li>
+                    </ul>
+                    <div id="default_add_new_machine_modal">
+                    <!-- Display a field for the key and a dropdown for the user
+                         done in JavaScript (load_modal_add_machine) -->
+                    </div>
+                </div>
+                <div id="preauth" class="col s12">
+                    <ul class='browser-default'>
+                        <li>Preauth Keys provide the capability to install tailscale using a pre-registered key (see the <code>--authkey</code> flag in the <a href="https://tailscale.com/kb/1080/cli/">tailscale command line documentation</a>)</li>
+                        <li>Preauth Keys are especially useful for deploying headscale as an always-on VPN (see the <a href="https://tailscale.com/kb/1189/install-windows-msi/">TS_UNATTENDEDMODE install option in the tailscale documentation</a>) or router-level VPN.</li>
+                        <li>Preauth Keys can be managed on the <a href="users">Users</a> page.</li>
+                    </ul>
+                </div>
+                <div id="oidc" class="col s12">
+                    <ul class='browser-default'>
+                        <li>OIDC provides the ability to register an external authentication provider (such as <a href="https://www.keycloak.org/">Keycloak</a> or <a href="https://www.authelia.com/">Authelia</a>) machines to headscale.</li>
+                        <li>Configure Headscale to register with an authentication provider by adding the OIDC configuration to your Headscale "config.yml" file described <a href="https://github.com/juanfont/headscale/blob/main/config-example.yaml">here</a>.</li>
+                    </ul>
+                </div>
+            </div>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="new_machine_modal_confirm" class="green btn-flat white-text" onclick="add_machine()">Add Machine</a>
+        <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </div>
+</div>
+<!-- FAB for adding new machines -->
+<div class="fixed-action-btn">
+    <a href="#new_machine_card_modal" 
+       onclick='load_modal_add_machine()' 
+       class="modal-trigger waves-effect waves-light btn-floating btn-large tooltipped {{ COLOR_BTN }}"
+       data-tooltip="Add a new machine to the Tailnet" data-position="left">
+        <i class="large material-icons">add</i>
+    </a>
+</div>
+        
+{% endblock %}

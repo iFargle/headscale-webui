@@ -1,0 +1,24 @@
+version: "3"
+services:
+  headscale-webui:
+    build:
+     context: /path/to/git/repo/root/headscale-webui/
+    container_name: headscale-webui
+    environment:
+      - TZ=UTC                                 # Timezone
+      - HS_SERVER=localhost                    # Set this to your Headscale server's URL.  It will need to access /api/ on Headscale.
+      - BASE_PATH="/admin"                     # Default, can be anything you want.  Tailscale's Windows app expects "HS_SERVER/admin"
+      - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32"
+    volumes:
+      - ./volume:/data                         # Headscale-WebUI's storage
+      - ./headscale/config/:/etc/headscale/:ro # Headscale's config storage location.  Used to read your Headscale config.
+    labels:
+      # Traefik Configs
+      - "traefik.enable=true"
+      - "traefik.http.routers.headscale-webui.entrypoints=web-secure"
+      - "traefik.http.routers.headscale-webui.rule=Host(`headscale.$DOMAIN`) && (PathPrefix(`/admin/`) || PathPrefix(`/admin`))"
+      - "traefik.http.services.headscale-webui.loadbalancer.server.port=5000"
+      - "traefik.http.routers.headscale-webui.tls.certresolver=letsencrypt"
+        # redirect /admin to /
+      - "traefik.http.middlewares.headscale-webui-stripprefix.stripprefix.forceslash=true"
+      - "traefik.http.middlewares.headscale-webui-stripprefix.stripprefix.prefixes=/admin/"

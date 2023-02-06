@@ -1,0 +1,52 @@
+{% extends 'template.html' %}
+{% set page = "Users" %}
+{% set users_active = "active" %}
+
+{% block title  %} {{ page }} {% endblock %}
+{% block header %} {{ page }} {% endblock %}
+
+{% block content %}
+<div class="row"><br>
+    {{ cards }}    
+</div>
+
+<!-- Modals -->
+<div id="card_modal" class="modal">
+    <div class="modal-content">
+        <h4 id="modal_title"></h4>
+        <p id="modal_content"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="modal_confirm" class="hide">Confirm</a>
+        <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </div>
+</div>
+
+<!-- Add new user modal -->
+<div id="new_user_card_modal" class="modal">
+    <div class="modal-content">
+        <h4 id="new_user_modal_title">Add a new User</h4>
+        <p id="new_user_modal_content">
+            <div class="col s12 m6">
+                <div class="input-field">
+                    <i class="material-icons prefix">language</i>
+                    <input id="add_user_name_field" type="text">
+                    <label for="add_user_name_field">User Name</label>
+                </div>
+            </div>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="new_user_modal_confirm" class="green btn-flat white-text" onclick="add_user()">Add User</a>
+        <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </div>
+</div>
+<!-- FAB for adding new users -->
+<div class="fixed-action-btn">
+    <a href="#new_user_card_modal" 
+       class="modal-trigger waves-effect waves-light btn-floating btn-large red tooltipped {{ COLOR_BTN }}"
+       data-tooltip="Add a new user to the Tailnet" data-position="left">
+        <i class="large material-icons">add</i>
+    </a>
+</div>
+{% endblock %}

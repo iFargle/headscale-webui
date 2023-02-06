@@ -1,0 +1,7 @@
+.collection .collection-item.avatar {
+    min-height: 0px;
+} 
+
+.collapsible span.badge {
+    margin-left: 5px;
+}

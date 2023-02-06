@@ -1,0 +1,10 @@
+{% extends 'template.html' %}
+{% set page = "Overview" %}
+{% set overview_active = "active" %}
+
+{% block title  %} {{ page }} {% endblock %}
+{% block header %} {{ page }} {% endblock %}
+
+{% block content %}
+    {{ render_page }}
+{% endblock %}
