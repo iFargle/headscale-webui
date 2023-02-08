@@ -8,11 +8,9 @@ pipeline {
                     additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
                 }
             }
-            stages {
-                stage("Test") {
-                    steps {
-                        sh 'cat /etc/hostname'
-                    }
+            stage("Test") {
+                steps {
+                    sh 'cat /etc/hostname'
                 }
             }
         }
