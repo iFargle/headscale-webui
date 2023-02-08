@@ -11,6 +11,8 @@ pipeline {
             steps {
                 sh 'cat /etc/os-release'
             }
+        }
+    }
     post {
         always {
             echo 'Finished'
