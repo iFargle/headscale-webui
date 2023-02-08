@@ -31,7 +31,7 @@ pipeline {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 script {
-                    docker.withRegistry('https://git.sysctl.io/', 'docker_registry') {
+                    docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                         dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                     }
                 }
