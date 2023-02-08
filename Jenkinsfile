@@ -2,11 +2,16 @@ pipeline {
     agent any
     stages {
         stage('Build - headscale-webui') {
-            steps {
-                agent {
-                    dockerfile {
-                        filename 'Dockerfile'
-                        additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+            agent {
+                dockerfile {
+                    filename 'Dockerfile'
+                    additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+                }
+            }
+            stages {
+                stag("Test") {
+                    steps {
+                        sh 'python --version'
                     }
                 }
             }
