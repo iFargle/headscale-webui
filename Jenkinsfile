@@ -3,7 +3,7 @@ def dockerImage
 def runArgs = '--entrypoint \'\''
 pipeline {
     agent {
-        label 'linux_x64'
+        label 'linux-x64'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
