@@ -1,48 +1,45 @@
+def dockerImage
+//jenkins needs entrypoint of the image to be empty
+def runArgs = '--entrypoint \'\''
 pipeline {
-    agent any
+    agent {
+        label 'linux_x64'
+    }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
+        timestamps()
+    }
     stages {
+        stage ('Environment') {
+            steps {
+                sh 'printenv'
+            }
+        }
         stage('Build') {
-            agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+            options { timeout(time: 30, unit: 'MINUTES') }
+            steps {
+                script {
+                    dockerImage = docker.build(":${env.BUILD_ID}",
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        + " --build-arg MY_ARG=myArg"
+                        + " ."
+                    )
                 }
             }
+        }
+        stage('Push to docker repository') {
+            when { branch 'master' }
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
-                sh 'cat /etc/os-release'
+                lock("${JOB_NAME}-Push") {
+                    script {
+                        docker.withRegistry('https://myrepo:5000', 'docker_registry') {
+                            dockerImage.push('latest')
+                        }
+                    }
+                    milestone 30
+                }
             }
-        }
-    }
-    post {
-        always {
-            echo 'Finished'
-        }
-        success {
-            echo "This will run only if successful"
-            /* Upload to Registry and tag with latest and build number */
-            
-            echo "Tagging successful build as ${env.BRANCH_NAME}-latest"
-            sh "docker image tag git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER} git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-latest"
-
-            echo "Uploading ${env.BRANCH_NAME}-${env.BUILD_NUMBER} to Forgejo Registry"
-            sh "docker image push git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-
-            echo "Uploading latest Jenkins ${env.BRANCH_NAME} build to Forgejo Registry:"
-            sh "docker image push git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-latest"
-
-            sh "docker image ls | grep headscale-webui"
-            deleteDir()
-
-        }
-        failure {
-            echo 'Cleaning up'
-            sh 'docker rmi --force $(docker images --quiet --filter=reference="git.sysctl.io/albert/headscale-webui")'
-            deleteDir()
-
-            echo 'This will run only if failed'
-            mail to:      'albert@sysctl.io',
-                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-                 body:    "Something is wrong with ${env.BUILD_URL}"
         }
     }
 }
