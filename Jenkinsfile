@@ -38,22 +38,24 @@ pipeline {
         }
         stage('Push') {
             options { timeout(time: 5, unit: 'MINUTES') }
-            script {
-                if (${env.BRANCH_NAME} == 'testing') { 
-                    steps {
-                        script {
-                            docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                                dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
+            steps {
+                script {
+                    if (${env.BRANCH_NAME} == 'testing') { 
+                        steps {
+                            script {
+                                docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                                    dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
+                                }
                             }
                         }
                     }
-                }
-                if (${env.BRANCH_NAME} == 'main') {
-                    options { timeout(time: 5, unit: 'MINUTES') }
-                    steps {
-                        script {
-                            docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                                dockerImage.push("latest")
+                    if (${env.BRANCH_NAME} == 'main') {
+                        options { timeout(time: 5, unit: 'MINUTES') }
+                        steps {
+                            script {
+                                docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                                    dockerImage.push("latest")
+                                }
                             }
                         }
                     }
