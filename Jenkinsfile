@@ -19,7 +19,7 @@ pipeline {
             options { timeout(time: 30, unit: 'MINUTES') }
             steps {
                 script {
-                    dockerImage = docker.build("headscale-webui:${env.BUILD_ID}",
+                    dockerImage = docker.build("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " --build-arg MY_ARG=myArg"
                         + " ."
@@ -28,13 +28,13 @@ pipeline {
             }
         }
         stage('Push to docker repository') {
-            when { branch 'master' }
+            when { branch 'testing' }
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 lock("${JOB_NAME}-Push") {
                     script {
-                        docker.withRegistry('https://myrepo:5000', 'docker_registry') {
-                            dockerImage.push('latest')
+                        docker.withRegistry('https://git.sysctl.io/', 'docker_registry') {
+                            dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                         }
                     }
                     milestone 30
