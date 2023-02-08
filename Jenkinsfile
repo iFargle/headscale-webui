@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     dockerImage.inside { 
-                        'cat /etc/hostname'
+                        sh 'cat /etc/hostname'
                     }
                 }
             }
