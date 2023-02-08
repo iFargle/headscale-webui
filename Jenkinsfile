@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages {
-        stage('Build - headscale-webui') {
+        stage('Build') {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
@@ -10,11 +10,6 @@ pipeline {
             }
             steps {
                 sh 'cat /etc/os-release'
-            }
-        }
-        stage("Test") {
-            steps {
-                sh 'cat /etc/hostname'
             }
         }
     }
