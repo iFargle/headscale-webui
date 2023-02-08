@@ -43,7 +43,7 @@ pipeline {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 script {
-                    if (env.BRANCH_NAME == '*-testing') { 
+                    if (env.BRANCH_NAME == *-'testing') { 
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                         }
