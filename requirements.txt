@@ -5,3 +5,4 @@ python-dateutil # Date / Time utility
 pytz            # Date / Time utility
 Flask-Executor  # Flask threading application
 pyyaml          # Used to read YAML files
+pyuwsgi         # Used to run the application
