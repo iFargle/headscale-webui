@@ -37,7 +37,7 @@ pipeline {
             }
         }
         stage('Push') {
-            if (branch 'testing') { 
+            if (${env.BRANCH_NAME} == 'testing') { 
                 options { timeout(time: 5, unit: 'MINUTES') }
                 steps {
                     script {
@@ -47,7 +47,7 @@ pipeline {
                     }
                 }
             }
-            if (branch 'main') {
+            if (${env.BRANCH_NAME} == 'main') {
                 options { timeout(time: 5, unit: 'MINUTES') }
                 steps {
                     script {
