@@ -30,7 +30,7 @@ pipeline {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
                 script {
-                    dockerImage.inside { 
+                    docker.image("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
                         sh 'hostname'
                     }
                 }
