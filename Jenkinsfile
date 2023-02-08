@@ -19,7 +19,7 @@ pipeline {
             options { timeout(time: 30, unit: 'MINUTES') }
             steps {
                 script {
-                    dockerImage = docker.build("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    dockerImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
