@@ -19,8 +19,6 @@ RUN pip install poetry && poetry config virtualenvs.in-project true
 WORKDIR ${WORKDIR}
 
 COPY --chown=1000:1000 . .
-
-# Install dependencies globally with poetry
 RUN poetry install --only main
 
 FROM python:3.11-alpine
