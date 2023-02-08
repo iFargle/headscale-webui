@@ -32,9 +32,10 @@ pipeline {
                 script {
                     docker.image("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
                         sh 'ls /app'
-                        sh 'ps aux'
+                        sh '. /app/.venv/bin/activate'
+                        sh 'exec $@'
                         sh 'apk add curl'
-                        sh 'curl 127.0.0.1:5000'
+                        sh 'curl localhost:5000'
                         sh 'apk del curl'
                     }
                 }
