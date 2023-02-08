@@ -36,9 +36,8 @@ pipeline {
                 }
             }
         }
-        stage('Push Testing') {
-            when { branch 'testing'}
-            if (branch == 'testing') { 
+        stage('Push') {
+            if (branch 'testing') { 
                 options { timeout(time: 5, unit: 'MINUTES') }
                 steps {
                     script {
@@ -48,7 +47,7 @@ pipeline {
                     }
                 }
             }
-            if (branch == 'main') {
+            if (branch 'main') {
                 options { timeout(time: 5, unit: 'MINUTES') }
                 steps {
                     script {
