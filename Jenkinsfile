@@ -31,7 +31,8 @@ pipeline {
             steps {
                 script {
                     docker.image("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
-                        sh 'hostname'
+                        sh 'ls /app'
+                        sh 'curl localhost:5000'
                     }
                 }
             }
@@ -40,7 +41,7 @@ pipeline {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'testing') { 
+                    if (env.BRANCH_NAME == '*-testing') { 
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                         }
