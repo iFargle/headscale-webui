@@ -11,10 +11,10 @@ pipeline {
             steps {
                 sh 'cat /etc/os-release'
             }
-            stage("Test") {
-                steps {
-                    sh 'cat /etc/hostname'
-                }
+        }
+        stage("Test") {
+            steps {
+                sh 'cat /etc/hostname'
             }
         }
     }
