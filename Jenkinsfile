@@ -37,8 +37,8 @@ pipeline {
             }
         }
         stage('Push') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             if (${env.BRANCH_NAME} == 'testing') { 
-                options { timeout(time: 5, unit: 'MINUTES') }
                 steps {
                     script {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
