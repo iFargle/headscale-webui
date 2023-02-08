@@ -23,16 +23,19 @@ pipeline {
             echo 'Finished'
         }
         success {
-            echo 'This will run only if successful'
+            echo "This will run only if successful"
             /* Upload to Registry and tag with latest and build number */
             
-            echo 'Tagging successful build as latest'
-            sh "docker image tag git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER} git.sysctl.io/albert/headscale-webui:latest"
+            echo "Tagging successful build as ${env.BRANCH_NAME}-latest"
+            sh "docker image tag git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER} git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-latest"
 
-            echo 'Uploading to Docker Registry:'
-            sh 'docker image push registry.sysctl.io/ifargle/feedbin-extract:latest'
+            echo "Uploading ${env.BRANCH_NAME}-${env.BUILD_NUMBER} to Forgejo Registry"
+            sh "docker image push git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
 
-            sh 'docker image ls | grep feedbin'
+            echo "Uploading latest Jenkins ${env.BRANCH_NAME} build to Forgejo Registry:"
+            sh "docker image push git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-latest"
+
+            sh "docker image ls | grep headscale-webui"
             deleteDir()
 
         }
