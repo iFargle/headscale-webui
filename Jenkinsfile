@@ -41,7 +41,7 @@ pipeline {
 
             echo 'This will run only if failed'
             mail to:      'albert@sysctl.io',
-                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName} - branch:  ${env.BRANCH_NAME}",
+                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
                  body:    "Something is wrong with ${env.BUILD_URL}"
         }
     }
