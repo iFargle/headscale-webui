@@ -1,6 +1,6 @@
 def dockerImage
 //jenkins needs entrypoint of the image to be empty
-def runArgs = '--entrypoint \'\''
+// def runArgs = '--entrypoint \'\''
 pipeline {
     agent {
         label 'linux-x64'
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     dockerImage.inside { 
-                        sh 'cat /etc/hostname'
+                        sh 'hostname'
                     }
                 }
             }
