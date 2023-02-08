@@ -26,6 +26,12 @@ pipeline {
                 }
             }
         }
+        stage('Test') {
+            options { timeout(time: 3, unit: 'MINUTES') }
+            steps {
+                dockerImage.inside('cat /etc/hostname')
+            }
+        }
         stage('Push') {
             when { branch 'testing' }
             options { timeout(time: 5, unit: 'MINUTES') }
