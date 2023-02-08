@@ -29,8 +29,10 @@ pipeline {
         stage('Test') {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
-                dockerImage.inside { 
-                    'cat /etc/hostname'
+                script {
+                    dockerImage.inside { 
+                        'cat /etc/hostname'
+                    }
                 }
             }
         }
