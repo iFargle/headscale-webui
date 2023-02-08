@@ -5,11 +5,8 @@ pipeline {
             agent {
                 dockerfile {
                     filename 'Dockerfile'
-                    additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BUILD_NUMBER}"
+                    additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
                 }
-            }
-            steps {
-                sh 'cat /etc/os-release'
             }
         }
     }
@@ -22,7 +19,7 @@ pipeline {
             /* Upload to Registry and tag with latest and build number */
             
             echo 'Tagging successful build as latest'
-            sh "docker image tag git.sysctl.io/albert/headscale-webui:jenkins-${env.BUILD_NUMBER} git.sysctl.io/albert/headscale-webui:latest"
+            sh "docker image tag git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER} git.sysctl.io/albert/headscale-webui:latest"
 
             echo 'Uploading to Docker Registry:'
             sh 'docker image push registry.sysctl.io/ifargle/feedbin-extract:latest'
@@ -38,7 +35,7 @@ pipeline {
 
             echo 'This will run only if failed'
             mail to:      'albert@sysctl.io',
-                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+                 subject: "Failed Pipeline: ${currentBuild.fullDisplayName} - headscale-webui branch:  ${env.BRANCH_NAME}",
                  body:    "Something is wrong with ${env.BUILD_URL}"
         }
     }
