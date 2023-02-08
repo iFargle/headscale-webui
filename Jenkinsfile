@@ -9,7 +9,7 @@ pipeline {
                 }
             }
             stages {
-                stag("Test") {
+                stage("Test") {
                     steps {
                         sh 'python --version'
                     }
