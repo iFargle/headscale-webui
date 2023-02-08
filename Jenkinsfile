@@ -26,7 +26,7 @@ pipeline {
                 }
             }
         }
-        stage('Push to docker repository') {
+        stage('Push') {
             when { branch 'testing' }
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
