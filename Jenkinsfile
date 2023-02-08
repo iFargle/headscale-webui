@@ -3,9 +3,11 @@ pipeline {
     stages {
         stage('Build - headscale-webui') {
             agent {
-                dockerfile {
-                    filename 'Dockerfile'
-                    additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+                steps{
+                    dockerfile {
+                        filename 'Dockerfile'
+                        additionalBuildArgs "-t git.sysctl.io/albert/headscale-webui:jenkins-${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+                    }
                 }
             }
         }
