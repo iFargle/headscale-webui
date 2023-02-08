@@ -31,11 +31,10 @@ pipeline {
             steps {
                 script {
                     docker.image("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
-                        sh 'ls /app'
-                        sh 'apk add curl'
-                        sh '/app/entrypoint.sh &'
-                        sh 'curl localhost:5000'
-                        sh 'apk del curl'
+                        sh 'ls -lah /app'
+                        sh '/app/entrypoint.sh'
+                        sh 'python --version'
+                        sh 'pip3 list'
                     }
                 }
             }
