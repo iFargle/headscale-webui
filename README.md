@@ -1,5 +1,5 @@
 # headscale-webui
-This is just a simple front-end for a Headscale server.  
+#### This is just a simple front-end for a Headscale server.  
 Allows you to do the following:
 1.  Enable/Disable routes and exit nodes
 2.  Add, move, rename, and remove machines
@@ -17,8 +17,7 @@ Allows you to do the following:
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
 
-Screenshots:
-
+# Screenshots:
 ![Machines](screenshots/machines.png)
 ![Users](screenshots/users.png)
 ![Add a new machine](screenshots/add-machine.png)
@@ -26,7 +25,7 @@ Screenshots:
 ![API Key Test](screenshots/settings.png)
 
 
-## Installation:
+# Installation:
 1.  This assumes you have traefik as your reverse proxy.  I'm sure it will work with others, but I don't have experience with any.
 2.  Change the following variables in docker-compose.yml:
     1.  TZ - Change to your timezone.  Example: Asia/Tokyo
@@ -40,7 +39,7 @@ Screenshots:
     1.  Example:  If Dockerfile is in /home/username/headscale-webui, your context will be:
         *      context: /home/username/headscale-webui/
 
-## Traefik
+# Traefik
 * This was built assuming the use of the Traefik reverse proxy.
 * Exmaple config:
 ```
