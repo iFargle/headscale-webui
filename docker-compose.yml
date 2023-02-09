@@ -1,10 +1,7 @@
 version: "3"
 services:
   headscale-webui:
-    build:
-     context: /path/to/git/repo/root/headscale-webui/
-    # Alternatively, you can use a prebuilt image:
-    # image: git.sysctl.io/albert/headscale-webui:latest
+    image: ghcr.io/ifargle/headscale-webui:latest
     container_name: headscale-webui
     environment:
       - TZ=UTC                                 # Timezone
