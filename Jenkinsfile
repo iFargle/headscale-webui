@@ -47,7 +47,7 @@ pipeline {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             dockerImage.push("latest")
                         }
-                        docker.withRegistry('https://ghcr.io/ifargle/', 'github-ifargle-pat') {
+                        docker.withRegistry('https://ghcr.io/', 'github-ifargle-pat') {
                             dockerImage.push("latest")
                         }
                     } else {
