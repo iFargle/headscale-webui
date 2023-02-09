@@ -18,11 +18,15 @@ Allows you to do the following:
     * Add and delete machine tags
 
 # Screenshots:
+Overview Page:
 ![Overview](screenshots/overview.png)
-![Machines](screenshots/machines.png)
+Users Page:
 ![Users](screenshots/users.png)
+New Machine Modal:
 ![Add a new machine](screenshots/add-machine.png)
+Machines Page:
 ![Machine Details](screenshots/machines.png)
+Settings Page showing an API Key Test:
 ![API Key Test](screenshots/settings.png)
 
 
