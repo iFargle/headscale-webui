@@ -30,7 +30,7 @@ pipeline {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
                 script {
-                    docker.image("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
+                    docker.image("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
                         sh 'ls -lah /app'
                         sh '/app/entrypoint.sh'
                         sh 'python --version'
