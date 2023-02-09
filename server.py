@@ -22,7 +22,7 @@ app.logger.setLevel(logging.DEBUG)
 COLOR_NAV   = "blue-grey darken-1"
 COLOR_BTN   = "blue-grey darken-3"
 BASE_PATH   = os.environ["BASE_PATH"]
-APP_VERSION = "2023-02-07.1"
+APP_VERSION = "0.1.0"
 HS_VERSION  = "0.20.0"
 DEBUG_STATE = False
 

@@ -1,7 +1,7 @@
 def forgejoImage
 def ghcrImage
-//jenkins needs entrypoint of the image to be empty
-// def runArgs = '--entrypoint \'\''
+def APP_VERSION = 0.1.0
+
 pipeline {
     agent {
         label 'linux-x64'
@@ -55,9 +55,11 @@ pipeline {
                     if (env.BRANCH_NAME == 'main') {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             forgejoImage.push("latest")
+                            forgejoImage.push(APP_VERSION)
                         }
                         docker.withRegistry('https://ghcr.io/', 'github-ifargle-pat') {
                             ghcrImage.push("latest")
+                            ghcrImage.push(APP_VERSION)
                         }
                     } else {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
