@@ -39,13 +39,11 @@ pipeline {
                         sh 'ls -lah /app'
                         sh '/app/entrypoint.sh'
                         sh 'python --version'
-                        sh 'pip3 list'
                     }
                     ghcrImage.inside { 
                         sh 'ls -lah /app'
                         sh '/app/entrypoint.sh'
                         sh 'python --version'
-                        sh 'pip3 list'
                     }
                 }
             }
