@@ -38,7 +38,7 @@ Allows you to do the following:
     2.  /etc/headscale/ - This is your Headscale configuration file.
 4.  Update the build context location to the directory with the Dockerfile.
     1.  Example:  If Dockerfile is in /home/username/headscale-webui, your context will be:
-        *      context: /home/username/headscale-webui/
+        * context: /home/username/headscale-webui/
 
 # Traefik
 * This was built assuming the use of the Traefik reverse proxy.
