@@ -921,7 +921,7 @@ function expire_preauth_key(user_name, key) {
         success: function(response) {
             if (response.status == "True") {
                 // Send the completion toast
-                M.toast({html: 'PreAuth key created in user '+user_name})
+                M.toast({html: 'PreAuth expired in '+user_name})
                 // If this is successfull, we should reload the table and close the modal:
                 var user_data = {"name": user_name}
                 $.ajax({
@@ -944,7 +944,7 @@ function expire_preauth_key(user_name, key) {
                 M.Tooltip.init(document.querySelectorAll('.tooltipped'))
 
             } else { 
-                load_modal_generic("error", "Error adding a pre-auth key", "Headscale response:  "+JSON.stringify(response.body.message))
+                load_modal_generic("error", "Error expiring a pre-auth key", "Headscale response:  "+JSON.stringify(response.body.message))
             }
         }
     })

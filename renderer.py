@@ -493,14 +493,14 @@ def build_preauth_key_table(user_name):
 
         tooltip_expired   = "Expiration:  "+expiration_time
 
-        btn_reusable      = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>" if key["reusable"] else ""
-        btn_ephemeral     = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>" if key["ephemeral"] else ""
-        btn_used          = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]   else ""
-        btn_usable        = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>" if key_usable     else ""
+        btn_reusable      = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
+        btn_ephemeral     = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
+        btn_used          = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
+        btn_usable        = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
 
         # Other buttons:
-        btn_delete        = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if not key_expired else ""
-        tooltip_data       = "Expiration:  "+expiration_time
+        btn_delete        = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
+        tooltip_data      = "Expiration:  "+expiration_time
 
         # TR ID will look like "1-albert-tr"
         preauth_keys_collection = preauth_keys_collection+"""
