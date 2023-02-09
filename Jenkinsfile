@@ -1,10 +1,11 @@
 def forgejoImage
 def ghcrImage
-def APP_VERSION = 0.1.0
-
 pipeline {
     agent {
         label 'linux-x64'
+    }
+    environment {
+        APP_VERSION = '0.1.0'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
