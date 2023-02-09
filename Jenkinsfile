@@ -1,4 +1,5 @@
-def dockerImage
+def forgejoImage
+def ghcrImage
 //jenkins needs entrypoint of the image to be empty
 // def runArgs = '--entrypoint \'\''
 pipeline {
@@ -19,12 +20,14 @@ pipeline {
             options { timeout(time: 30, unit: 'MINUTES') }
             steps {
                 script {
-                    dockerImage = docker.build("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    forgejoImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
-                    dockerImage.tag("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}")  // Forgejo
-                    dockerImage.tag("ghcr.io/iFargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}")       // GitHub
+                    ghcrImage = docker.build("iFargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        + " ."
+                    )
                 }
             }
         }
@@ -32,7 +35,13 @@ pipeline {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
                 script {
-                    docker.image("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}").inside { 
+                    forgejoImage.inside { 
+                        sh 'ls -lah /app'
+                        sh '/app/entrypoint.sh'
+                        sh 'python --version'
+                        sh 'pip3 list'
+                    }
+                    ghcrImage.inside { 
                         sh 'ls -lah /app'
                         sh '/app/entrypoint.sh'
                         sh 'python --version'
@@ -46,15 +55,15 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        docker.withRegistry('https://git.sysctl.io/albert/', 'gitea-jenkins-pat') {
-                            dockerImage.push("latest")
+                        docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                            forgejoImage.push("latest")
                         }
-                        docker.withRegistry('https://ghcr.io/iFargle/', 'github-ifargle-pat') {
-                            dockerImage.push("latest")
+                        docker.withRegistry('https://ghcr.io/', 'github-ifargle-pat') {
+                            ghcrImage.push("latest")
                         }
                     } else {
-                        docker.withRegistry('https://git.sysctl.io/albert/', 'gitea-jenkins-pat') {
-                            dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
+                        docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                            forgejoImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                         }
                     }
                 }
