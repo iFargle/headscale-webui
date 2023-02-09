@@ -24,7 +24,7 @@ pipeline {
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
-                    ghcrImage = docker.build("iFargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
