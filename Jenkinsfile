@@ -19,7 +19,7 @@ pipeline {
             options { timeout(time: 30, unit: 'MINUTES') }
             steps {
                 script {
-                    dockerImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    dockerImage = docker.build("headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
@@ -44,14 +44,14 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                        docker.withRegistry('https://git.sysctl.io/albert/', 'gitea-jenkins-pat') {
                             dockerImage.push("latest")
                         }
-                        docker.withRegistry('https://ghcr.io/', 'github-ifargle-pat') {
+                        docker.withRegistry('https://ghcr.io/iFargle/', 'github-ifargle-pat') {
                             dockerImage.push("latest")
                         }
                     } else {
-                        docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
+                        docker.withRegistry('https://git.sysctl.io/albert/', 'gitea-jenkins-pat') {
                             dockerImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                         }
                     }
