@@ -23,6 +23,8 @@ pipeline {
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
                         + " ."
                     )
+                    dockerImage.tag("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}")  # Forgejo
+                    dockerImage.tag("ghcr.io/iFargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}")       # GitHub
                 }
             }
         }
