@@ -18,6 +18,7 @@ Allows you to do the following:
     * Add and delete machine tags
 
 # Screenshots:
+![Overview](screenshots/overview.png)
 ![Machines](screenshots/machines.png)
 ![Users](screenshots/users.png)
 ![Add a new machine](screenshots/add-machine.png)
