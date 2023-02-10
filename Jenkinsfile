@@ -29,8 +29,8 @@ pipeline {
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
-                        + " --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
-                        + " --build-arg \"GIT_BRANCH=${env.BRANCH_NAME}\" "
+                        + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
+                        + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
                         + " ."
                     )
                 }
