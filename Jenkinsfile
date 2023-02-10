@@ -66,6 +66,7 @@ pipeline {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             forgejoImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                             forgejoImage.push("${env.BRANCH_NAME}")
+                            forgejoImage.push("testing")
                         }
                     }
                 }
