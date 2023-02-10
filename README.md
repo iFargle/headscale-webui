@@ -1,5 +1,5 @@
 # headscale-webui
-#### This is just a simple front-end for a Headscale server.  
+#### This is a simple front-end for a Headscale server.  
 Allows you to do the following:
 1.  Enable/Disable routes and exit nodes
 2.  Add, move, rename, and remove machines
