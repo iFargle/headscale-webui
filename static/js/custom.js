@@ -968,3 +968,9 @@ function toggle_expired() {
         }
     }
 }
+
+// Copy a PreAuth Key to the clipboard.  Show only the Prefix by default
+function copy_preauth_key(key) {
+    navigator.clipboard.writeText(key);
+    M.toast({html: 'PreAuth key copied to clipboard.'})
+}

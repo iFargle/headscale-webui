@@ -5,7 +5,7 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION = '0.1.0'
+        APP_VERSION = '0.2.0'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -65,6 +65,7 @@ pipeline {
                     } else {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             forgejoImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
+                            forgejoImage.push("${env.BRANCH_NAME}")
                         }
                     }
                 }

@@ -466,7 +466,7 @@ def build_preauth_key_table(user_name):
                     <thead>
                         <tr>
                             <td>ID</td>
-                            <td>Key</td>
+                            <td class='tooltipped' data-tooltip='Click an Auth Key Prefix to copy it to the clipboard'>Key Prefix</td>
                             <td><center>Reusable</center></td>
                             <td><center>Used</center></td>
                             <td><center>Ephemeral</center></td>
@@ -506,7 +506,7 @@ def build_preauth_key_table(user_name):
         preauth_keys_collection = preauth_keys_collection+"""
             <tr id='"""+key["id"]+"""-"""+user_name+"""-tr' class='"""+hide_expired+"""'>
                 <td>"""+str(key["id"])+"""</td>
-                <td class='tooltipped' data-tooltip='"""+tooltip_data+"""'>"""+str(key["key"])+"""</td>
+                <td  onclick=copy_preauth_key('"""+str(key["key"])+"""') class='tooltipped' data-tooltip='"""+tooltip_data+"""'>"""+str(key["key"])[0:10]+"""</td>
                 <td><center>"""+btn_reusable+"""</center></td>
                 <td><center>"""+btn_used+"""</center></td>
                 <td><center>"""+btn_ephemeral+"""</center></td>
