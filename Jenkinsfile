@@ -22,13 +22,11 @@ pipeline {
             steps {
                 script {
                     forgejoImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
-                        + "--build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                         + " ."
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
-                        + " --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                         + " ."
                     )
                 }
