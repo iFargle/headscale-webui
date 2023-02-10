@@ -505,7 +505,7 @@ def build_preauth_key_table(user_name):
         # TR ID will look like "1-albert-tr"
         preauth_keys_collection = preauth_keys_collection+"""
             <tr id='"""+key["id"]+"""-"""+user_name+"""-tr' class='"""+hide_expired+"""'>
-                <td>"""+str(key["id"])[0:10]+""" onclick=copy_preauth_key(""""+str(key["id"])+"""")</td>
+                <td>"""+str(key["id"])[0:10]+""" onclick=copy_preauth_key('"""+str(key["id"])+"""')</td>
                 <td class='tooltipped' data-tooltip='"""+tooltip_data+"""'>"""+str(key["key"])+"""</td>
                 <td><center>"""+btn_reusable+"""</center></td>
                 <td><center>"""+btn_used+"""</center></td>
