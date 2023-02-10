@@ -22,7 +22,7 @@ app.logger.setLevel(logging.DEBUG)
 COLOR_NAV   = "blue-grey darken-1"
 COLOR_BTN   = "blue-grey darken-3"
 BASE_PATH   = os.environ["BASE_PATH"]
-APP_VERSION = "v0.2.1"
+APP_VERSION = os.environ["APP_VERSION"]
 GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
