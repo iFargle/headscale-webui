@@ -5,7 +5,7 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION = '0.2.1'
+        APP_VERSION = 'v0.2.2'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -22,11 +22,17 @@ pipeline {
             steps {
                 script {
                     forgejoImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
+                        + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
+                        + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
                         + " ."
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\""
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
+                        + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
+                        + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
                         + " ."
                     )
                 }
@@ -66,6 +72,7 @@ pipeline {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
                             forgejoImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                             forgejoImage.push("${env.BRANCH_NAME}")
+                            forgejoImage.push("testing")
                         }
                     }
                 }
