@@ -21,7 +21,7 @@ app.logger.setLevel(logging.DEBUG)
 # Colors:  https://materializecss.com/color.html
 COLOR_NAV   = "blue-grey darken-1"
 COLOR_BTN   = "blue-grey darken-3"
-BASE_PATH   = eval(os.environ["BASE_PATH"])
+BASE_PATH   = os.environ["BASE_PATH"].replace('"', '')
 APP_VERSION = os.environ["APP_VERSION"]
 GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
