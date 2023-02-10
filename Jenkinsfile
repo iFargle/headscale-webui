@@ -5,7 +5,7 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION = '0.2.1'
+        APP_VERSION = 'v0.2.1'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -22,11 +22,15 @@ pipeline {
             steps {
                 script {
                     forgejoImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg \"GIT_BRANCH=${env.BRANCH_NAME}\" "
                         + " ."
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg \"GIT_COMMIT=${env.GIT_COMMIT}\" "
+                        + " --build-arg \"GIT_BRANCH=${env.BRANCH_NAME}\" "
                         + " ."
                     )
                 }

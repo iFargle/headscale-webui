@@ -22,9 +22,9 @@ app.logger.setLevel(logging.DEBUG)
 COLOR_NAV   = "blue-grey darken-1"
 COLOR_BTN   = "blue-grey darken-3"
 BASE_PATH   = os.environ["BASE_PATH"]
-APP_VERSION = "0.2.1"
+APP_VERSION = "v0.2.1"
 GIT_COMMIT  = os.environ["GIT_COMMIT"]
-HS_VERSION  = "0.20.0"
+HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 
 @app.route('/')
