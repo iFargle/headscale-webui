@@ -24,6 +24,7 @@ COLOR_BTN   = "blue-grey darken-3"
 BASE_PATH   = os.environ["BASE_PATH"]
 APP_VERSION = "v0.2.1"
 GIT_COMMIT  = os.environ["GIT_COMMIT"]
+GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 
@@ -76,7 +77,9 @@ def settings_page():
                             COLOR_NAV    = COLOR_NAV,
                             COLOR_BTN    = COLOR_BTN,
                             HS_VERSION   = HS_VERSION,
-                            APP_VERSION  = APP_VERSION
+                            APP_VERSION  = APP_VERSION,
+                            GIT_COMMIT   = GIT_COMMIT,
+                            GIT_BRANCH   = GIT_BRANCH
                             )
 
 ########################################################################################
