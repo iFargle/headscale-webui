@@ -485,7 +485,7 @@ def build_preauth_key_table(user_name):
         expiration_time  = str(expiration_parse.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
 
         # Class for the javascript function to look for to toggle the hide function
-        hide_expired = "expired-row" if key_expired else ""
+        hide_expired = "expired-row" if not key_usable else ""
 
         key_usable = False
         if key["reusable"] and not key_expired: key_usable = True
