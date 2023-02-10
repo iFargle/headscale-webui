@@ -37,6 +37,8 @@ ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV BASE_PATH="http://127.0.0.1/"
+
+# Put Git commit info into the app
 ARG GIT_COMMIT_ARG=""
 ARG GIT_BRANCH_ARG=""
 ENV GIT_COMMIT=$GIT_COMMIT_ARG

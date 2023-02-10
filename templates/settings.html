@@ -32,12 +32,17 @@
       <div class="card hoverable">
         <div class="card-content">
           <span class="card-title">About</span>
-            <p>Developed with Flask, Python, MaterializeCSS, and jQuery.</p>
-            <p>Version: {{ APP_VERSION }}</p>
-            <p>Commit:  {{ GIT_COMMIT }}</p>
-            <p>Branch:  {{ GIT_BRANCH }}</p>
-            <p>Tested on Headscale {{ HS_VERSION }}</p>
-            <p>Repository: <a href="https://github.com/iFargle/headscale-webui">Github</a>.</p>
+          <table class="striped">
+            <tbody>
+              <tr>
+                <td>Compatible with</td><td>Headscale {{ HS_VERSION }}</td>
+                <td>App Version</td><td>{{ APP_VERSION }}</td>
+                <td>Git Commit</td><td>{{ GIT_COMMIT }}</td>
+                <td>Git Branch</td><td>{{ GIT_BRANCH }}</td>
+                <td>Source Code</td><td><a href="https://github.com/iFargle/headscale-webui">Github</a></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
