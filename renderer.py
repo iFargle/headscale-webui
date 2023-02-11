@@ -103,6 +103,7 @@ def render_overview():
     """
 
     #     Whether OIDC is configured
+    oidc_content = ""
     if "oidc" in config_yaml:
         oidc_content  = """
             <div class="col s12 m6">
