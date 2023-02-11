@@ -103,7 +103,7 @@ def render_overview():
     """
 
     #     Whether OIDC is configured
-    if config_yaml["oidc"] != NULL:
+    if "oidc" in config_yaml:
         oidc_content  = """
             <div class="col s12 m6">
                 <div class="card hoverable">
