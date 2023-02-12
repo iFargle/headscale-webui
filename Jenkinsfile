@@ -6,6 +6,7 @@ pipeline {
     }
     environment {
         APP_VERSION = 'v0.2.4'
+        BUILD_DATE = ''
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -15,6 +16,7 @@ pipeline {
         stage ('Environment') {
             steps {
                 sh 'printenv'
+                script { BUILD_DATE = java.time.LocalDate.now() }
             }
         }
         stage('Build') {
@@ -26,6 +28,7 @@ pipeline {
                         + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
                         + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
+                        + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
                         + " ."
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
@@ -33,6 +36,7 @@ pipeline {
                         + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
                         + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
+                        + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
                         + " ."
                     )
                 }

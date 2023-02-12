@@ -22,6 +22,7 @@ app.logger.setLevel(logging.DEBUG)
 COLOR_NAV   = "blue-grey darken-1"
 COLOR_BTN   = "blue-grey darken-3"
 BASE_PATH   = os.environ["BASE_PATH"].replace('"', '')
+BUILD_DATE  = os.environ["BUILD_DATE"]
 APP_VERSION = os.environ["APP_VERSION"]
 GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
@@ -79,7 +80,8 @@ def settings_page():
                             HS_VERSION   = HS_VERSION,
                             APP_VERSION  = APP_VERSION,
                             GIT_COMMIT   = GIT_COMMIT,
-                            GIT_BRANCH   = GIT_BRANCH
+                            GIT_BRANCH   = GIT_BRANCH,
+                            BUILD_DATE   = BUILD_DATE
                             )
 
 ########################################################################################
