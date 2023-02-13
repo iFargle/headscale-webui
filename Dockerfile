@@ -10,11 +10,7 @@ ENV PYTHONUNBUFFERED=1
 # Don't create `.pyc` files:
 ENV PYTHONDONTWRITEBYTECODE=1
 
-
-
 RUN pip install poetry && poetry config virtualenvs.in-project true
-
-
 
 WORKDIR ${WORKDIR}
 
@@ -30,7 +26,6 @@ RUN adduser app -DHh ${WORKDIR} -u 1000
 USER 1000
 
 COPY --chown=app:app --from=builder ${WORKDIR} .
-
 
 ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
