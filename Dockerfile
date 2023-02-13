@@ -24,7 +24,6 @@ RUN poetry install --only main
 FROM python:3.11-alpine
 
 ARG WORKDIR
-
 WORKDIR ${WORKDIR}
 
 RUN adduser app -DHh ${WORKDIR} -u 1000
@@ -49,13 +48,9 @@ ENV GIT_BRANCH=$GIT_BRANCH_ARG
 ENV APP_VERSION=$APP_VERSION_ARG
 ENV BUILD_DATE=$BUILD_DATE_ARG
 
-
-
 VOLUME /headscale
 VOLUME /data
 
 EXPOSE 5000/tcp
-
 ENTRYPOINT ["/app/entrypoint.sh"]
-
 CMD gunicorn -w 4 -b 0.0.0.0:5000 server:app
