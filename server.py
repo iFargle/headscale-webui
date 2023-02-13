@@ -7,7 +7,6 @@ from dateutil import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
 
-
 # Global vars
 # Colors:  https://materializecss.com/color.html
 COLOR_NAV   = "blue-grey darken-1"
@@ -19,7 +18,6 @@ GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
-
 
 static_url_path = '/static'
 if BASE_PATH != '':
@@ -35,8 +33,8 @@ handler.setFormatter(logging.Formatter(
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
-logger.debug("Static assets served on:  "+static_url_path)
-logger.debug("BASE_PATH:  "+BASE_PATH)
+app.logger.debug("Static assets served on:  "+static_url_path)
+app.logger.debug("BASE_PATH:  "+BASE_PATH)
 
 @app.route('/')
 @app.route(BASE_PATH+'/')
