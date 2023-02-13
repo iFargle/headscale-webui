@@ -36,6 +36,10 @@ app.logger.setLevel(logging.DEBUG)
 app.logger.debug("Static assets served on:  "+static_url_path)
 app.logger.debug("BASE_PATH:  "+BASE_PATH)
 
+########################################################################################
+# / pages - User-facing pages
+########################################################################################
+
 @app.route('/')
 @app.route(BASE_PATH+'/')
 @app.route('/overview')
