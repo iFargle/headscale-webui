@@ -140,7 +140,7 @@ def startup_checks():
         if os.access('/data/key.txt', os.W_OK): file_writable = True
         else: checks_passed = False
 
-    if checks_passed: return True
+    if checks_passed: return "Pass"
 
     messageHTML = ""
     # Generate the message:
