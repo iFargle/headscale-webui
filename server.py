@@ -111,6 +111,9 @@ def settings_page():
 @app.route(BASE_PATH+'/error')
 @app.route('/error')
 def error_page():
+    if helper.startup_checks() == "Pass": 
+        return redirect(BASE_PATH+url_for('overview_page'))
+
     return render_template('error.html', 
         ERROR_MESSAGE = Markup(helper.startup_checks())
     )
