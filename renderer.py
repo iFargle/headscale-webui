@@ -7,10 +7,11 @@ from dateutil import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
 
+log = logging.getLogger('server.renderer')
+
 app = Flask(__name__)
 executor = Executor(app)
 
-log = logging.getLogger('server.renderer')
 
 def render_overview():
     url           = headscale.get_url()

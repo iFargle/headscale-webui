@@ -4,13 +4,14 @@ from cryptography.fernet import Fernet
 from datetime            import datetime, timedelta, date
 from dateutil            import parser
 
+log = logging.getLogger('server.headscale')
+
 # log = logging.getLogger('server.headscale')
 # handler = logging.StreamHandler(sys.stderr)
 # handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
 # log.addHandler(handler)
 # log.setLevel(logging.INFO)
 
-log = logging.getLogger('server.headscale')
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS

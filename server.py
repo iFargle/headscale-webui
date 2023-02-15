@@ -7,6 +7,8 @@ from dateutil import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
 
+log = logging.getLogger('server.server')
+
 # Global vars
 # Colors:  https://materializecss.com/color.html
 COLOR_NAV   = "blue-grey darken-1"
