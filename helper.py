@@ -132,12 +132,17 @@ def startup_checks():
     
     # Check 2:  See if /data/ is writable:
     writable = False
-    key_file = open("/data/key.txt", "a")
-    if key_file.writable():  
-        writable = True
-    else:
+    python_error = ""
+    try:
+        key_file = open("/data/key.txt", "a")
+        if key_file.writable():  
+            writable = True
+        else: 
+            writable = False
+    except exception as e:
         writable = False
         checks_passed = False
+        python_error = e
 
     if checks_passed: return "Pass"
 
@@ -154,7 +159,7 @@ def startup_checks():
         message = """
         <p>/data/key.txt is not writable.  Please ensure your 
         permissions are correct. /data mount should be writable 
-        by UID/GID 1000:1000</p>
+        by UID/GID 1000:1000. Error:  """+str(python_error)+"""</p>
         """
         messageHTML += format_error_message("Error", "/data not writable", message)
     return messageHTML
