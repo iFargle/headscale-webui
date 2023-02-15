@@ -134,13 +134,17 @@ def startup_checks():
     if os.access('/data/', os.W_OK): data_writable = True
     else: checks_passed = False
 
-    # Check 4/5:  See if /data/key.txt is rw:
+    # Check 4/5:  See if /data/key.txt exists and is rw:
     file_readable = False
     file_writable = False
-    if os.access('/data/key.txt', os.R_OK): file_readable = True
-    else: checks_passed = False
-    if os.access('/data/key.txt', os.W_OK): file_writable = True
-    else: checks_passed = False
+    file_exists   = False
+    if os.access('/data/key.txt', os.F_OK): 
+        file_exists: True
+        if os.access('/data/key.txt', os.R_OK): file_readable = True
+        else: checks_passed = False
+        if os.access('/data/key.txt', os.W_OK): file_writable = True
+        else: checks_passed = False
+    else 
 
     if checks_passed: return "Pass"
 
@@ -170,20 +174,22 @@ def startup_checks():
         """
 
         messageHTML += format_error_message("Error", "/data not readable", message)
-    if not file_writable:
-        message = """
-        <p>/data/key.txt is not writable.  Please ensure your 
-        permissions are correct. /data mount should be writable 
-        by UID/GID 1000:1000.</p>
-        """
 
-        messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
-    if not file_readable:
-        message = """
-        <p>/data/key.txt is not readable.  Please ensure your 
-        permissions are correct. /data mount should be readable 
-        by UID/GID 1000:1000.</p>
-        """
+    if file_exists:
+        if not file_writable:
+            message = """
+            <p>/data/key.txt is not writable.  Please ensure your 
+            permissions are correct. /data mount should be writable 
+            by UID/GID 1000:1000.</p>
+            """
 
-        messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
+            messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
+        if not file_readable:
+            message = """
+            <p>/data/key.txt is not readable.  Please ensure your 
+            permissions are correct. /data mount should be readable 
+            by UID/GID 1000:1000.</p>
+            """
+
+            messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
     return messageHTML
