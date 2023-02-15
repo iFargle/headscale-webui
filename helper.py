@@ -117,7 +117,6 @@ def startup_checks():
 
     # Return an error message if things fail. 
     # Return a formatted error message for EACH fail.
-    # Otherwise, return "Pass"
     checks_passed = True
 
     # Check 1:  See if the Headscale server is reachable:
@@ -134,7 +133,7 @@ def startup_checks():
     if os.access('/data/', os.W_OK): data_writable = True
     else: checks_passed = False
 
-    # Check 4/5:  See if /data/key.txt exists and is rw:
+    # Check 4/5/6:  See if /data/key.txt exists and is rw:
     file_readable = False
     file_writable = False
     file_exists   = False
@@ -145,7 +144,7 @@ def startup_checks():
         if os.access('/data/key.txt', os.W_OK): file_writable = True
         else: checks_passed = False
 
-    if checks_passed: return "Pass"
+    if checks_passed: return True
 
     messageHTML = ""
     # Generate the message:
@@ -159,7 +158,7 @@ def startup_checks():
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
     if not data_writable:
         message = """
-        <p>/data/ is not writable.  Please ensure your 
+        <p>/data is not writable.  Please ensure your 
         permissions are correct. /data mount should be writable 
         by UID/GID 1000:1000.</p>
         """
@@ -167,14 +166,14 @@ def startup_checks():
         messageHTML += format_error_message("Error", "/data not writable", message)
     if not data_readable:
         message = """
-        <p>/data/ is not readable.  Please ensure your 
+        <p>/data is not readable.  Please ensure your 
         permissions are correct. /data mount should be readable 
         by UID/GID 1000:1000.</p>
         """
 
         messageHTML += format_error_message("Error", "/data not readable", message)
 
-    if file_exists:
+    if file_exists: # If it doesn't exist, we assume the user hasn't created it yet.  Just redirect to the settings page to enter an API Key
         if not file_writable:
             message = """
             <p>/data/key.txt is not writable.  Please ensure your 
