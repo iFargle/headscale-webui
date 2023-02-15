@@ -153,7 +153,7 @@ def startup_checks():
     file_exists   = False
     if os.access('/data/key.txt', os.F_OK): 
         file_exists = True
-        if os.access('/data/key.txt', os.R_OK): chmod
+        if os.access('/data/key.txt', os.R_OK):
             file_readable = True
         else:
             app.logger.error("/data/key.txt READ: FAILED")
