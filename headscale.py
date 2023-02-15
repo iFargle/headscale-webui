@@ -1,17 +1,12 @@
-import requests, json, os, logging, sys
+import requests, json, os, sys
 from os.path             import exists
 from cryptography.fernet import Fernet
 from datetime            import datetime, timedelta, date
 from dateutil            import parser
+from flask               import Flask
 
-log = logging.getLogger('server.headscale')
-
-# log = logging.getLogger('server.headscale')
-# handler = logging.StreamHandler(sys.stderr)
-# handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
-# log.addHandler(handler)
-# log.setLevel(logging.INFO)
-
+app = Flask(__name__)
+executor = Executor(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
@@ -52,7 +47,7 @@ def test_api_key(url, api_key):
 def expire_key(url, api_key):
         payload = {'prefix':str(api_key[0:10])}
         json_payload=json.dumps(payload)
-#       log.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+#       app.logge.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
         response = requests.post(
             str(url)+"/api/v1/apikey/expire",
@@ -84,10 +79,10 @@ def renew_api_key(url, api_key):
 
     # If the delta is less than 5 days, renew the key:
     if delta < timedelta(days=5):
-#       log.warning("Key is about to expire.  Delta is "+str(delta))
+#       app.logge.warning("Key is about to expire.  Delta is "+str(delta))
         payload = {'expiration':str(new_expiration_date)}
         json_payload=json.dumps(payload)
-#       log.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+#       app.logge.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
         response = requests.post(
             str(url)+"/api/v1/apikey",
@@ -99,17 +94,17 @@ def renew_api_key(url, api_key):
                 }
         )
         new_key = response.json()
-#       log.warning("JSON:  "+json.dumps(new_key))
-#       log.warning("New Key is:  "+new_key["apiKey"])
+#       app.logge.warning("JSON:  "+json.dumps(new_key))
+#       app.logge.warning("New Key is:  "+new_key["apiKey"])
         api_key_test = test_api_key(url, new_key["apiKey"])
-#       log.warning("Testing the key:  "+str(api_key_test))
+#       app.logge.warning("Testing the key:  "+str(api_key_test))
         # Test if the new key works:
         if api_key_test == 200:
-#           log.warning("The new key is valid and we are writing it to the file")
+#           app.logge.warning("The new key is valid and we are writing it to the file")
             if not set_api_key(new_key["apiKey"]):
-#               log.warning("We failed writing the new key!")
+#               app.logge.warning("We failed writing the new key!")
                 return False # Key write failed
-#           log.warning("Key validated and written.  Moving to expire the key.")
+#           app.logge.warning("Key validated and written.  Moving to expire the key.")
             expire_key(url, api_key)
             return True     # Key updated and validated
         else: return False  # The API Key test failed
@@ -192,10 +187,10 @@ def update_route(url, api_key, route_id, current_state):
     if current_state == "False": action = "enable"
 
     # Debug
-    #log.info("URL:  "+str(url))
-    #log.info("Route ID:  "+str(route_id))
-    #log.info("Current State:  "+str(current_state))
-    #log.info("Action to take:  "+str(action))
+    #app.logger.info("URL:  "+str(url))
+    #app.logger.info("Route ID:  "+str(route_id))
+    #app.logger.info("Current State:  "+str(current_state))
+    #app.logger.info("Action to take:  "+str(action))
 
     response = requests.post(
         str(url)+"/api/v1/routes/"+str(route_id)+"/"+str(action),
@@ -395,6 +390,6 @@ def expire_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
-    # log.info("expire_preauth_key - Return:  "+str(response.json()))
-    # log.info("expire_preauth_key - Status:  "+str(status))
+    # app.logger.info("expire_preauth_key - Return:  "+str(response.json()))
+    # app.logger.info("expire_preauth_key - Status:  "+str(status))
     return {"status": status, "body": response.json()}

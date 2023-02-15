@@ -1,4 +1,4 @@
-import headscale, helper, json, logging, sys, pytz, os, time, yaml
+import headscale, helper, json, sys, pytz, os, time, yaml
 from flask    import Markup, render_template, Flask
 from datetime import datetime, timedelta, date
 from dateutil import parser
@@ -6,8 +6,6 @@ from dateutil import parser
 # Threading to speed things up
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
-
-log = logging.getLogger('server.renderer')
 
 app = Flask(__name__)
 executor = Executor(app)

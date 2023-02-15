@@ -1,14 +1,10 @@
-import logging, sys, pytz, os, headscale, requests
-from datetime            import datetime, timedelta, date
-from dateutil            import parser
+import sys, pytz, os, headscale, requests
+from datetime import datetime, timedelta, date
+from dateutil import parser
+from flask    import Flask
 
-log = logging.getLogger('server.helper')
-
-# log = logging.getLogger('server.helper')
-# handler = logging.StreamHandler(sys.stderr)
-# handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
-# log.addHandler(handler)
-# log.setLevel(logging.INFO)
+app = Flask(__name__)
+executor = Executor(app)
 
 def pretty_print_duration(duration):
     days, seconds = duration.days, duration.seconds
@@ -150,6 +146,7 @@ def startup_checks():
     messageHTML = ""
     # Generate the message:
     if not server_reachable:
+        app.logger.error("Server is unreachable")
         message = """
         <p>Your headscale server is either unreachable or not properly configured.  
         Please ensure your configuration is correct (Check for 200 status on 
@@ -158,6 +155,7 @@ def startup_checks():
 
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
     if not data_writable:
+        app.logger.error("/data folder is not writable")
         message = """
         <p>/data is not writable.  Please ensure your 
         permissions are correct. /data mount should be writable 
@@ -166,6 +164,7 @@ def startup_checks():
 
         messageHTML += format_error_message("Error", "/data not writable", message)
     if not data_readable:
+        app.logge.error("/data folder is not readable")
         message = """
         <p>/data is not readable.  Please ensure your 
         permissions are correct. /data mount should be readable 
@@ -176,6 +175,7 @@ def startup_checks():
 
     if file_exists: # If it doesn't exist, we assume the user hasn't created it yet.  Just redirect to the settings page to enter an API Key
         if not file_writable:
+            app.logger.error("/data/key.txt is not writable")
             message = """
             <p>/data/key.txt is not writable.  Please ensure your 
             permissions are correct. /data mount should be writable 
@@ -184,6 +184,7 @@ def startup_checks():
 
             messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
         if not file_readable:
+            app.logger.info("/data/key.txt is not readable")
             message = """
             <p>/data/key.txt is not readable.  Please ensure your 
             permissions are correct. /data mount should be readable 
