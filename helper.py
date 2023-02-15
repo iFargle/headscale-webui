@@ -122,13 +122,7 @@ def startup_checks():
 
     # Check 1:  See if the Headscale server is reachable:
     reachable = False
-    response = requests.delete(
-        str(url)+"/api/v1/",
-        headers={
-            'Accept': 'application/json',
-            'Authorization': 'Bearer '+str(api_key)
-        }
-    )
+    response = requests.get(str(url)+"/api/v1/")
     if response.status_code == 200:
         reachable = True
     else:
