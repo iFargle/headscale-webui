@@ -126,7 +126,7 @@ def render_overview():
 
     derp_content = ""
     if "derp" in config_yaml:
-        if "server" in config_yaml['derp"]:
+        if "server" in config_yaml["derp"]:
             derp_content  = """
                 <div class="col s12 m6">
                     <div class="card hoverable">
@@ -152,7 +152,7 @@ def render_overview():
     #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
-    if config_yaml["dns_config"]:
+    if "dns_config" in config_yaml:
         dns_content  = """
             <div class="col s12 m6">
                 <div class="card hoverable">
