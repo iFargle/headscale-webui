@@ -20,6 +20,10 @@ def render_overview():
     
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
+    config_file = ""
+    except:  config_file = open("/etc/headscale/config.yml",  "r")
+    try:     config_file = open("/etc/headscale/config.yaml", "r")
+
     config_file = open("/etc/headscale/config.yaml", "r")
     config_yaml = yaml.safe_load(config_file)
 
@@ -123,26 +127,29 @@ def render_overview():
             </div>
         """
 
-    if config_yaml["derp"]["server"]:
-        derp_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
-                    <div class="card-content">
-                        <span class="card-title">Built-in DERP</span>
-                        <p>
-                            <table>
-                                <tr><td> Enabled      </td><td> """+str(config_yaml["derp"]["server"]["enabled"])          +""" </td></tr>
-                                <tr><td> Region ID    </td><td> """+str(config_yaml["derp"]["server"]["region_id"])        +""" </td></tr>
-                                <tr><td> Region Code  </td><td> """+str(config_yaml["derp"]["server"]["region_code"])      +""" </td></tr>
-                                <tr><td> Region Name  </td><td> """+str(config_yaml["derp"]["server"]["region_name"])      +""" </td></tr>
-                                <tr><td> STUN Address </td><td> """+str(config_yaml["derp"]["server"]["stun_listen_addr"]) +""" </td></tr>
-                            </table>
-                        </p>
+    derp_content = ""
+    if "derp" in config_yaml:
+        if "server" in config_yaml['derp"]:
+            derp_content  = """
+                <div class="col s12 m6">
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title">Built-in DERP</span>
+                            <p>
+                                <table>
+                                    <tr><td> Enabled      </td><td> """+str(config_yaml["derp"]["server"]["enabled"])          +""" </td></tr>
+                                    <tr><td> Region ID    </td><td> """+str(config_yaml["derp"]["server"]["region_id"])        +""" </td></tr>
+                                    <tr><td> Region Code  </td><td> """+str(config_yaml["derp"]["server"]["region_code"])      +""" </td></tr>
+                                    <tr><td> Region Name  </td><td> """+str(config_yaml["derp"]["server"]["region_name"])      +""" </td></tr>
+                                    <tr><td> STUN Address </td><td> """+str(config_yaml["derp"]["server"]["stun_listen_addr"]) +""" </td></tr>
+                                </table>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        """
+            """
 
+    # TODO:  
     #     Whether there are custom DERP servers
     #         If there are custom DERP servers, get the file location from the config file.  Assume mapping is the same.
     #     Whether the built-in DERP server is enabled 
@@ -196,21 +203,6 @@ def thread_machine_content(machine, machine_content, idx):
     pulled_routes = headscale.get_machine_routes(url, api_key, machine["id"])
     routes = ""
 
-# New format to parse:
-# New JSON endpoint requires a machine_id and a route_id to toggle.
-# Pass the following info:
-#  1.  Machine ID
-#  2.  Route ID (NEW REQ)
-#  3.  Route State (NEW REQ) - This would be the JSON key of pulled_routes["routes"][index][enabled]
-# {
-#   "routes": [
-#     { <INDEX>
-#       "id": "1",
-#       "prefix": "0.0.0.0/0",
-#       "advertised": true,
-#       "enabled": true,
-#     },
-
     # Test if the machine is an exit node:
     exit_node = False
     # If the LENGTH of "routes" is NULL/0, there are no routes, enabled or disabled:
@@ -250,38 +242,6 @@ def thread_machine_content(machine, machine_content, idx):
                 </p>
                 """
             routes = routes+"</div></p></li>"
-# This entire thing will probably need to change after the new API endpoint change.
-# Old code for v1.17.0
-#    # Test if the machine is an exit node:
-#    exit_node = False
-#    # If there are ANY advertised routes, print them:
-#    if len(pulled_routes["routes"]["advertisedRoutes"]) > 0:
-#        routes = """
-#            <li class="collection-item avatar">
-#                <i class="material-icons circle">directions</i>
-#                <span class="title">Routes</span>
-#                <p><div>
-#        """
-#        for advertised_route in pulled_routes["routes"]["advertisedRoutes"]:
-#            # Check if the route has been enabled.  Red for False, Green for True 
-#            route_enabled = "red"
-#            route_tooltip = 'enable'
-#            for enabled_route in pulled_routes["routes"]["enabledRoutes"]:
-#                if advertised_route == enabled_route: 
-#                    route_enabled = "green"
-#                    route_tooltip = 'disable'
-#            if (advertised_route == "0.0.0.0/0" or advertised_route == "::/0") and route_enabled == "green": 
-#                exit_node = True
-#            routes = routes+"""
-#            <p 
-#                class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
-#                data-position='top' data-tooltip='Click to """+route_tooltip+"""'
-#                id='"""+machine['id']+"""-"""+advertised_route+"""'
-#                onclick="toggle_route("""+machine['id']+""", '"""+advertised_route+"""')">
-#                """+advertised_route+"""
-#            </p>
-#            """
-#        routes = routes+"</div></p></li>"
 
     # Get machine tags
     tag_array = ""

@@ -140,6 +140,11 @@ def startup_checks():
         if os.access('/data/key.txt', os.W_OK): file_writable = True
         else: checks_passed = False
 
+    # Check 7:  See if /etc/headscale/config.yaml is readable:
+    config_readable = False
+    if os.access('/etc/headscale/config.yaml', os.R_OK): config_readable = True
+    if os.access('/etc/headscale/config.yml', os.R_OK): config_readable  = True
+
     if checks_passed: return "Pass"
 
     messageHTML = ""
@@ -153,6 +158,17 @@ def startup_checks():
         """
 
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
+
+    if not config_readable:
+        app.logger.error("Headscale configuration is not readable")
+        message = """
+        <p>/etc/headscale/config.yaml not readable.  Please ensure your 
+        headscale configuration file resides in /etc/headscale and 
+        is named "config.yaml" or "config.yml"</p>
+        """
+
+        messageHTML += format_error_message("Error", "/etc/headscale/config.yaml not readable", message)
+
     if not data_writable:
         app.logger.error("/data folder is not writable")
         message = """
@@ -163,7 +179,7 @@ def startup_checks():
 
         messageHTML += format_error_message("Error", "/data not writable", message)
     if not data_readable:
-        app.logge.error("/data folder is not readable")
+        app.logger.error("/data folder is not readable")
         message = """
         <p>/data is not readable.  Please ensure your 
         permissions are correct. /data mount should be readable 
@@ -183,7 +199,7 @@ def startup_checks():
 
             messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
         if not file_readable:
-            app.logger.info("/data/key.txt is not readable")
+            app.logger.error("/data/key.txt is not readable")
             message = """
             <p>/data/key.txt is not readable.  Please ensure your 
             permissions are correct. /data mount should be readable 
