@@ -133,7 +133,8 @@ def startup_checks():
     # Check 2:  See if /data/ is writable:
     writable = False
     try:
-        key_file = open("/data/key.txt", "wb+")
+        with open("/data/key.txt", "wb+") as key_file:
+            key_file.close()
         writable = True
     except PermissionError:
         writable = False
