@@ -38,7 +38,9 @@ app.logger.warning("BASE_PATH:  "+BASE_PATH)
 @app.route(BASE_PATH+'/overview')
 def overview_page():
     # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    if helper.startup_checks() != "Pass": 
+        app.logger.debug("Why does this fail? Return value:  "+helper.startup_checks())
+        return redirect(BASE_PATH+url_for('error_page'))
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
 

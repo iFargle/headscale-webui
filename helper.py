@@ -156,11 +156,14 @@ def startup_checks():
     if os.access('/etc/headscale/config.yaml', os.R_OK): 
         app.logger.warning("/etc/headscale/config.yaml: READ: PASS")
         config_readable = True
-    if os.access('/etc/headscale/config.yml', os.R_OK): 
+    elif os.access('/etc/headscale/config.yml', os.R_OK): 
         app.logger.warning("/etc/headscale/config.yml: READ: PASS")
         config_readable  = True
+    else: checks_passed = False
 
-    if checks_passed: return "Pass"
+    if checks_passed: 
+        app.logger.warning("All startup checks passed.")
+        return "Pass"
 
     messageHTML = ""
     # Generate the message:
