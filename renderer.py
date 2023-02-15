@@ -165,19 +165,19 @@ def render_overview():
                             <p>
                                 <table>
                                     <tr><td> Enabled      </td><td> """
-            if str(config_yaml["derp"]["server"]["enabled"])          : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
+            if str(config_yaml["derp"]["server"]["enabled"]) : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region ID    </td><td> """
-            if str(config_yaml["derp"]["server"]["region_id"])        : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
+            if str(config_yaml["derp"]["server"]["region_id"]) : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region Code  </td><td> """
-            if str(config_yaml["derp"]["server"]["region_code"])      : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
+            if str(config_yaml["derp"]["server"]["region_code"]) : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region Name  </td><td> """
-            if str(config_yaml["derp"]["server"]["region_name"])      : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
+            if str(config_yaml["derp"]["server"]["region_name"]) : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> STUN Address </td><td> """
@@ -206,21 +206,21 @@ def render_overview():
                         <p>
                             <table>
                                 <tr><td> Nameservers </td><td> """
-            if str(config_yaml["dns_config"]["nameservers"]): dns_content += str(config_yaml["dns_config"]["nameservers"]) 
-            else: dns_content += "N/A"
-            dns_content += """ </td></tr>
-            <tr><td> MagicDNS    </td><td> """
-            if str(config_yaml["dns_config"]["magic_dns"])  : dns_content += str(config_yaml["dns_config"]["magic_dns"])   
-            else: dns_content += "N/A"
-            dns_content += """ </td></tr>
-            <tr><td> Domains     </td><td> """
-            if str(config_yaml["dns_config"]["domains"])    : dns_content += str(config_yaml["dns_config"]["domains"])     
-            else: dns_content += "N/A"
-            dns_content += """ </td></tr>
-            <tr><td> Base Domain </td><td> """
-            if str(config_yaml["dns_config"]["base_domain"]): dns_content += str(config_yaml["dns_config"]["base_domain"]) 
-            else: dns_content += "N/A"
-            dns_content += """ </td></tr>
+        if str(config_yaml["dns_config"]["nameservers"]): dns_content += str(config_yaml["dns_config"]["nameservers"]) 
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> MagicDNS    </td><td> """
+        if str(config_yaml["dns_config"]["magic_dns"]) : dns_content += str(config_yaml["dns_config"]["magic_dns"])   
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> Domains     </td><td> """
+        if str(config_yaml["dns_config"]["domains"]) : dns_content += str(config_yaml["dns_config"]["domains"])     
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> Base Domain </td><td> """
+        if str(config_yaml["dns_config"]["base_domain"]): dns_content += str(config_yaml["dns_config"]["base_domain"]) 
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
                                 <tr><td> </td><td><br></td></tr>
                             </table>
                         </p>
