@@ -6,7 +6,6 @@ from dateutil            import parser
 from flask               import Flask
 
 app = Flask(__name__)
-executor = Executor(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS

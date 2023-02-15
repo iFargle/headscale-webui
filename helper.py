@@ -4,7 +4,6 @@ from dateutil import parser
 from flask    import Flask
 
 app = Flask(__name__)
-executor = Executor(app)
 
 def pretty_print_duration(duration):
     days, seconds = duration.days, duration.seconds
