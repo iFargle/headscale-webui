@@ -146,7 +146,7 @@ def startup_checks():
     file_writable = False
     file_exists   = False
     if os.access('/data/key.txt', os.F_OK): 
-        file_exists: True
+        file_exists = True
         if os.access('/data/key.txt', os.R_OK): 
             file_readable = True
         else:
