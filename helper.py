@@ -139,7 +139,7 @@ def startup_checks():
             writable = True
         else: 
             writable = False
-    except exception as e:
+    except Exception as e:
         writable = False
         checks_passed = False
         python_error = e
