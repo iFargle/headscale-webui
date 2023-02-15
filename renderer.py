@@ -231,7 +231,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # log.info("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                # app.logger.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -369,7 +369,7 @@ def thread_machine_content(machine, machine_content, idx):
         preauth_key       = str(preauth_key),
         machine_tags      = Markup(tags),
     )))
-    log.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -383,14 +383,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, numThreads):
-        log.info("Appending iterable:  "+str(i))
+        app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    log.info("Starting futures")
+    app.logger.warning("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    log.info("Finished futures")
+    app.logger.warning("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)

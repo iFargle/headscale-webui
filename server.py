@@ -2,7 +2,6 @@ import requests, json, renderer, headscale, helper, sys, pytz, os, time
 from flask          import Flask, render_template, request, url_for, redirect, Markup
 from datetime       import datetime, timedelta, date
 from dateutil       import parser
-from logging.config import dictConfig
 
 # Threading to speed things up
 from concurrent.futures import wait, ALL_COMPLETED
@@ -20,32 +19,14 @@ GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 
-# https://flask.palletsprojects.com/en/2.2.x/logging/#basic-configuration
-dictConfig({
-    'version': 1,
-    'formatters': {'default': {
-        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-    }},
-    'handlers': {'wsgi': {
-        'class': 'logging.StreamHandler',
-        'stream': 'ext://flask.logging.wsgi_errors_stream',
-        'formatter': 'default'
-    }},
-    'root': {
-        'level': 'INFO',
-        'handlers': ['wsgi']
-    }
-})
-
-
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
 app = Flask(__name__, static_url_path=static_url_path)
 executor = Executor(app)
 
-app.logger.info("Static assets served on:  "+static_url_path)
-app.logger.info("BASE_PATH:  "+BASE_PATH)
+app.logger.warning("Static assets served on:  "+static_url_path)
+app.logger.warning("BASE_PATH:  "+BASE_PATH)
 
 ########################################################################################
 # / pages - User-facing pages
@@ -148,8 +129,8 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.logger.info("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
-    app.logger.info("Renewed:  "+str(renewed))
+    app.logger.warning("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
+    app.logger.warning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 
