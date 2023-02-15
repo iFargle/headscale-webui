@@ -1,5 +1,5 @@
 import requests, json, renderer, headscale, helper, logging, sys, pytz, os, time
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, Markup
 from datetime import datetime, timedelta, date
 from dateutil import parser
 
@@ -47,6 +47,8 @@ app.logger.debug("BASE_PATH:  "+BASE_PATH)
 def overview_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -59,7 +61,9 @@ def overview_page():
 def machines_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
-
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
         cards            = cards,
@@ -73,6 +77,8 @@ def machines_page():
 def users_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -85,19 +91,29 @@ def users_page():
 @app.route(BASE_PATH+'/settings', methods=('GET', 'POST'))
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     url     = headscale.get_url()
     api_key = headscale.get_api_key()
 
-    return render_template('settings.html', 
-                            url          = url,
-                            COLOR_NAV    = COLOR_NAV,
-                            COLOR_BTN    = COLOR_BTN,
-                            HS_VERSION   = HS_VERSION,
-                            APP_VERSION  = APP_VERSION,
-                            GIT_COMMIT   = GIT_COMMIT,
-                            GIT_BRANCH   = GIT_BRANCH,
-                            BUILD_DATE   = BUILD_DATE
-                            )
+    return render_template(
+        'settings.html', 
+        url          = url,
+        COLOR_NAV    = COLOR_NAV,
+        COLOR_BTN    = COLOR_BTN,
+        HS_VERSION   = HS_VERSION,
+        APP_VERSION  = APP_VERSION,
+        GIT_COMMIT   = GIT_COMMIT,
+        GIT_BRANCH   = GIT_BRANCH,
+        BUILD_DATE   = BUILD_DATE
+    )
+
+@app.route(BASE_PATH+'/error', methods=('GET'))
+@app.route('/error', methods=('GET'))
+def error_page():
+    return render_template('error.html', 
+        ERROR_MESSAGE = helper.startup_checks()
+    )
 
 ########################################################################################
 # /api pages
@@ -169,7 +185,6 @@ def save_key_page():
             return "Key saved and tested:  "+message
         else: return "Key failed testing.  Check your key"
     else: return "Key did not save properly.  Check logs"
-
 
 ########################################################################################
 # Machine API Endpoints

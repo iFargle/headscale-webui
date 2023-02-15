@@ -1,5 +1,5 @@
 
-import logging, sys, pytz, os, headscale
+import logging, sys, pytz, os, headscale, requests
 from datetime            import datetime, timedelta, date
 from dateutil            import parser
 
@@ -85,3 +85,81 @@ def get_color(id, type = ""):
         ]
         index = id % len(colors)
         return colors[index]
+
+def error_message_format(type, title, message):
+    content = """
+        <ul class="collection">
+        <li class="collection-item avatar">
+    """
+    match type.lower():
+        case "warning":
+            icon  = """<i class="material-icons circle yellow">priority_high</i>"""
+            title = "<span class="title">Warning</span>"
+        case "success":
+            icon  = """<i class="material-icons circle green">check</i>"""
+            title = "<span class="title">Success</span>"
+        case "error":
+            icon  = """<i class="material-icons circle red">warning</i>"""
+            title = "<span class="title">Error</span>"
+        case "information":
+            icon  = """<i class="material-icons circle grey">help</i>"""
+            title = "<span class="title">Information</span>"
+
+    content = content+icon+title+message        
+    content = content+"""
+            </li>
+        </ul>
+    """
+    return content
+
+def startup_checks():
+    url = headscale.get_url()
+
+    # Return an error message if things fail. 
+    # Return a formatted error message for EACH fail.
+    # Otherwise, return "Pass"
+    pass = True
+
+    # Check 1:  See if the Headscale server is reachable:
+    reachable = NULL
+    response = requests.delete(
+        str(url)+"/api/v1/,
+        headers={
+            'Accept': 'application/json',
+            'Authorization': 'Bearer '+str(api_key)
+        }
+    )
+    if response.status_code == 200:
+        reachable = True
+    else:
+        reachable = False
+        pass = False
+    
+    # Check 2:  See if /data/ is writable:
+    writable = NULL
+    try:
+        key_file = open("/data/key.txt", "wb+")
+        writable = True
+    except PermissionError:
+        writable = False
+        pass = False
+    
+    if pass: return "Pass"
+
+    messageHTML = ""
+    # Generate the message:
+    if not reachable:
+        message = """
+        <p>Your headscale server is either unreachable or not properly configured.  
+        Please ensure your configuration is correct (Check for 200 status on 
+        """+url+"""/api/v1 failed.)</p>
+        """
+        messageHTML += format_error_message("Error", "Headscale unreachable", message)
+    if not writable:
+        message = """
+        <p>/data/key.txt is not writable.  Please ensure your 
+        permissions are correct. /data mount should be writable 
+        by UID/GID 1000:1000</p>
+        """
+        messageHTML += format_error_message("Error", "/data not writable", message)
+    return messageHTML
