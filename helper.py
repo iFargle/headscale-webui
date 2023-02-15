@@ -121,7 +121,7 @@ def startup_checks():
     checks_passed = True
 
     # Check 1:  See if the Headscale server is reachable:
-    reachable = NULL
+    reachable = False
     response = requests.delete(
         str(url)+"/api/v1/",
         headers={
@@ -136,7 +136,7 @@ def startup_checks():
         checks_passed = False
     
     # Check 2:  See if /data/ is writable:
-    writable = NULL
+    writable = False
     try:
         key_file = open("/data/key.txt", "wb+")
         writable = True
