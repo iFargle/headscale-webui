@@ -1,7 +1,8 @@
 import requests, json, renderer, headscale, helper, sys, pytz, os, time
-from flask    import Flask, render_template, request, url_for, redirect, Markup
-from datetime import datetime, timedelta, date
-from dateutil import parser
+from flask          import Flask, render_template, request, url_for, redirect, Markup
+from datetime       import datetime, timedelta, date
+from dateutil       import parser
+from logging.config import dictConfig
 
 # Threading to speed things up
 from concurrent.futures import wait, ALL_COMPLETED
@@ -18,6 +19,24 @@ GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
+
+# https://flask.palletsprojects.com/en/2.2.x/logging/#basic-configuration
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
