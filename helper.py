@@ -144,7 +144,6 @@ def startup_checks():
         else: checks_passed = False
         if os.access('/data/key.txt', os.W_OK): file_writable = True
         else: checks_passed = False
-    else 
 
     if checks_passed: return "Pass"
 
