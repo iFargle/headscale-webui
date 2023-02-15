@@ -132,7 +132,7 @@ def startup_checks():
     
     # Check 2:  See if /data/ is writable:
     writable = False
-    key_file = open("/data/key.txt", "ab+"):
+    key_file = open("/data/key.txt", "a"):
     if key_file.writable():  
         writable = True
     else:
