@@ -87,6 +87,7 @@ def format_error_message(type, title, message):
         <ul class="collection">
         <li class="collection-item avatar">
     """
+
     match type.lower():
         case "warning":
             icon  = """<i class="material-icons circle yellow">priority_high</i>"""
@@ -106,6 +107,7 @@ def format_error_message(type, title, message):
             </li>
         </ul>
     """
+
     return content
 
 def startup_checks():
@@ -122,7 +124,7 @@ def startup_checks():
         server_reachable = True
     else: 
         checks_passed = False
-        app.logger.warning("Headscale URL: Response 200: FAILED")
+        app.logger.error("Headscale URL: Response 200: FAILED")
 
     
     # Check 2 and 3:  See if /data/ is rw:
@@ -131,12 +133,12 @@ def startup_checks():
     if os.access('/data/', os.R_OK): 
         data_readable = True
     else:
-        app.logger.warning("/data READ: FAILED")
+        app.logger.error("/data READ: FAILED")
         checks_passed = False
     if os.access('/data/', os.W_OK): 
         data_writable = True
     else:
-        app.logger.warning("/data WRITE: FAILED")
+        app.logger.error("/data WRITE: FAILED")
         checks_passed = False
 
     # Check 4/5/6:  See if /data/key.txt exists and is rw:
@@ -148,15 +150,15 @@ def startup_checks():
         if os.access('/data/key.txt', os.R_OK): 
             file_readable = True
         else:
-            app.logger.warning("/data/key.txt READ: FAILED")
+            app.logger.error("/data/key.txt READ: FAILED")
             checks_passed = False
         if os.access('/data/key.txt', os.W_OK): 
             file_writable = True
         else:
-            app.logger.warning("/data/key.txt WRITE: FAILED")
+            app.logger.error("/data/key.txt WRITE: FAILED")
             checks_passed = False
     else:
-        app.logger.warning("/data/key.txt EXIST: FAILED - NO ERROR")
+        app.logger.error("/data/key.txt EXIST: FAILED - NO ERROR")
 
     # Check 7:  See if /etc/headscale/config.yaml is readable:
     config_readable = False
@@ -165,11 +167,11 @@ def startup_checks():
     elif os.access('/etc/headscale/config.yml', os.R_OK): 
         config_readable  = True
     else: 
-        app.logger.warning("/etc/headscale/config.y(a)ml: READ: FAILED")
+        app.logger.error("/etc/headscale/config.y(a)ml: READ: FAILED")
         checks_passed = False
 
     if checks_passed: 
-        app.logger.warning("All startup checks passed.")
+        app.logger.error("All startup checks passed.")
         return "Pass"
 
     messageHTML = ""
@@ -181,6 +183,7 @@ def startup_checks():
         Please ensure your configuration is correct (Check for 200 status on 
         """+url+"""/api/v1 failed.  Response:  """+str(response.status_code)+""".)</p>
         """
+
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
 
     if not config_readable:
@@ -190,6 +193,7 @@ def startup_checks():
         headscale configuration file resides in /etc/headscale and 
         is named "config.yaml" or "config.yml"</p>
         """
+
         messageHTML += format_error_message("Error", "/etc/headscale/config.yaml not readable", message)
 
     if not data_writable:
@@ -199,6 +203,7 @@ def startup_checks():
         permissions are correct. /data mount should be writable 
         by UID/GID 1000:1000.</p>
         """
+
         messageHTML += format_error_message("Error", "/data not writable", message)
 
     if not data_readable:
@@ -208,6 +213,7 @@ def startup_checks():
         permissions are correct. /data mount should be readable 
         by UID/GID 1000:1000.</p>
         """
+
         messageHTML += format_error_message("Error", "/data not readable", message)
 
 
@@ -219,6 +225,7 @@ def startup_checks():
             permissions are correct. /data mount should be writable 
             by UID/GID 1000:1000.</p>
             """
+
             messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
 
         if not file_readable:
@@ -228,6 +235,7 @@ def startup_checks():
             permissions are correct. /data mount should be readable 
             by UID/GID 1000:1000.</p>
             """
+
             messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
 
     return messageHTML
