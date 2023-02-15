@@ -46,10 +46,6 @@ ENV BUILD_DATE=$BUILD_DATE_ARG
 VOLUME /etc/headscale
 VOLUME /data
 
-USER root
-RUN mkdir -p /data && chown 1000:1000 /data
-USER 1000
-
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD gunicorn -w 4 -b 0.0.0.0:5000 server:app
