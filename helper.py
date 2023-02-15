@@ -128,8 +128,9 @@ def startup_checks():
 
     
     # Check 2 and 3:  See if /data/ is rw:
-    data_readable = False
-    data_writable = False
+    data_readable   = False
+    data_writable   = False
+    data_executable = False # Execute on directories allows file access, even if you cannot list the directory contents
     if os.access('/data/', os.R_OK): 
         data_readable = True
     else:
@@ -140,6 +141,11 @@ def startup_checks():
     else:
         app.logger.error("/data WRITE: FAILED")
         checks_passed = False
+    if os.access('/data/', os.X_OK): 
+        data_executable = True
+    else:
+        app.logger.error("/data EXEC: FAILED")
+        checks_passed = False
 
     # Check 4/5/6:  See if /data/key.txt exists and is rw:
     file_readable = False
@@ -147,7 +153,7 @@ def startup_checks():
     file_exists   = False
     if os.access('/data/key.txt', os.F_OK): 
         file_exists = True
-        if os.access('/data/key.txt', os.R_OK): 
+        if os.access('/data/key.txt', os.R_OK): chmod
             file_readable = True
         else:
             app.logger.error("/data/key.txt READ: FAILED")
@@ -215,6 +221,16 @@ def startup_checks():
         """
 
         messageHTML += format_error_message("Error", "/data not readable", message)
+
+    if not data_executable:
+        app.logger.error("/data folder is not readable")
+        message = """
+        <p>/data is not executable.  Please ensure your 
+        permissions are correct. /data mount should be readable 
+        by UID/GID 1000:1000. (chown 1000:1000 /path/to/data && chmod -R 755 /path/to/data)</p>
+        """
+
+        messageHTML += format_error_message("Error", "/data not executable", message)
 
 
     if file_exists: # If it doesn't exist, we assume the user hasn't created it yet.  Just redirect to the settings page to enter an API Key
