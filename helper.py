@@ -118,15 +118,21 @@ def startup_checks():
     # Check 1:  See if the Headscale server is reachable:
     server_reachable = False
     response = requests.get(str(url)+"/health")
-    if response.status_code == 200: server_reachable = True
+    if response.status_code == 200:
+        app.logger.warning("server response 200: PASS")
+        server_reachable = True
     else: checks_passed = False
     
     # Check 2 and 3:  See if /data/ is rw:
     data_readable = False
     data_writable = False
-    if os.access('/data/', os.R_OK): data_readable = True
+    if os.access('/data/', os.R_OK): 
+        app.logger.warning("/data READ: PASS")
+        data_readable = True
     else: checks_passed = False
-    if os.access('/data/', os.W_OK): data_writable = True
+    if os.access('/data/', os.W_OK): 
+        app.logger.warning("/data WRITE: PASS")
+        data_writable = True
     else: checks_passed = False
 
     # Check 4/5/6:  See if /data/key.txt exists and is rw:
@@ -134,16 +140,25 @@ def startup_checks():
     file_writable = False
     file_exists   = False
     if os.access('/data/key.txt', os.F_OK): 
+        app.logger.warning("/data/key.txt EXIST: PASS")
         file_exists: True
-        if os.access('/data/key.txt', os.R_OK): file_readable = True
+        if os.access('/data/key.txt', os.R_OK): 
+            app.logger.warning("/data/key.txt READ: PASS")
+            file_readable = True
         else: checks_passed = False
-        if os.access('/data/key.txt', os.W_OK): file_writable = True
+        if os.access('/data/key.txt', os.W_OK): 
+            app.logger.warning("/data/key.txt WRITE: PASS")
+            file_writable = True
         else: checks_passed = False
 
     # Check 7:  See if /etc/headscale/config.yaml is readable:
     config_readable = False
-    if os.access('/etc/headscale/config.yaml', os.R_OK): config_readable = True
-    if os.access('/etc/headscale/config.yml', os.R_OK): config_readable  = True
+    if os.access('/etc/headscale/config.yaml', os.R_OK): 
+        app.logger.warning("/etc/headscale/config.yaml: READ: PASS")
+        config_readable = True
+    if os.access('/etc/headscale/config.yml', os.R_OK): 
+        app.logger.warning("/etc/headscale/config.yml: READ: PASS")
+        config_readable  = True
 
     if checks_passed: return "Pass"
 
