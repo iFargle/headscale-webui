@@ -71,11 +71,11 @@ def render_overview():
                     <span class="card-title">Stats</span>
                     <p>
                         <table>
-                            <tr><td> Machines Added      </td><td> """+ str(machines_count)    +""" </td></tr>
-                            <tr><td> Users          </td><td> """+ str(user_count)   +""" </td></tr>
-                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count) +""" </td></tr>
-                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)+""" </td></tr>
-                            <tr><td> Enabled/Total Exits</td><td> """+ str(exits_enabled_count) +"""/"""+str(exits_count)+""" </td></tr>
+                            <tr><td> Machines            </td><td> """+ str(machines_count)                                +""" </td></tr>
+                            <tr><td> Users               </td><td> """+ str(user_count)                                    +""" </td></tr>
+                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count)                             +""" </td></tr>
+                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)     +""" </td></tr>
+                            <tr><td> Enabled/Total Exits</td><td>  """+ str(exits_enabled_count) +"""/"""+str(exits_count) +""" </td></tr>
                         </table>
                     </p>
                 </div>
@@ -90,11 +90,11 @@ def render_overview():
                     <span class="card-title">General</span>
                     <p>
                         <table>
-                            <tr><td> IP Prefixes                </td><td> """+str(config_yaml["ip_prefixes"])                       +""" </td></tr>
-                            <tr><td> Server URL                 </td><td> """+str(config_yaml["server_url"])                        +""" </td></tr>
-                            <tr><td> Updates Disabled?          </td><td> """+str(config_yaml["disable_check_updates"])             +""" </td></tr>
-                            <tr><td> Ephemeral Node Timeout     </td><td> """+str(config_yaml["ephemeral_node_inactivity_timeout"]) +""" </td></tr>
-                            <tr><td> Node Update Check Interval </td><td> """+str(config_yaml["node_update_check_interval"])        +""" </td></tr>
+                            <tr><td> IP Prefixes                </td><td> """+if "ip_prefixes" in config_yaml:                        str(config_yaml["ip_prefixes"])                       +""" </td></tr>
+                            <tr><td> Server URL                 </td><td> """+if "server_url" in config_yaml:                         str(config_yaml["server_url"])                        +""" </td></tr>
+                            <tr><td> Updates Disabled?          </td><td> """+if "disable_check_updates" in config_yaml:              str(config_yaml["disable_check_updates"])             +""" </td></tr>
+                            <tr><td> Ephemeral Node Timeout     </td><td> """+if "ephemeral_node_inactivity_timeout" in config_yaml:  str(config_yaml["ephemeral_node_inactivity_timeout"]) +""" </td></tr>
+                            <tr><td> Node Update Check Interval </td><td> """+if "node_update_check_interval" in config_yaml:         str(config_yaml["node_update_check_interval"])        +""" </td></tr>
                         </table>
                     </p>
                 </div>
@@ -112,11 +112,11 @@ def render_overview():
                         <span class="card-title">OIDC</span>
                         <p>
                             <table>   
-                                <tr><td> Issuer             </td><td> """+str(config_yaml["oidc"]["issuer"])                +""" </td></tr>
-                                <tr><td> Client ID          </td><td> """+str(config_yaml["oidc"]["client_id"])             +""" </td></tr>
-                                <tr><td> Scope              </td><td> """+str(config_yaml["oidc"]["scope"])                 +""" </td></tr>
-                                <tr><td> Token Expiry       </td><td> """+str(config_yaml["oidc"]["use_expiry_from_token"]) +""" </td></tr>
-                                <tr><td> Expiry             </td><td> """+str(config_yaml["oidc"]["expiry"])                +""" </td></tr>
+                                <tr><td> Issuer             </td><td> """+ if "issuer" in config_yaml:                 str(config_yaml["oidc"]["issuer"])                +""" </td></tr>
+                                <tr><td> Client ID          </td><td> """+ if "client_id" in config_yaml:              str(config_yaml["oidc"]["client_id"])             +""" </td></tr>
+                                <tr><td> Scope              </td><td> """+ if "scope" in config_yaml:                  str(config_yaml["oidc"]["scope"])                 +""" </td></tr>
+                                <tr><td> Token Expiry       </td><td> """+ if "use_expiry_from_token" in config_yaml:  str(config_yaml["oidc"]["use_expiry_from_token"]) +""" </td></tr>
+                                <tr><td> Expiry             </td><td> """+ if "expiry" in config_yaml:                 str(config_yaml["oidc"]["expiry"])                +""" </td></tr>
                             </table>
                         </p>
                     </div>
@@ -171,7 +171,6 @@ def render_overview():
                 </div>
             </div>
         """
-    if config_yaml["derp"]["paths"]: pass
     #   # open the path:
     #   derp_file = 
     #   config_file = open("/etc/headscale/config.yaml", "r")
