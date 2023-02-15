@@ -1,6 +1,6 @@
-import headscale, helper, json, sys, pytz, os, time, yaml
+import headscale, helper, pytz, os, yaml
 from flask    import Markup, render_template, Flask
-from datetime import datetime, timedelta, date
+from datetime import datetime
 from dateutil import parser
 
 # Threading to speed things up
@@ -425,13 +425,9 @@ def render_machines_cards():
 
 # Render the cards for the Users page:
 def render_users_cards():
-    url            = headscale.get_url()
-    api_key        = headscale.get_api_key()
+    url       = headscale.get_url()
+    api_key   = headscale.get_api_key()
     user_list = headscale.get_users(url, api_key)
-
-    # Set the current timezone and local time
-    timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
-    local_time = timezone.localize(datetime.now())
 
     content = "<div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>"
     for user in user_list["users"]:
@@ -504,8 +500,6 @@ def build_preauth_key_table(user_name):
         
         # Class for the javascript function to look for to toggle the hide function
         hide_expired = "expired-row" if not key_usable else ""
-
-        tooltip_expired   = "Expiration:  "+expiration_time
 
         btn_reusable      = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
         btn_ephemeral     = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
