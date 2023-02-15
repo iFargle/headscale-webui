@@ -171,7 +171,6 @@ def startup_checks():
         Please ensure your configuration is correct (Check for 200 status on 
         """+url+"""/api/v1 failed.  Response:  """+str(response.status_code)+""".)</p>
         """
-
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
 
     if not config_readable:
@@ -181,7 +180,6 @@ def startup_checks():
         headscale configuration file resides in /etc/headscale and 
         is named "config.yaml" or "config.yml"</p>
         """
-
         messageHTML += format_error_message("Error", "/etc/headscale/config.yaml not readable", message)
 
     if not data_writable:
@@ -191,8 +189,8 @@ def startup_checks():
         permissions are correct. /data mount should be writable 
         by UID/GID 1000:1000.</p>
         """
-
         messageHTML += format_error_message("Error", "/data not writable", message)
+
     if not data_readable:
         app.logger.error("/data folder is not readable")
         message = """
@@ -200,8 +198,8 @@ def startup_checks():
         permissions are correct. /data mount should be readable 
         by UID/GID 1000:1000.</p>
         """
-
         messageHTML += format_error_message("Error", "/data not readable", message)
+
 
     if file_exists: # If it doesn't exist, we assume the user hasn't created it yet.  Just redirect to the settings page to enter an API Key
         if not file_writable:
@@ -211,8 +209,8 @@ def startup_checks():
             permissions are correct. /data mount should be writable 
             by UID/GID 1000:1000.</p>
             """
-
             messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
+
         if not file_readable:
             app.logger.error("/data/key.txt is not readable")
             message = """
@@ -220,6 +218,6 @@ def startup_checks():
             permissions are correct. /data mount should be readable 
             by UID/GID 1000:1000.</p>
             """
-
             messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
+
     return messageHTML
