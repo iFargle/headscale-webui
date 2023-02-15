@@ -112,7 +112,7 @@ def settings_page():
 @app.route('/error')
 def error_page():
     return render_template('error.html', 
-        ERROR_MESSAGE = helper.startup_checks()
+        ERROR_MESSAGE = Markup(helper.startup_checks())
     )
 
 ########################################################################################
