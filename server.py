@@ -7,16 +7,6 @@ from dateutil import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
 
-# Logging headers
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-app.logger.addHandler(handler)
-app.logger.setLevel(logging.DEBUG)
-
-log = logging.getLogger('server.server')
-
-
 # Global vars
 # Colors:  https://materializecss.com/color.html
 COLOR_NAV   = "blue-grey darken-1"
@@ -34,6 +24,14 @@ if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
 app = Flask(__name__, static_url_path=static_url_path)
 executor = Executor(app)
+
+# Logging headers
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.DEBUG)
+log = logging.getLogger('server.server')
 
 log.info("Static assets served on:  "+static_url_path)
 log.info("BASE_PATH:  "+BASE_PATH)
