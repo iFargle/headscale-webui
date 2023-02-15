@@ -47,7 +47,7 @@ VOLUME /etc/headscale
 VOLUME /data
 
 USER root
-RUN chown 1000:1000 /data
+RUN mkdir -p /data && chown 1000:1000 /data
 USER 1000
 
 EXPOSE 5000/tcp
