@@ -40,7 +40,7 @@ def overview_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
-    if helper.startup_checks() not "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -54,7 +54,7 @@ def machines_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
-    if helper.startup_checks() not "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -70,7 +70,7 @@ def users_page():
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
-    if helper.startup_checks() not "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -84,7 +84,7 @@ def users_page():
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
     # General error checks.  See the function for more info:
-    if helper.startup_checks() not "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     url     = headscale.get_url()
     api_key = headscale.get_api_key()
 
