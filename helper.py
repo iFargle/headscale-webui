@@ -115,9 +115,17 @@ def startup_checks():
 
     # Return an error message if things fail. 
     # Return a formatted error message for EACH fail.
-    checks_passed = True
+    checks_passed   = True # Default to true.  Set to false when any checks fail.
+    data_readable   = False # Checks R permissions of /data
+    data_writable   = False # Checks W permissions of /data
+    data_executable = False # Execute on directories allows file access, even if you cannot list the directory contents
+    file_readable   = False # Checks R permissions of /data/key.txt
+    file_writable   = False # Checks W permissions of /data/key.txt
+    file_exists     = False # Checks if /data/key.txt exists
+    config_readable = False # Checks if the headscale configuration file is readable
 
-    # Check 1:  See if the Headscale server is reachable:
+
+    # Check 1: Check: the Headscale server is reachable:
     server_reachable = False
     response = requests.get(str(url)+"/health")
     if response.status_code == 200:
@@ -126,52 +134,36 @@ def startup_checks():
         checks_passed = False
         app.logger.error("Headscale URL: Response 200: FAILED")
 
-    
-    # Check 2 and 3:  See if /data/ is rw:
-    data_readable   = False
-    data_writable   = False
-    data_executable = False # Execute on directories allows file access, even if you cannot list the directory contents
-    if os.access('/data/', os.R_OK): 
-        data_readable = True
+    # Check: /data is rwx for 1000:1000:
+    if os.access('/data/', os.R_OK):  data_readable = True
     else:
         app.logger.error("/data READ: FAILED")
         checks_passed = False
-    if os.access('/data/', os.W_OK): 
-        data_writable = True
+    if os.access('/data/', os.W_OK):  data_writable = True
     else:
         app.logger.error("/data WRITE: FAILED")
         checks_passed = False
-    if os.access('/data/', os.X_OK): 
-        data_executable = True
+    if os.access('/data/', os.X_OK):   data_executable = True
     else:
         app.logger.error("/data EXEC: FAILED")
         checks_passed = False
 
-    # Check 4/5/6:  See if /data/key.txt exists and is rw:
-    file_readable = False
-    file_writable = False
-    file_exists   = False
+    # Check: /data/key.txt exists and is rw:
     if os.access('/data/key.txt', os.F_OK): 
         file_exists = True
-        if os.access('/data/key.txt', os.R_OK):
-            file_readable = True
+        if os.access('/data/key.txt', os.R_OK): file_readable = True
         else:
             app.logger.error("/data/key.txt READ: FAILED")
             checks_passed = False
-        if os.access('/data/key.txt', os.W_OK): 
-            file_writable = True
+        if os.access('/data/key.txt', os.W_OK):  file_writable = True
         else:
             app.logger.error("/data/key.txt WRITE: FAILED")
             checks_passed = False
-    else:
-        app.logger.error("/data/key.txt EXIST: FAILED - NO ERROR")
+    else: app.logger.error("/data/key.txt EXIST: FAILED - NO ERROR")
 
-    # Check 7:  See if /etc/headscale/config.yaml is readable:
-    config_readable = False
-    if os.access('/etc/headscale/config.yaml', os.R_OK): 
-        config_readable = True
-    elif os.access('/etc/headscale/config.yml', os.R_OK): 
-        config_readable  = True
+    # Check: /etc/headscale/config.yaml is readable:
+    if os.access('/etc/headscale/config.yaml', os.R_OK):  config_readable = True
+    elif os.access('/etc/headscale/config.yml', os.R_OK): config_readable = True
     else: 
         app.logger.error("/etc/headscale/config.y(a)ml: READ: FAILED")
         checks_passed = False
