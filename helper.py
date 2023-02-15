@@ -118,7 +118,7 @@ def startup_checks():
     # Return an error message if things fail. 
     # Return a formatted error message for EACH fail.
     # Otherwise, return "Pass"
-    pass = True
+    checks_passed = True
 
     # Check 1:  See if the Headscale server is reachable:
     reachable = NULL
@@ -133,7 +133,7 @@ def startup_checks():
         reachable = True
     else:
         reachable = False
-        pass = False
+        checks_passed = False
     
     # Check 2:  See if /data/ is writable:
     writable = NULL
@@ -142,9 +142,9 @@ def startup_checks():
         writable = True
     except PermissionError:
         writable = False
-        pass = False
+        checks_passed = False
     
-    if pass: return "Pass"
+    if checks_passed: return "Pass"
 
     messageHTML = ""
     # Generate the message:
