@@ -10,7 +10,6 @@ from flask_executor import Executor
 app = Flask(__name__)
 executor = Executor(app)
 
-
 def render_overview():
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -23,8 +22,6 @@ def render_overview():
     config_file = ""
     except:  config_file = open("/etc/headscale/config.yml",  "r")
     try:     config_file = open("/etc/headscale/config.yaml", "r")
-
-    config_file = open("/etc/headscale/config.yaml", "r")
     config_yaml = yaml.safe_load(config_file)
 
     # Get and display the following information:
