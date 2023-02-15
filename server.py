@@ -108,8 +108,8 @@ def settings_page():
         BUILD_DATE   = BUILD_DATE
     )
 
-@app.route(BASE_PATH+'/error', methods=('GET'))
-@app.route('/error', methods=('GET'))
+@app.route(BASE_PATH+'/error')
+@app.route('/error')
 def error_page():
     return render_template('error.html', 
         ERROR_MESSAGE = helper.startup_checks()
