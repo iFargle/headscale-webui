@@ -20,8 +20,8 @@ def render_overview():
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
     config_file = ""
-    except:  config_file = open("/etc/headscale/config.yml",  "r")
-    try:     config_file = open("/etc/headscale/config.yaml", "r")
+    try:    config_file = open("/etc/headscale/config.yml",  "r")
+    except: config_file = open("/etc/headscale/config.yaml", "r")
     config_yaml = yaml.safe_load(config_file)
 
     # Get and display the following information:
