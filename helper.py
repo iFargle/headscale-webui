@@ -94,16 +94,16 @@ def format_error_message(type, title, message):
     match type.lower():
         case "warning":
             icon  = """<i class="material-icons circle yellow">priority_high</i>"""
-            title = """<span class="title">Warning</span>"""
+            title = """<span class="title">Warning - """+title+"""</span>"""
         case "success":
             icon  = """<i class="material-icons circle green">check</i>"""
-            title = """<span class="title">Success</span>"""
+            title = """<span class="title">Success - """+title+"""</span>"""
         case "error":
             icon  = """<i class="material-icons circle red">warning</i>"""
-            title = """<span class="title">Error</span>"""
+            title = """<span class="title">Error - """+title+"""</span>"""
         case "information":
             icon  = """<i class="material-icons circle grey">help</i>"""
-            title = """<span class="title">Information</span>"""
+            title = """<span class="title">Information - """+title+"""</span>"""
 
     content = content+icon+title+message        
     content = content+"""
@@ -123,6 +123,7 @@ def startup_checks():
     # Check 1:  See if the Headscale server is reachable:
     reachable = False
     response = requests.get(str(url)+"/api/v1/")
+    log.warning("STARTUP CHECK:  Response:  "+str(response.status_code))
     if response.status_code == 200:
         reachable = True
     else:
