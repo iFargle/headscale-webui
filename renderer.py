@@ -206,19 +206,19 @@ def render_overview():
                         <p>
                             <table>
                                 <tr><td> Nameservers </td><td> """
-        ["dns_config"]["nameservers"] in config_yaml: dns_content += str(config_yaml["dns_config"]["nameservers"]) 
+        if ["dns_config"]["nameservers"] in config_yaml: dns_content += str(config_yaml["dns_config"]["nameservers"]) 
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> MagicDNS    </td><td> """
-        ["dns_config"]["magic_dns"] in config_yaml: dns_content += str(config_yaml["dns_config"]["magic_dns"])   
+        if ["dns_config"]["magic_dns"] in config_yaml: dns_content += str(config_yaml["dns_config"]["magic_dns"])   
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> Domains     </td><td> """
-        ["dns_config"]["domains"] in config_yaml: dns_content += str(config_yaml["dns_config"]["domains"])     
+        if ["dns_config"]["domains"] in config_yaml: dns_content += str(config_yaml["dns_config"]["domains"])     
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> Base Domain </td><td> """
-        ["dns_config"]["base_domain"] in config_yaml: dns_content += str(config_yaml["dns_config"]["base_domain"]) 
+        if ["dns_config"]["base_domain"] in config_yaml: dns_content += str(config_yaml["dns_config"]["base_domain"]) 
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
                                 <tr><td> </td><td><br></td></tr>
