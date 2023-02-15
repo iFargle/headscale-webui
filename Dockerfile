@@ -46,6 +46,8 @@ ENV BUILD_DATE=$BUILD_DATE_ARG
 VOLUME /headscale
 VOLUME /data
 
+RUN chown 1000:1000 /data
+
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD gunicorn -w 4 -b 0.0.0.0:5000 server:app
