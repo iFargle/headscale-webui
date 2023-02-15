@@ -3,11 +3,13 @@ import logging, sys, pytz, os, headscale, requests
 from datetime            import datetime, timedelta, date
 from dateutil            import parser
 
+# log = logging.getLogger('server.helper')
+# handler = logging.StreamHandler(sys.stderr)
+# handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
+# log.addHandler(handler)
+# log.setLevel(logging.INFO)
+
 log = logging.getLogger('server.helper')
-handler = logging.StreamHandler(sys.stderr)
-handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
-log.addHandler(handler)
-log.setLevel(logging.INFO)
 
 def pretty_print_duration(duration):
     days, seconds = duration.days, duration.seconds

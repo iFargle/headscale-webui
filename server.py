@@ -1,5 +1,5 @@
 import requests, json, renderer, headscale, helper, logging, sys, pytz, os, time
-from flask import Flask, render_template, request, url_for, redirect, Markup
+from flask    import Flask, render_template, request, url_for, redirect, Markup
 from datetime import datetime, timedelta, date
 from dateutil import parser
 
@@ -20,21 +20,20 @@ HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 
 static_url_path = '/static'
-if BASE_PATH != '':
-    static_url_path = BASE_PATH + static_url_path
+if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
 app = Flask(__name__, static_url_path=static_url_path)
 executor = Executor(app)
 
 # Logging headers
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-app.logger.addHandler(handler)
-app.logger.setLevel(logging.DEBUG)
+# handler = logging.StreamHandler(sys.stdout)
+# handler.setFormatter(logging.Formatter(
+#     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+# app.logger.addHandler(handler)
+# app.logger.setLevel(logging.DEBUG)
 
-app.logger.debug("Static assets served on:  "+static_url_path)
-app.logger.debug("BASE_PATH:  "+BASE_PATH)
+log.info("Static assets served on:  "+static_url_path)
+log.info("BASE_PATH:  "+BASE_PATH)
 
 ########################################################################################
 # / pages - User-facing pages
@@ -137,8 +136,8 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.logger.debug("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
-    app.logger.debug("Renewed:  "+str(renewed))
+    log.info("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
+    log.info("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 

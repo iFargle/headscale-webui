@@ -4,11 +4,13 @@ from cryptography.fernet import Fernet
 from datetime            import datetime, timedelta, date
 from dateutil            import parser
 
+# log = logging.getLogger('server.headscale')
+# handler = logging.StreamHandler(sys.stderr)
+# handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
+# log.addHandler(handler)
+# log.setLevel(logging.INFO)
+
 log = logging.getLogger('server.headscale')
-handler = logging.StreamHandler(sys.stderr)
-handler.setFormatter(logging.Formatter('%(name)s - %(levelname)s - %(message)s'))
-log.addHandler(handler)
-log.setLevel(logging.INFO)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
@@ -392,6 +394,6 @@ def expire_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
-    log.warning("Return:  "+str(response.json()))
-    log.warning("Status:  "+str(status))
+    # log.info("expire_preauth_key - Return:  "+str(response.json()))
+    # log.info("expire_preauth_key - Status:  "+str(status))
     return {"status": status, "body": response.json()}
