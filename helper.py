@@ -121,9 +121,9 @@ def startup_checks():
     checks_passed = True
 
     # Check 1:  See if the Headscale server is reachable:
-    reachable = False
+    server_reachable = False
     response = requests.get(str(url)+"/health")
-    if response.status_code == 200: reachable = True
+    if response.status_code == 200: server_reachable = True
     else: checks_passed = False
     
     # Check 2 and 3:  See if /data/ is rw:
