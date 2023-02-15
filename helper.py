@@ -86,7 +86,7 @@ def get_color(id, type = ""):
         index = id % len(colors)
         return colors[index]
 
-def error_message_format(type, title, message):
+def format_error_message(type, title, message):
     content = """
         <ul class="collection">
         <li class="collection-item avatar">
