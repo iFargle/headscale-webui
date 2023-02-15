@@ -123,43 +123,62 @@ def startup_checks():
     # Check 1:  See if the Headscale server is reachable:
     reachable = False
     response = requests.get(str(url)+"/health")
-    log.warning("STARTUP CHECK:  Response:  "+str(response.status_code))
-    if response.status_code == 200:
-        reachable = True
-    else:
-        reachable = False
-        checks_passed = False
+    if response.status_code == 200: reachable = True
     
-    # Check 2:  See if /data/ is writable:
-    writable = False
-    python_error = ""
-    try:
-        key_file = open("/data/key.txt", "a")
-        if key_file.writable():  
-            writable = True
-        else: 
-            writable = False
-    except Exception as e:
-        writable = False
-        checks_passed = False
-        python_error = e
+    # Check 2 and 3:  See if /data/ is rw:
+    data_readable = False
+    data_writable = False
+    if os.access('/data/', os.R_OK): data_readable = True
+    if os.access('/data/', os.W_OK): data_writable = True
+
+    # Check 4/5:  See if /data/key.txt is rw:
+    file_readable = False
+    file_writable = False
+    if os.access('/data/key.txt', os.R_OK): file_readable = True
+    if os.access('/data/key.txt', os.W_OK): file_writable = True
 
     if checks_passed: return "Pass"
 
     messageHTML = ""
     # Generate the message:
-    if not reachable:
+    if not server_reachable:
         message = """
         <p>Your headscale server is either unreachable or not properly configured.  
         Please ensure your configuration is correct (Check for 200 status on 
         """+url+"""/api/v1 failed.  Response:  """+str(response.status_code)+""".)</p>
         """
+
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
-    if not writable:
+    if not data_writable:
+        message = """
+        <p>/data/ is not writable.  Please ensure your 
+        permissions are correct. /data mount should be writable 
+        by UID/GID 1000:1000.</p>
+        """
+
+        messageHTML += format_error_message("Error", "/data not writable", message)
+    if not data_readable:
+        message = """
+        <p>/data/ is not readable.  Please ensure your 
+        permissions are correct. /data mount should be readable 
+        by UID/GID 1000:1000.</p>
+        """
+
+        messageHTML += format_error_message("Error", "/data not readable", message)
+    if not file_writable:
         message = """
         <p>/data/key.txt is not writable.  Please ensure your 
         permissions are correct. /data mount should be writable 
-        by UID/GID 1000:1000. Error:  """+str(python_error)+"""</p>
+        by UID/GID 1000:1000.</p>
         """
-        messageHTML += format_error_message("Error", "/data not writable", message)
+
+        messageHTML += format_error_message("Error", "/data/key.txt not writable", message)
+    if not file_readable:
+        message = """
+        <p>/data/key.txt is not readable.  Please ensure your 
+        permissions are correct. /data mount should be readable 
+        by UID/GID 1000:1000.</p>
+        """
+
+        messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
     return messageHTML
