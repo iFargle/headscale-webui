@@ -132,14 +132,13 @@ def startup_checks():
     
     # Check 2:  See if /data/ is writable:
     writable = False
-    try:
-        with open("/data/key.txt", "wb+") as key_file:
-            key_file.close()
+    key_file = open("/data/key.txt", "ab+"):
+    if key_file.writable():  
         writable = True
-    except PermissionError:
+    else:
         writable = False
         checks_passed = False
-    
+
     if checks_passed: return "Pass"
 
     messageHTML = ""
