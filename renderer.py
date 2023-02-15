@@ -91,23 +91,23 @@ def render_overview():
                     <p>
                         <table>
                             <tr><td> IP Prefixes </td><td> """; 
-    if str(config_yaml["ip_prefixes"]):  general_content += str(config_yaml["ip_prefixes"])
+    if ["ip_prefixes"] in config_yaml:  general_content += str(config_yaml["ip_prefixes"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
     <tr><td> Server URL </td><td> """; 
-    if str(config_yaml["server_url"]):  general_content += str(config_yaml["server_url"])
+    if ["server_url"] in config_yaml:  general_content += str(config_yaml["server_url"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
     <tr><td> Updates Disabled? </td><td> """; 
-    if str(config_yaml["disable_check_updates"]):  general_content += str(config_yaml["disable_check_updates"])
+    if ["disable_check_updates"] in config_yaml:  general_content += str(config_yaml["disable_check_updates"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
     <tr><td> Ephemeral Node Timeout </td><td> """; 
-    if str(config_yaml["ephemeral_node_inactivity_timeout"]):  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"]); 
+    if ["ephemeral_node_inactivity_timeout"] in config_yaml:  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"]); 
     else: general_content += "N/A"
     general_content +=""" </td></tr>
     <tr><td> Node Update Check Interval </td><td> """; 
-    if str(config_yaml["node_update_check_interval"]):  general_content += str(config_yaml["node_update_check_interval"])
+    if ["node_update_check_interval"] in config_yaml:  general_content += str(config_yaml["node_update_check_interval"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
                         </table>
@@ -128,23 +128,23 @@ def render_overview():
                         <p>
                             <table>   
                                 <tr><td> Issuer </td><td> """
-        if str(config_yaml["oidc"]["issuer"]) : oidc_content += str(config_yaml["oidc"]["issuer"])                
+        if ["oidc"]["issuer"] in config_yaml : oidc_content += str(config_yaml["oidc"]["issuer"])                
         else: oidc_content += "N/A"
         oidc_content += """</td></tr>
         <tr><td> Client ID </td><td> """
-        if str(config_yaml["oidc"]["client_id"]) : oidc_content += str(config_yaml["oidc"]["client_id"])             
+        if ["oidc"]["client_id"] in config_yaml : oidc_content += str(config_yaml["oidc"]["client_id"])             
         else: oidc_content += "N/A"
         oidc_content += """</td></tr>
         <tr><td> Scope </td><td> """
-        if str(config_yaml["oidc"]["scope"]) : oidc_content += str(config_yaml["oidc"]["scope"])                 
+        if ["oidc"]["scope"] in config_yaml : oidc_content += str(config_yaml["oidc"]["scope"])                 
         else: oidc_content += "N/A"
         oidc_content += """</td></tr>
         <tr><td> Token Expiry </td><td> """
-        if str(config_yaml["oidc"]["use_expiry_from_token"]) : oidc_content += str(config_yaml["oidc"]["use_expiry_from_token"]) 
+        if ["oidc"]["use_expiry_from_token"] in config_yaml : oidc_content += str(config_yaml["oidc"]["use_expiry_from_token"]) 
         else: oidc_content += "N/A"
         oidc_content += """</td></tr>
         <tr><td> Expiry </td><td> """
-        if str(config_yaml["oidc"]["expiry"]) : oidc_content += str(config_yaml["oidc"]["expiry"])                
+        if ["oidc"]["expiry"] in config_yaml : oidc_content += str(config_yaml["oidc"]["expiry"])                
         else: oidc_content += "N/A"
         oidc_content += """</td></tr>
                             </table>
@@ -165,23 +165,23 @@ def render_overview():
                             <p>
                                 <table>
                                     <tr><td> Enabled      </td><td> """
-            if str(config_yaml["derp"]["server"]["enabled"]) : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
+            if ["derp"]["server"]["enabled"] in config_yaml : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region ID    </td><td> """
-            if str(config_yaml["derp"]["server"]["region_id"]) : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
+            if ["derp"]["server"]["region_id"] in config_yaml : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region Code  </td><td> """
-            if str(config_yaml["derp"]["server"]["region_code"]) : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
+            if ["derp"]["server"]["region_code"] in config_yaml : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> Region Name  </td><td> """
-            if str(config_yaml["derp"]["server"]["region_name"]) : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
+            if ["derp"]["server"]["region_name"] in config_yaml : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
             <tr><td> STUN Address </td><td> """
-            if str(config_yaml["derp"]["server"]["stun_listen_addr"]) : derp_content+= str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
+            if ["derp"]["server"]["stun_listen_addr"] in config_yaml: derp_content+= str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
             else: derp_content+= "N/A"
             derp_content+= """ </td></tr>
                                 </table>
@@ -206,19 +206,19 @@ def render_overview():
                         <p>
                             <table>
                                 <tr><td> Nameservers </td><td> """
-        if str(config_yaml["dns_config"]["nameservers"]): dns_content += str(config_yaml["dns_config"]["nameservers"]) 
+        ["dns_config"]["nameservers"] in config_yaml: dns_content += str(config_yaml["dns_config"]["nameservers"]) 
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> MagicDNS    </td><td> """
-        if str(config_yaml["dns_config"]["magic_dns"]) : dns_content += str(config_yaml["dns_config"]["magic_dns"])   
+        ["dns_config"]["magic_dns"] in config_yaml: dns_content += str(config_yaml["dns_config"]["magic_dns"])   
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> Domains     </td><td> """
-        if str(config_yaml["dns_config"]["domains"]) : dns_content += str(config_yaml["dns_config"]["domains"])     
+        ["dns_config"]["domains"] in config_yaml: dns_content += str(config_yaml["dns_config"]["domains"])     
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
         <tr><td> Base Domain </td><td> """
-        if str(config_yaml["dns_config"]["base_domain"]): dns_content += str(config_yaml["dns_config"]["base_domain"]) 
+        ["dns_config"]["base_domain"] in config_yaml: dns_content += str(config_yaml["dns_config"]["base_domain"]) 
         else: dns_content += "N/A"
         dns_content += """ </td></tr>
                                 <tr><td> </td><td><br></td></tr>
