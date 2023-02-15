@@ -37,10 +37,10 @@ app.logger.warning("BASE_PATH:  "+BASE_PATH)
 @app.route('/overview')
 @app.route(BASE_PATH+'/overview')
 def overview_page():
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
     if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    # If the API key fails, redirect to the settings page:
+    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -51,10 +51,10 @@ def overview_page():
 @app.route(BASE_PATH+'/machines', methods=('GET', 'POST'))
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
     if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    # If the API key fails, redirect to the settings page:
+    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -67,10 +67,10 @@ def machines_page():
 @app.route(BASE_PATH+'/users', methods=('GET', 'POST'))
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
     # General error checks.  See the function for more info:
     if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
+    # If the API key fails, redirect to the settings page:
+    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
