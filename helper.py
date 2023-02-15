@@ -124,18 +124,23 @@ def startup_checks():
     reachable = False
     response = requests.get(str(url)+"/health")
     if response.status_code == 200: reachable = True
+    else: checks_passed = False
     
     # Check 2 and 3:  See if /data/ is rw:
     data_readable = False
     data_writable = False
     if os.access('/data/', os.R_OK): data_readable = True
+    else: checks_passed = False
     if os.access('/data/', os.W_OK): data_writable = True
+    else: checks_passed = False
 
     # Check 4/5:  See if /data/key.txt is rw:
     file_readable = False
     file_writable = False
     if os.access('/data/key.txt', os.R_OK): file_readable = True
+    else: checks_passed = False
     if os.access('/data/key.txt', os.W_OK): file_writable = True
+    else: checks_passed = False
 
     if checks_passed: return "Pass"
 
