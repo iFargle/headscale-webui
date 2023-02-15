@@ -147,7 +147,7 @@ def startup_checks():
         message = """
         <p>Your headscale server is either unreachable or not properly configured.  
         Please ensure your configuration is correct (Check for 200 status on 
-        """+url+"""/api/v1 failed.  Response:  """+response.status_code+""".)</p>
+        """+url+"""/api/v1 failed.  Response:  """+str(response.status_code)+""".)</p>
         """
         messageHTML += format_error_message("Error", "Headscale unreachable", message)
     if not writable:
