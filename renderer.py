@@ -112,11 +112,11 @@ def render_overview():
                         <span class="card-title">OIDC</span>
                         <p>
                             <table>   
-                                <tr><td> Issuer             </td><td> """+str(config_yaml["oidc"]["issuer"])            +""" </td></tr>
-                                <tr><td> Client ID          </td><td> """+str(config_yaml["oidc"]["client_id"])         +""" </td></tr>
-                                <tr><td> Scope              </td><td> """+str(config_yaml["oidc"]["scope"])             +""" </td></tr>
-                                <tr><td> Allowed Domains    </td><td> """+str(config_yaml["oidc"]["allowed_domains"])   +""" </td></tr>
-                                <tr><td> Strip Email Domain </td><td> """+str(config_yaml["oidc"]["strip_email_domain"])+""" </td></tr>
+                                <tr><td> Issuer             </td><td> """+str(config_yaml["oidc"]["issuer"])                +""" </td></tr>
+                                <tr><td> Client ID          </td><td> """+str(config_yaml["oidc"]["client_id"])             +""" </td></tr>
+                                <tr><td> Scope              </td><td> """+str(config_yaml["oidc"]["scope"])                 +""" </td></tr>
+                                <tr><td> Token Expiry       </td><td> """+str(config_yaml["oidc"]["use_expiry_from_token"]) +""" </td></tr>
+                                <tr><td> Expiry             </td><td> """+str(config_yaml["oidc"]["expiry"])                +""" </td></tr>
                             </table>
                         </p>
                     </div>
