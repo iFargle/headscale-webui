@@ -5,7 +5,7 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION = 'v0.2.5'
+        APP_VERSION = 'v0.3.0'
         BUILD_DATE = ''
     }
     options {

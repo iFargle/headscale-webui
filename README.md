@@ -29,11 +29,9 @@ Allows you to do the following:
     3.  BASE_PATH - This will be the path your server is served on.  Because the Windows Tailscale GUI expects <HS_SERVER/admin>, I usually put this as "/admin"
     4.  KEY - Your encryption key to store your headscale API key on disk.  Generate a new one with "openssl rand -base64 32".  Do not forget the quotations around the key when entering.
 2. You will also need to change the volumes:
-    1.  /data - Where your encryption key will reside.  Can be anywhere
+    1.  /data - Where your encryption key will reside.  Can be anywhere writable by UID 1000
     2.  /etc/headscale/ - This is your Headscale configuration file.
-3.  Update the build context location to the directory with the Dockerfile.
-    1.  Example:  If Dockerfile is in /home/username/headscale-webui, your context will be:
-        * context: /home/username/headscale-webui/
+3.  Make sure the host path for /data is readable and writable to UID 1000, otherwise writing the key to disk will fail.
 
 ## Traefik example with SSL:
 * docker-compose labels:

@@ -1,7 +1,7 @@
-import requests, json, renderer, headscale, helper, logging, sys, pytz, os, time
-from flask import Flask, render_template, request, url_for, redirect
-from datetime import datetime, timedelta, date
-from dateutil import parser
+import requests, json, renderer, headscale, helper, sys, pytz, os, time
+from flask          import Flask, render_template, request, url_for, redirect, Markup
+from datetime       import datetime, timedelta, date
+from dateutil       import parser
 
 # Threading to speed things up
 from concurrent.futures import wait, ALL_COMPLETED
@@ -20,21 +20,13 @@ HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 
 static_url_path = '/static'
-if BASE_PATH != '':
-    static_url_path = BASE_PATH + static_url_path
+if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
 app = Flask(__name__, static_url_path=static_url_path)
 executor = Executor(app)
 
-# Logging headers
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-app.logger.addHandler(handler)
-app.logger.setLevel(logging.DEBUG)
-
-app.logger.debug("Static assets served on:  "+static_url_path)
-app.logger.debug("BASE_PATH:  "+BASE_PATH)
+app.logger.warning("Static assets served on:  "+static_url_path)
+app.logger.warning("BASE_PATH:  "+BASE_PATH)
 
 ########################################################################################
 # / pages - User-facing pages
@@ -45,6 +37,10 @@ app.logger.debug("BASE_PATH:  "+BASE_PATH)
 @app.route('/overview')
 @app.route(BASE_PATH+'/overview')
 def overview_page():
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": 
+        app.logger.debug("Why does this fail? Return value:  "+helper.startup_checks())
+        return redirect(BASE_PATH+url_for('error_page'))
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
 
@@ -57,9 +53,11 @@ def overview_page():
 @app.route(BASE_PATH+'/machines', methods=('GET', 'POST'))
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
-
+    
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
         cards            = cards,
@@ -71,6 +69,8 @@ def machines_page():
 @app.route(BASE_PATH+'/users', methods=('GET', 'POST'))
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     # If the API key fails, redirect to the settings page:
     if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
 
@@ -85,19 +85,32 @@ def users_page():
 @app.route(BASE_PATH+'/settings', methods=('GET', 'POST'))
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
+    # General error checks.  See the function for more info:
+    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     url     = headscale.get_url()
     api_key = headscale.get_api_key()
 
-    return render_template('settings.html', 
-                            url          = url,
-                            COLOR_NAV    = COLOR_NAV,
-                            COLOR_BTN    = COLOR_BTN,
-                            HS_VERSION   = HS_VERSION,
-                            APP_VERSION  = APP_VERSION,
-                            GIT_COMMIT   = GIT_COMMIT,
-                            GIT_BRANCH   = GIT_BRANCH,
-                            BUILD_DATE   = BUILD_DATE
-                            )
+    return render_template(
+        'settings.html', 
+        url          = url,
+        COLOR_NAV    = COLOR_NAV,
+        COLOR_BTN    = COLOR_BTN,
+        HS_VERSION   = HS_VERSION,
+        APP_VERSION  = APP_VERSION,
+        GIT_COMMIT   = GIT_COMMIT,
+        GIT_BRANCH   = GIT_BRANCH,
+        BUILD_DATE   = BUILD_DATE
+    )
+
+@app.route(BASE_PATH+'/error')
+@app.route('/error')
+def error_page():
+    if helper.startup_checks() == "Pass": 
+        return redirect(url_for('overview_page'))
+
+    return render_template('error.html', 
+        ERROR_MESSAGE = Markup(helper.startup_checks())
+    )
 
 ########################################################################################
 # /api pages
@@ -118,8 +131,8 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.logger.debug("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
-    app.logger.debug("Renewed:  "+str(renewed))
+    app.logger.warning("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
+    app.logger.warning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 
@@ -169,7 +182,6 @@ def save_key_page():
             return "Key saved and tested:  "+message
         else: return "Key failed testing.  Check your key"
     else: return "Key did not save properly.  Check logs"
-
 
 ########################################################################################
 # Machine API Endpoints

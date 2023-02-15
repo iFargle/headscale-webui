@@ -1,4 +1,4 @@
-import headscale, helper, json, logging, sys, pytz, os, time, yaml
+import headscale, helper, json, sys, pytz, os, time, yaml
 from flask    import Markup, render_template, Flask
 from datetime import datetime, timedelta, date
 from dateutil import parser
@@ -10,8 +10,6 @@ from flask_executor import Executor
 app = Flask(__name__)
 executor = Executor(app)
 
-log = logging.getLogger('server.renderer')
-
 def render_overview():
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -21,7 +19,9 @@ def render_overview():
     
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
-    config_file = open("/etc/headscale/config.yaml", "r")
+    config_file = ""
+    try:    config_file = open("/etc/headscale/config.yml",  "r")
+    except: config_file = open("/etc/headscale/config.yaml", "r")
     config_yaml = yaml.safe_load(config_file)
 
     # Get and display the following information:
@@ -71,11 +71,11 @@ def render_overview():
                     <span class="card-title">Stats</span>
                     <p>
                         <table>
-                            <tr><td> Machines Added      </td><td> """+ str(machines_count)    +""" </td></tr>
-                            <tr><td> Users          </td><td> """+ str(user_count)   +""" </td></tr>
-                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count) +""" </td></tr>
-                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)+""" </td></tr>
-                            <tr><td> Enabled/Total Exits</td><td> """+ str(exits_enabled_count) +"""/"""+str(exits_count)+""" </td></tr>
+                            <tr><td> Machines            </td><td> """+ str(machines_count)                                +""" </td></tr>
+                            <tr><td> Users               </td><td> """+ str(user_count)                                    +""" </td></tr>
+                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count)                             +""" </td></tr>
+                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)     +""" </td></tr>
+                            <tr><td> Enabled/Total Exits</td><td>  """+ str(exits_enabled_count) +"""/"""+str(exits_count) +""" </td></tr>
                         </table>
                     </p>
                 </div>
@@ -90,11 +90,26 @@ def render_overview():
                     <span class="card-title">General</span>
                     <p>
                         <table>
-                            <tr><td> IP Prefixes                </td><td> """+str(config_yaml["ip_prefixes"])                       +""" </td></tr>
-                            <tr><td> Server URL                 </td><td> """+str(config_yaml["server_url"])                        +""" </td></tr>
-                            <tr><td> Updates Disabled?          </td><td> """+str(config_yaml["disable_check_updates"])             +""" </td></tr>
-                            <tr><td> Ephemeral Node Timeout     </td><td> """+str(config_yaml["ephemeral_node_inactivity_timeout"]) +""" </td></tr>
-                            <tr><td> Node Update Check Interval </td><td> """+str(config_yaml["node_update_check_interval"])        +""" </td></tr>
+                            <tr><td> IP Prefixes </td><td> """; 
+    if str(config_yaml["ip_prefixes"]):  general_content += str(config_yaml["ip_prefixes"])
+    else: general_content += "N/A"
+    general_content +=""" </td></tr>
+    <tr><td> Server URL </td><td> """; 
+    if str(config_yaml["server_url"]):  general_content += str(config_yaml["server_url"])
+    else: general_content += "N/A"
+    general_content +=""" </td></tr>
+    <tr><td> Updates Disabled? </td><td> """; 
+    if str(config_yaml["disable_check_updates"]):  general_content += str(config_yaml["disable_check_updates"])
+    else: general_content += "N/A"
+    general_content +=""" </td></tr>
+    <tr><td> Ephemeral Node Timeout </td><td> """; 
+    if str(config_yaml["ephemeral_node_inactivity_timeout"]):  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"]); 
+    else: general_content += "N/A"
+    general_content +=""" </td></tr>
+    <tr><td> Node Update Check Interval </td><td> """; 
+    if str(config_yaml["node_update_check_interval"]):  general_content += str(config_yaml["node_update_check_interval"])
+    else: general_content += "N/A"
+    general_content +=""" </td></tr>
                         </table>
                     </p>
                 </div>
@@ -112,11 +127,26 @@ def render_overview():
                         <span class="card-title">OIDC</span>
                         <p>
                             <table>   
-                                <tr><td> Issuer             </td><td> """+str(config_yaml["oidc"]["issuer"])            +""" </td></tr>
-                                <tr><td> Client ID          </td><td> """+str(config_yaml["oidc"]["client_id"])         +""" </td></tr>
-                                <tr><td> Scope              </td><td> """+str(config_yaml["oidc"]["scope"])             +""" </td></tr>
-                                <tr><td> Allowed Domains    </td><td> """+str(config_yaml["oidc"]["allowed_domains"])   +""" </td></tr>
-                                <tr><td> Strip Email Domain </td><td> """+str(config_yaml["oidc"]["strip_email_domain"])+""" </td></tr>
+                                <tr><td> Issuer </td><td> """
+        if str(config_yaml["oidc"]["issuer"]) : oidc_content += str(config_yaml["oidc"]["issuer"])                
+        else: oidc_content += "N/A"
+        oidc_content += """</td></tr>
+        <tr><td> Client ID </td><td> """
+        if str(config_yaml["oidc"]["client_id"]) : oidc_content += str(config_yaml["oidc"]["client_id"])             
+        else: oidc_content += "N/A"
+        oidc_content += """</td></tr>
+        <tr><td> Scope </td><td> """
+        if str(config_yaml["oidc"]["scope"]) : oidc_content += str(config_yaml["oidc"]["scope"])                 
+        else: oidc_content += "N/A"
+        oidc_content += """</td></tr>
+        <tr><td> Token Expiry </td><td> """
+        if str(config_yaml["oidc"]["use_expiry_from_token"]) : oidc_content += str(config_yaml["oidc"]["use_expiry_from_token"]) 
+        else: oidc_content += "N/A"
+        oidc_content += """</td></tr>
+        <tr><td> Expiry </td><td> """
+        if str(config_yaml["oidc"]["expiry"]) : oidc_content += str(config_yaml["oidc"]["expiry"])                
+        else: oidc_content += "N/A"
+        oidc_content += """</td></tr>
                             </table>
                         </p>
                     </div>
@@ -124,32 +154,50 @@ def render_overview():
             </div>
         """
 
-    if config_yaml["derp"]["server"]:
-        derp_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
-                    <div class="card-content">
-                        <span class="card-title">Built-in DERP</span>
-                        <p>
-                            <table>
-                                <tr><td> Enabled      </td><td> """+str(config_yaml["derp"]["server"]["enabled"])          +""" </td></tr>
-                                <tr><td> Region ID    </td><td> """+str(config_yaml["derp"]["server"]["region_id"])        +""" </td></tr>
-                                <tr><td> Region Code  </td><td> """+str(config_yaml["derp"]["server"]["region_code"])      +""" </td></tr>
-                                <tr><td> Region Name  </td><td> """+str(config_yaml["derp"]["server"]["region_name"])      +""" </td></tr>
-                                <tr><td> STUN Address </td><td> """+str(config_yaml["derp"]["server"]["stun_listen_addr"]) +""" </td></tr>
-                            </table>
-                        </p>
+    derp_content = ""
+    if "derp" in config_yaml:
+        if "server" in config_yaml["derp"]:
+            derp_content  = """
+                <div class="col s12 m6">
+                    <div class="card hoverable">
+                        <div class="card-content">
+                            <span class="card-title">Built-in DERP</span>
+                            <p>
+                                <table>
+                                    <tr><td> Enabled      </td><td> """
+            if str(config_yaml["derp"]["server"]["enabled"]) : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
+            else: derp_content+= "N/A"
+            derp_content+= """ </td></tr>
+            <tr><td> Region ID    </td><td> """
+            if str(config_yaml["derp"]["server"]["region_id"]) : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
+            else: derp_content+= "N/A"
+            derp_content+= """ </td></tr>
+            <tr><td> Region Code  </td><td> """
+            if str(config_yaml["derp"]["server"]["region_code"]) : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
+            else: derp_content+= "N/A"
+            derp_content+= """ </td></tr>
+            <tr><td> Region Name  </td><td> """
+            if str(config_yaml["derp"]["server"]["region_name"]) : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
+            else: derp_content+= "N/A"
+            derp_content+= """ </td></tr>
+            <tr><td> STUN Address </td><td> """
+            if str(config_yaml["derp"]["server"]["stun_listen_addr"]) : derp_content+= str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
+            else: derp_content+= "N/A"
+            derp_content+= """ </td></tr>
+                                </table>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        """
+            """
 
+    # TODO:  
     #     Whether there are custom DERP servers
     #         If there are custom DERP servers, get the file location from the config file.  Assume mapping is the same.
     #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
-    if config_yaml["dns_config"]:
+    if "dns_config" in config_yaml:
         dns_content  = """
             <div class="col s12 m6">
                 <div class="card hoverable">
@@ -157,10 +205,22 @@ def render_overview():
                         <span class="card-title">DNS</span>
                         <p>
                             <table>
-                                <tr><td> Nameservers </td><td> """+str(config_yaml["dns_config"]["nameservers"])+""" </td></tr>
-                                <tr><td> MagicDNS    </td><td> """+str(config_yaml["dns_config"]["magic_dns"])  +""" </td></tr>
-                                <tr><td> Domains     </td><td> """+str(config_yaml["dns_config"]["domains"])    +""" </td></tr>
-                                <tr><td> Base Domain </td><td> """+str(config_yaml["dns_config"]["base_domain"])+""" </td></tr>
+                                <tr><td> Nameservers </td><td> """
+        if str(config_yaml["dns_config"]["nameservers"]): dns_content += str(config_yaml["dns_config"]["nameservers"]) 
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> MagicDNS    </td><td> """
+        if str(config_yaml["dns_config"]["magic_dns"]) : dns_content += str(config_yaml["dns_config"]["magic_dns"])   
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> Domains     </td><td> """
+        if str(config_yaml["dns_config"]["domains"]) : dns_content += str(config_yaml["dns_config"]["domains"])     
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
+        <tr><td> Base Domain </td><td> """
+        if str(config_yaml["dns_config"]["base_domain"]): dns_content += str(config_yaml["dns_config"]["base_domain"]) 
+        else: dns_content += "N/A"
+        dns_content += """ </td></tr>
                                 <tr><td> </td><td><br></td></tr>
                             </table>
                         </p>
@@ -197,21 +257,6 @@ def thread_machine_content(machine, machine_content, idx):
     pulled_routes = headscale.get_machine_routes(url, api_key, machine["id"])
     routes = ""
 
-# New format to parse:
-# New JSON endpoint requires a machine_id and a route_id to toggle.
-# Pass the following info:
-#  1.  Machine ID
-#  2.  Route ID (NEW REQ)
-#  3.  Route State (NEW REQ) - This would be the JSON key of pulled_routes["routes"][index][enabled]
-# {
-#   "routes": [
-#     { <INDEX>
-#       "id": "1",
-#       "prefix": "0.0.0.0/0",
-#       "advertised": true,
-#       "enabled": true,
-#     },
-
     # Test if the machine is an exit node:
     exit_node = False
     # If the LENGTH of "routes" is NULL/0, there are no routes, enabled or disabled:
@@ -232,7 +277,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # log.info("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                # app.logger.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -251,38 +296,6 @@ def thread_machine_content(machine, machine_content, idx):
                 </p>
                 """
             routes = routes+"</div></p></li>"
-# This entire thing will probably need to change after the new API endpoint change.
-# Old code for v1.17.0
-#    # Test if the machine is an exit node:
-#    exit_node = False
-#    # If there are ANY advertised routes, print them:
-#    if len(pulled_routes["routes"]["advertisedRoutes"]) > 0:
-#        routes = """
-#            <li class="collection-item avatar">
-#                <i class="material-icons circle">directions</i>
-#                <span class="title">Routes</span>
-#                <p><div>
-#        """
-#        for advertised_route in pulled_routes["routes"]["advertisedRoutes"]:
-#            # Check if the route has been enabled.  Red for False, Green for True 
-#            route_enabled = "red"
-#            route_tooltip = 'enable'
-#            for enabled_route in pulled_routes["routes"]["enabledRoutes"]:
-#                if advertised_route == enabled_route: 
-#                    route_enabled = "green"
-#                    route_tooltip = 'disable'
-#            if (advertised_route == "0.0.0.0/0" or advertised_route == "::/0") and route_enabled == "green": 
-#                exit_node = True
-#            routes = routes+"""
-#            <p 
-#                class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
-#                data-position='top' data-tooltip='Click to """+route_tooltip+"""'
-#                id='"""+machine['id']+"""-"""+advertised_route+"""'
-#                onclick="toggle_route("""+machine['id']+""", '"""+advertised_route+"""')">
-#                """+advertised_route+"""
-#            </p>
-#            """
-#        routes = routes+"</div></p></li>"
 
     # Get machine tags
     tag_array = ""
@@ -370,7 +383,7 @@ def thread_machine_content(machine, machine_content, idx):
         preauth_key       = str(preauth_key),
         machine_tags      = Markup(tags),
     )))
-    log.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -384,14 +397,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, numThreads):
-        log.info("Appending iterable:  "+str(i))
+        app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    log.info("Starting futures")
+    app.logger.warning("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    log.info("Finished futures")
+    app.logger.warning("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
