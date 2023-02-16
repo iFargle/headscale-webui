@@ -14,6 +14,7 @@ GIT_COMMIT  = os.environ["GIT_COMMIT"]
 GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
+AUTH_TYPE   = os.environ["AUTH_TYPE"]
 
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
@@ -24,6 +25,18 @@ executor = Executor(app)
 app.logger.warning("Static assets served on:  "+static_url_path)
 app.logger.warning("BASE_PATH:  "+BASE_PATH)
 
+# Set Authentication type:
+if AUTH_TYPE.lower() == "oidc":
+    # Load OIDC libraries
+    app.logger.info("Loading OIDC libraries and configuring app...")
+    # https://flask-oidc.readthedocs.io/en/latest/
+
+if AUTH_TYPE.lower() == "basic":
+    # Load basic auth libraries:
+    app.logger.info("Loading basic auth libraries and configuring app...")
+    # https://flask-basicauth.readthedocs.io/en/latest/
+
+
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
@@ -33,12 +46,8 @@ app.logger.warning("BASE_PATH:  "+BASE_PATH)
 @app.route('/overview')
 @app.route(BASE_PATH+'/overview')
 def overview_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": 
-        app.logger.debug("Why does this fail? Return value:  "+helper.startup_checks())
-        return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    if not load_checks("overview"): return load_checks()
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -49,10 +58,8 @@ def overview_page():
 @app.route(BASE_PATH+'/machines', methods=('GET', 'POST'))
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    if not load_checks("machines"): return load_checks()
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -65,10 +72,8 @@ def machines_page():
 @app.route(BASE_PATH+'/users', methods=('GET', 'POST'))
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    if not load_checks("users"): return load_checks()
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -81,13 +86,11 @@ def users_page():
 @app.route(BASE_PATH+'/settings', methods=('GET', 'POST'))
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    url     = headscale.get_url()
+    # Some basic sanity checks:
+    if load_checks("settings"): return load_checks()
 
-    return render_template(
-        'settings.html', 
-        url          = url,
+    return render_template('settings.html', 
+        url          = headscale.get_url(),
         COLOR_NAV    = COLOR_NAV,
         COLOR_BTN    = COLOR_BTN,
         HS_VERSION   = HS_VERSION,
@@ -106,6 +109,14 @@ def error_page():
     return render_template('error.html', 
         ERROR_MESSAGE = Markup(helper.startup_checks())
     )
+
+@app.route(BASE_PATH+'/login')
+@app.route('/login')
+def login_page():
+    # Some basic sanity checks:
+    if not load_checks(): return load_checks()
+
+
 
 ########################################################################################
 # /api pages

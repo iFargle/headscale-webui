@@ -16,6 +16,8 @@ Flask-Executor = "^1.0.0"
 PyYAML = "^6.0"
 pyuwsgi = "^2.0.21"
 gunicorn = "^20.1.0"
+flask-oidc = "^1.4.0"
+flask-basicauth = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 

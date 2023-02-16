@@ -30,7 +30,7 @@ def text_color_duration(duration):
     elif secs  > 30: return "green-text       text-lighten-2" 
     else:            return "green-text                     "
 
-def key_test():
+def key_check():
     api_key    = headscale.get_api_key()
     url        = headscale.get_url()
 
@@ -108,7 +108,7 @@ def format_error_message(type, title, message):
 
     return content
 
-def startup_checks():
+def access_check():
     url = headscale.get_url()
 
     # Return an error message if things fail. 
@@ -168,7 +168,7 @@ def startup_checks():
 
     if checks_passed: 
         app.logger.error("All startup checks passed.")
-        return "Pass"
+        return True
 
     messageHTML = ""
     # Generate the message:
@@ -245,3 +245,30 @@ def startup_checks():
             messageHTML += format_error_message("Error", "/data/key.txt not readable", message)
 
     return messageHTML
+
+def login_check(page):
+    AUTH_TYPE = os.environ["AUTH_TYPE"]
+    # if we are already on the login page, don't redirect:
+
+    # Set Authentication type:
+    if AUTH_TYPE.lower() == "oidc":
+        # Load OIDC libraries
+        app.logger.info("Loading OIDC libraries and configuring app...")
+        # https://flask-oidc.readthedocs.io/en/latest/
+
+    if AUTH_TYPE.lower() == "basic":
+        # Load basic auth libraries:
+        app.logger.info("Loading basic auth libraries and configuring app...")
+        # https://flask-basicauth.readthedocs.io/en/latest/
+
+    if page == "login": return True
+    return True
+
+def load_checks(page):
+    # General error checks.  See the function for more info:
+    if helper.access_check()    == False: return redirect(BASE_PATH+url_for('error_page'))
+    # Login authorization checks.  If it fails, redirect to /login:
+    if helper.login_check(page) == False: return redirect(BASE_PATH+url_for('login_page'))
+    # If the API key fails, redirect to the settings page:
+    if helper.key_check()       == False: return redirect(BASE_PATH+url_for('settings_page'))
+    return 0

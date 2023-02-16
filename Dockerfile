@@ -32,6 +32,11 @@ ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV BASE_PATH="http://127.0.0.1/"
 
+# Authentication variables
+ENV AUTH_TYPE="basic"
+ENV BASIC_AUTH_USER="user"
+ENV BASIC_AUTH_PASS="pass"
+
 # Jenkins build args
 ARG GIT_COMMIT_ARG=""
 ARG GIT_BRANCH_ARG=""
