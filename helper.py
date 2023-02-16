@@ -266,9 +266,9 @@ def login_check(page):
 
 def load_checks(page):
     # General error checks.  See the function for more info:
-    if helper.access_check()    == False: return redirect(BASE_PATH+url_for('error_page'))
+    if access_check()    == False: return redirect(BASE_PATH+url_for('error_page'))
     # Login authorization checks.  If it fails, redirect to /login:
-    if helper.login_check(page) == False: return redirect(BASE_PATH+url_for('login_page'))
+    if login_check(page) == False: return redirect(BASE_PATH+url_for('login_page'))
     # If the API key fails, redirect to the settings page:
-    if helper.key_check()       == False: return redirect(BASE_PATH+url_for('settings_page'))
+    if key_check()       == False: return redirect(BASE_PATH+url_for('settings_page'))
     return 0
