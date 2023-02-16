@@ -15,7 +15,6 @@ GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"]
-BASIC_AUTH  = False
 
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
@@ -29,19 +28,18 @@ app.logger.warning("BASE_PATH:  "+BASE_PATH)
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
-    app.logger.info("Loading OIDC libraries and configuring app...")
+    app.logger.debug("Loading OIDC libraries and configuring app...")
     # https://flask-oidc.readthedocs.io/en/latest/
 
 if AUTH_TYPE.lower() == "basic":
     # Load basic auth libraries:
-    app.logger.info("Loading basic auth libraries and configuring app...")
+    app.logger.debug("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
 
     from flask_basicauth import BasicAuth
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
     app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
-    app.config['BASIC_AUTH_FORCE'] = True
-    BASIC_AUTH = True
+    app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
 
@@ -56,7 +54,8 @@ if AUTH_TYPE.lower() == "basic":
 @app.route(BASE_PATH+'/overview')
 def overview_page():
     # Some basic sanity checks:
-    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -68,7 +67,8 @@ def overview_page():
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
     # Some basic sanity checks:
-    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -82,7 +82,8 @@ def machines_page():
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
     # Some basic sanity checks:
-    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -96,7 +97,8 @@ def users_page():
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
     # Some basic sanity checks:
-    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
 
     return render_template('settings.html', 
         url          = headscale.get_url(),
