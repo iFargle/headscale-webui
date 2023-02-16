@@ -21,6 +21,7 @@ if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
 app = Flask(__name__, static_url_path=static_url_path)
 executor = Executor(app)
+
 app.logger.warning("Authentication chosen:  "+AUTH_TYPE.lower())
 app.logger.warning("Static assets served on:  "+static_url_path)
 app.logger.warning("BASE_PATH:  "+BASE_PATH)
