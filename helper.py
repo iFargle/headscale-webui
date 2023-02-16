@@ -253,12 +253,12 @@ def login_check(page):
     # Set Authentication type:
     if AUTH_TYPE.lower() == "oidc":
         # Load OIDC libraries
-        app.logger.info("Loading OIDC libraries and configuring app...")
+        app.logger.debug("Loading OIDC libraries and configuring app...")
         # https://flask-oidc.readthedocs.io/en/latest/
 
     if AUTH_TYPE.lower() == "basic":
         # Load basic auth libraries:
-        app.logger.info("Loading basic auth libraries and configuring app...")
+        app.logger.debug("Loading basic auth libraries and configuring app...")
         # https://flask-basicauth.readthedocs.io/en/latest/
 
     if page == "login": return True
@@ -266,9 +266,9 @@ def login_check(page):
 
 def load_checks(page):
     # General error checks.  See the function for more info:
-    if access_check()    == False: return redirect(BASE_PATH+url_for('error_page'))
+    if access_check()    == False: 'error_page'
     # Login authorization checks.  If it fails, redirect to /login:
-    if login_check(page) == False: return redirect(BASE_PATH+url_for('login_page'))
+    if login_check(page) == False: 'login_page'
     # If the API key fails, redirect to the settings page:
-    if key_check()       == False: return redirect(BASE_PATH+url_for('settings_page'))
+    if key_check()       == False: 'settings_page'
     return 0
