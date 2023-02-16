@@ -108,7 +108,7 @@ def format_error_message(type, title, message):
 
     return content
 
-def access_check():
+def access_checsk():
     url = headscale.get_url()
 
     # Return an error message if things fail. 
@@ -248,7 +248,7 @@ def access_check():
 
 def load_checks():
     # General error checks.  See the function for more info:
-    if access_check() == "Pass": return 'error_page'
+    if access_checsk() == "Pass": return 'error_page'
     # If the API key fails, redirect to the settings page:
     if key_check() == False: return 'settings_page'
     return "Pass"
