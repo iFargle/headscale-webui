@@ -1,7 +1,7 @@
-import requests, json, os, sys
+import requests, json, os
 from os.path             import exists
 from cryptography.fernet import Fernet
-from datetime            import datetime, timedelta, date
+from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
 
@@ -57,7 +57,7 @@ def expire_key(url, api_key):
                 'Authorization': 'Bearer '+str(api_key)
                 }
         )
-        return 0
+        return response.status_code
 
 # Checks if the key needs to be renewed
 # If it does, renews the key, then expires the old key
@@ -144,8 +144,6 @@ def register_machine(url, api_key, machine_key, user):
 
 # Sets the machines tags
 def set_machine_tags(url, api_key, machine_id, tags_list):
-    json_payload=json.dumps(tags_list)
-
     response = requests.post(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/tags",
         data=tags_list,

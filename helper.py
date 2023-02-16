@@ -1,6 +1,4 @@
-import sys, pytz, os, headscale, requests
-from datetime import datetime, timedelta, date
-from dateutil import parser
+import os, headscale, requests
 from flask    import Flask
 
 app = Flask(__name__)
@@ -87,7 +85,7 @@ def format_error_message(type, title, message):
         <ul class="collection">
         <li class="collection-item avatar">
     """
-
+    
     match type.lower():
         case "warning":
             icon  = """<i class="material-icons circle yellow">priority_high</i>"""

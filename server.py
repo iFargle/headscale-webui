@@ -1,10 +1,6 @@
-import requests, json, renderer, headscale, helper, sys, pytz, os, time
+import json, renderer, headscale, helper, pytz, os
 from flask          import Flask, render_template, request, url_for, redirect, Markup
-from datetime       import datetime, timedelta, date
 from dateutil       import parser
-
-# Threading to speed things up
-from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor import Executor
 
 # Global vars
@@ -88,7 +84,6 @@ def settings_page():
     # General error checks.  See the function for more info:
     if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
     url     = headscale.get_url()
-    api_key = headscale.get_api_key()
 
     return render_template(
         'settings.html', 
@@ -139,20 +134,15 @@ def test_key_page():
     key_info   = headscale.get_api_key_info(url, api_key)
 
     # Set the current timezone and local time
-    timezone = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
-    local_time      = timezone.localize(datetime.now())
+    timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
 
     # Format the dates for easy readability
     expiration_parse   = parser.parse(key_info['expiration'])
     expiration_local   = expiration_parse.astimezone(timezone)
-    expiration_delta   = expiration_local - local_time
-    expiration_print   = helper.pretty_print_duration(expiration_delta)
     expiration_time    = str(expiration_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
 
     creation_parse     = parser.parse(key_info['createdAt'])
     creation_local     = creation_parse.astimezone(timezone)
-    creation_delta     = local_time - creation_local
-    creation_print     = helper.pretty_print_duration(creation_delta)
     creation_time      = str(creation_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
     
     key_info['expiration'] = expiration_time
