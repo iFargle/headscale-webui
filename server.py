@@ -31,6 +31,10 @@ if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     app.logger.debug("Loading OIDC libraries and configuring app...")
     # https://flask-oidc.readthedocs.io/en/latest/
+    # https://stackoverflow.com/questions/29046866/basic-flask-openid-connect-example#29056144
+
+    from flask_oidc import OpenIDConnect
+    oidc = OpenIDConnect(app)
 
 if AUTH_TYPE.lower() == "basic":
     # Load basic auth libraries:
@@ -48,6 +52,12 @@ if AUTH_TYPE.lower() == "basic":
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
+
+@app.route('/login')
+@app.route(BASE_PATH+'/login')
+@oidc.require_login
+def login():
+    return redirect(BBASEURL+url_for('overview'))
 
 @app.route('/')
 @app.route(BASE_PATH+'/')

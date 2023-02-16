@@ -11,6 +11,10 @@ services:
       - AUTH_TYPE=Basic                        # AUTH_TYPE is either "Basic" or "OIDC" - Removing this will disable authentication
       - BASIC_AUTH_USER=user                   # Used for basic auth - Can be omitted if not using Basic Auth  
       - BASIC_AUTH_PASS=pass                   # Used for basic auth - Can be omitted if not using Basic Auth
+      # ENV for OIDC (Used only if AUTH_TYPE is "OIDC")
+      - OIDC_URL=https://auth.$DOMAIN
+      - OIDC_CLIENT_ID=Headscale WebUI
+      - OIDC_CLIENT_SECRET=YourOIDCClientSecret
     volumes:
       - ./volume:/data                         # Headscale-WebUI's storage.  Make sure ./volume is readable by UID 1000 (chown 1000:1000 ./volume)
       - ./headscale/config/:/etc/headscale/:ro # Headscale's config storage location.  Used to read your Headscale config.
