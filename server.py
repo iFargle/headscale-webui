@@ -36,6 +36,13 @@ if AUTH_TYPE.lower() == "basic":
     app.logger.info("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
 
+    from flask_basicauth import BasicAuth
+    app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
+    app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
+    app.config['BASIC_AUTH_FORCE'] = True
+
+    basic_auth = BasicAuth(app)
+
 
 ########################################################################################
 # / pages - User-facing pages
@@ -47,7 +54,7 @@ if AUTH_TYPE.lower() == "basic":
 @app.route(BASE_PATH+'/overview')
 def overview_page():
     # Some basic sanity checks:
-    if not load_checks("overview"): return load_checks()
+    if not helper.load_checks("overview"): return helper.load_checks()
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -59,7 +66,7 @@ def overview_page():
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
     # Some basic sanity checks:
-    if not load_checks("machines"): return load_checks()
+    if not helper.load_checks("machines"): return helper.load_checks()
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -73,7 +80,7 @@ def machines_page():
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
     # Some basic sanity checks:
-    if not load_checks("users"): return load_checks()
+    if not helper.load_checks("users"): return helper.load_checks()
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -87,7 +94,7 @@ def users_page():
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
     # Some basic sanity checks:
-    if load_checks("settings"): return load_checks()
+    if helper.load_checks("settings"): return helper.load_checks()
 
     return render_template('settings.html', 
         url          = headscale.get_url(),
@@ -114,7 +121,7 @@ def error_page():
 @app.route('/login')
 def login_page():
     # Some basic sanity checks:
-    if not load_checks(): return load_checks()
+    if not helper.load_checks(): return helper.load_checks()
 
 
 
