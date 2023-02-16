@@ -1,11 +1,9 @@
 import headscale, helper, pytz, os, yaml
-from flask    import Markup, render_template, Flask
-from datetime import datetime
-from dateutil import parser
-
-# Threading to speed things up
+from flask              import Markup, render_template, Flask
+from datetime           import datetime
+from dateutil           import parser
 from concurrent.futures import wait, ALL_COMPLETED
-from flask_executor import Executor
+from flask_executor     import Executor
 
 app = Flask(__name__)
 executor = Executor(app)
