@@ -1,5 +1,5 @@
 # headscale-webui
-## This is a simple front-end for a Headscale server.  
+## This is a simple front-end for a Headscale server  
 #### PR's, questions, bug-fixes, feature requests are welcome!
 ---
 Allows you to do the following:
@@ -18,6 +18,7 @@ Allows you to do the following:
     * PreAuth key associated with the machine
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
+7.  Basic authentication (See Docker Compose changes below)
 
 ---
 
@@ -28,6 +29,9 @@ Allows you to do the following:
     2.  HS_SERVER - Change to your headscale's URL
     3.  BASE_PATH - This will be the path your server is served on.  Because the Windows Tailscale GUI expects <HS_SERVER/admin>, I usually put this as "/admin"
     4.  KEY - Your encryption key to store your headscale API key on disk.  Generate a new one with "openssl rand -base64 32".  Do not forget the quotations around the key when entering.
+    5.  AUTH_TYPE - Set to either "Basic" or "OIDC" for password authentication
+    6.  AUTH_USER - Username for Basic auth   Can be removed if AUTH_TYPE is not "Basic"
+    7.  AUTH_PASS - Password for Basic auth.  Can be removed if AUTH_TYPE is not "Basic"
 2. You will also need to change the volumes:
     1.  /data - Where your encryption key will reside.  Can be anywhere writable by UID 1000
     2.  /etc/headscale/ - This is your Headscale configuration file.
