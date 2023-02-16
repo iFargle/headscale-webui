@@ -248,7 +248,7 @@ def access_checks():
 
 def load_checks():
     # General error checks.  See the function for more info:
-    if access_checsk() == "Pass": return 'error_page'
+    if access_checks() == "Pass": return 'error_page'
     # If the API key fails, redirect to the settings page:
     if key_check() == False: return 'settings_page'
     return "Pass"
