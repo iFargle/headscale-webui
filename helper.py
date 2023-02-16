@@ -108,7 +108,7 @@ def format_error_message(type, title, message):
 
     return content
 
-def access_checsk():
+def access_checks():
     url = headscale.get_url()
 
     # Return an error message if things fail. 
