@@ -246,29 +246,9 @@ def access_check():
 
     return messageHTML
 
-def login_check(page):
-    AUTH_TYPE = os.environ["AUTH_TYPE"]
-    # if we are already on the login page, don't redirect:
-
-    # Set Authentication type:
-    if AUTH_TYPE.lower() == "oidc":
-        # Load OIDC libraries
-        app.logger.debug("Loading OIDC libraries and configuring app...")
-        # https://flask-oidc.readthedocs.io/en/latest/
-
-    if AUTH_TYPE.lower() == "basic":
-        # Load basic auth libraries:
-        app.logger.debug("Loading basic auth libraries and configuring app...")
-        # https://flask-basicauth.readthedocs.io/en/latest/
-
-    if page == "login": return True
-    return True
-
-def load_checks(page):
+def load_checks():
     # General error checks.  See the function for more info:
-    if access_check()    == False: 'error_page'
-    # Login authorization checks.  If it fails, redirect to /login:
-    if login_check(page) == False: 'login_page'
+    if access_check()    == False: return 'error_page'
     # If the API key fails, redirect to the settings page:
-    if key_check()       == False: 'settings_page'
+    if key_check()       == False: return 'settings_page'
     return 0

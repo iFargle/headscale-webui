@@ -15,6 +15,7 @@ GIT_BRANCH  = os.environ["GIT_BRANCH"]
 HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"]
+BASIC_AUTH  = False
 
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
@@ -40,6 +41,7 @@ if AUTH_TYPE.lower() == "basic":
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
     app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
     app.config['BASIC_AUTH_FORCE'] = True
+    BASIC_AUTH = True
 
     basic_auth = BasicAuth(app)
 
@@ -54,8 +56,7 @@ if AUTH_TYPE.lower() == "basic":
 @app.route(BASE_PATH+'/overview')
 def overview_page():
     # Some basic sanity checks:
-    if not helper.load_checks("overview"): 
-        return redirect(BASE_PATH+str(url_for(helper.load_checks("overview"))))
+    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -67,8 +68,7 @@ def overview_page():
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
     # Some basic sanity checks:
-    if not helper.load_checks("machines"): 
-        return redirect(BASE_PATH+str(url_for(helper.load_checks("machines"))))
+    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -82,8 +82,7 @@ def machines_page():
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
     # Some basic sanity checks:
-    if not helper.load_checks("users"): 
-        return redirect(BASE_PATH+str(url_for(helper.load_checks("users"))))
+    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -97,8 +96,7 @@ def users_page():
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
     # Some basic sanity checks:
-    if helper.load_checks("settings"): 
-        return redirect(BASE_PATH+str(url_for(helper.load_checks("settings"))))
+    if not helper.load_checks(): return redirect(BASE_PATH+str(url_for(helper.load_checks())))
 
     return render_template('settings.html', 
         url          = headscale.get_url(),
@@ -120,13 +118,6 @@ def error_page():
     return render_template('error.html', 
         ERROR_MESSAGE = Markup(helper.startup_checks())
     )
-
-@app.route(BASE_PATH+'/login')
-@app.route('/login')
-def login_page():
-    # Some basic sanity checks:
-    if not helper.load_checks(): 
-        return redirect(BASE_PATH+str(url_for(helper.load_checks())))
 
 ########################################################################################
 # /api pages
