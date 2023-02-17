@@ -1,5 +1,4 @@
 import requests, json, os
-from os.path             import exists
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
@@ -21,7 +20,7 @@ def set_api_key(api_key):
     return True if key_file.write(encrypted_key) else False # Return true if the file wrote correctly
 
 def get_api_key():
-    if not exists("/data/key.txt"): return False
+    if not os.path.exists("/data/key.txt"): return False
     encryption_key = os.environ['KEY']                      # User-set encryption key
     key_file       = open("/data/key.txt", "rb+")           # Key file on the filesystem for persistent storage
     enc_api_key    = key_file.read()                        # The encrypted key read from the file
