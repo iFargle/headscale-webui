@@ -38,11 +38,11 @@ if AUTH_TYPE.lower() == "oidc":
 
     class CustomConfig(BaseConfig):
         DEBUG = DEBUG_STATE
-        PROVIDER_NAME = "OIDC"                           # Default:  'google'
-        CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
-        CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
-        CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
-        OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
+        FLASK_OIDC_PROVIDER_NAME = "OIDC"                           # Default:  'google'
+        FLASK_OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
+        FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
+        FLASK_OIDC_CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
+        FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 
 
     app = FlaskOIDC(__name__, static_url_path=static_url_path)
