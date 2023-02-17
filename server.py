@@ -16,6 +16,17 @@ HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '')
 
+# OIDC Variables:  https://github.com/verdan/flaskoidc
+FLASK_OIDC_PROVIDER_NAME = "OIDC"                           # Default:  'google'
+FLASK_OIDC_SCOPES                                           # Default:  'openid email profile'
+FLASK_OIDC_USER_ID_FIELD                                    # Default:  'email'
+FLASK_OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
+FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
+FLASK_OIDC_FORCE_SCHEME                                     # Default:  'http'
+FLASK_OIDC_REDIRECT_URI                                     # Default:  '/auth'
+FLASK_OIDC_CONFIG_URL                                       # Default:  ''
+FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
+
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
@@ -46,7 +57,6 @@ elif AUTH_TYPE.lower() == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
-
 
 else:
     app = Flask(__name__, static_url_path=static_url_path)
