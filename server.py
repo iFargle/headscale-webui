@@ -59,6 +59,7 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__)
 
+app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
 app.logger.debug("Authentication Method:  "+AUTH_TYPE.lower())
 
 ########################################################################################
@@ -333,6 +334,4 @@ def build_preauth_key_table():
 # Main thread
 ########################################################################################
 if __name__ == '__main__':
-    app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
-
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
