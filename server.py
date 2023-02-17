@@ -17,15 +17,15 @@ DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '')
 
 # OIDC Variables:  https://github.com/verdan/flaskoidc
-FLASK_OIDC_PROVIDER_NAME = "OIDC"                           # Default:  'google'
-# FLASK_OIDC_SCOPES                                           # Default:  'openid email profile'
-# FLASK_OIDC_USER_ID_FIELD                                    # Default:  'email'
-FLASK_OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
-FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
-# FLASK_OIDC_FORCE_SCHEME                                     # Default:  'http'
-# FLASK_OIDC_REDIRECT_URI                                     # Default:  '/auth'
-FLASK_OIDC_CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
-FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
+#    OIDC_PROVIDER = os.environ.get("FLASK_OIDC_PROVIDER_NAME", "google")
+#    OIDC_SCOPES = os.environ.get("FLASK_OIDC_SCOPES", "openid email profile")
+#    USER_ID_FIELD = os.environ.get("FLASK_OIDC_USER_ID_FIELD", "email")
+#    CLIENT_ID = os.environ.get("FLASK_OIDC_CLIENT_ID", "")
+#    CLIENT_SECRET = os.environ.get("FLASK_OIDC_CLIENT_SECRET", "")
+#    SCHEME = os.environ.get("FLASK_OIDC_FORCE_SCHEME", "http")
+#    REDIRECT_URI = os.environ.get("FLASK_OIDC_REDIRECT_URI", "/auth")
+#    OVERWRITE_REDIRECT_URI = os.environ.get("FLASK_OIDC_OVERWRITE_REDIRECT_URI", "/")
+#    CONFIG_URL = os.environ.get("FLASK_OIDC_CONFIG_URL", "")
 
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
@@ -34,20 +34,8 @@ if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     from flaskoidc import FlaskOIDC
-    from flaskoidc.config import BaseConfig
 
-    class CustomConfig(BaseConfig):
-        DEBUG = DEBUG_STATE
-        PROVIDER_NAME = "OIDC"                           # Default:  'google'
-        CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
-        CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
-        CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
-        OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
-
-    print("using config "+FLASK_OIDC_CONFIG_URL)
     app = FlaskOIDC(__name__, static_url_path=static_url_path)
-    app.config.from_object(CustomConfig)
-
     app.logger.debug("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
