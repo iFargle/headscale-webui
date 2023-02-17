@@ -1,7 +1,7 @@
 import json, renderer, headscale, helper, pytz, os
 from flask          import Flask, render_template, request, url_for, redirect, Markup
 from dateutil       import parser
-from flask_executor import Executor
+# from flask_executor import Executor
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
@@ -19,12 +19,8 @@ AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '')
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
-app = Flask(__name__, static_url_path=static_url_path)
-executor = Executor(app)
-
-app.logger.warning("Authentication chosen:  "+AUTH_TYPE.lower())
-app.logger.warning("Static assets served on:  "+static_url_path)
-app.logger.warning("BASE_PATH:  "+BASE_PATH)
+app.logger.warning("Authentication Method:  "+AUTH_TYPE.lower())
+app.logger.warning("Static Assets:  "+static_url_path)
 
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
@@ -33,10 +29,13 @@ if AUTH_TYPE.lower() == "oidc":
     # https://flask-oidc.readthedocs.io/en/latest/
     # https://stackoverflow.com/questions/29046866/basic-flask-openid-connect-example#29056144
 
-    from flask_oidc import OpenIDConnect
-    oidc = OpenIDConnect(app)
+    from flaskoidc import FlaskOIDC
 
-if AUTH_TYPE.lower() == "basic":
+    # TODO:
+    # If OIDC is enabled, add user info and a logout button to the top bar.
+
+elif AUTH_TYPE.lower() == "basic":
+    app = Flask(__name__, static_url_path=static_url_path)
     # Load basic auth libraries:
     app.logger.debug("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -48,6 +47,11 @@ if AUTH_TYPE.lower() == "basic":
 
     basic_auth = BasicAuth(app)
 
+
+else:
+    app = Flask(__name__, static_url_path=static_url_path)
+
+# executor = Executor(app)
 
 ########################################################################################
 # / pages - User-facing pages
