@@ -33,12 +33,13 @@ if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
-    app.logger.debug("Loading OIDC libraries and configuring app...")
     # https://flask-oidc.readthedocs.io/en/latest/
     # https://stackoverflow.com/questions/29046866/basic-flask-openid-connect-example#29056144
 
     from flaskoidc import FlaskOIDC
-
+    app = FlaskOIDC(__name__)
+    
+    app.logger.debug("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
