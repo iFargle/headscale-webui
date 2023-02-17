@@ -526,7 +526,7 @@ def build_preauth_key_table(user_name):
         """
     return preauth_keys_collection
 
-def render_oidc_nav_dropdown() {
+def render_oidc_nav_dropdown():
 
     htmlPayload = """
         <!-- Dropdown Structure -->
@@ -545,4 +545,3 @@ def render_oidc_nav_dropdown() {
     """
 
     return Markup(htmlPayload)
-}
