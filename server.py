@@ -31,7 +31,6 @@ print("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAM
 print("FLASK_OIDC_CLIENT_ID:               "+os.environ["FLASK_OIDC_CLIENT_ID"])
 print("FLASK_OIDC_CLIENT_SECRET:           "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
 print("FLASK_OIDC_CONFIG_URL:              "+os.environ["FLASK_OIDC_CONFIG_URL"])
-print("FLASK_OIDC_OVERWRITE_REDIRECT_URI:  "+os.environ["FLASK_OIDC_OVERWRITE_REDIRECT_URI"])
 print("FLASK_OIDC_REDIRECT_URI:            "+os.environ["FLASK_OIDC_REDIRECT_URI"])
 print("BASE_PATH:                          "+os.environ["BASE_PATH"])
 
@@ -46,7 +45,7 @@ if AUTH_TYPE.lower() == "oidc":
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
-    app = Flask(__name__, static_url_path=static_url_path)
+    app = Flask(__name__)
     # Load basic auth libraries:
     app.logger.debug("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -59,7 +58,7 @@ elif AUTH_TYPE.lower() == "basic":
     basic_auth = BasicAuth(app)
 
 else:
-    app = Flask(__name__, static_url_path=static_url_path)
+    app = Flask(__name__)
 
 app.logger.warning("Authentication Method:  "+AUTH_TYPE.lower())
 app.logger.warning("Static Assets:  "+static_url_path)
@@ -336,5 +335,6 @@ def build_preauth_key_table():
 # Main thread
 ########################################################################################
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", debug=DEBUG_STATE)
     app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
+
+    app.run(host="0.0.0.0", debug=DEBUG_STATE)
