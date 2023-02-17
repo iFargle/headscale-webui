@@ -23,7 +23,6 @@ ARG WORKDIR
 WORKDIR ${WORKDIR}
 
 RUN adduser app -DHh ${WORKDIR} -u 1000
-RUN mkdir /app/instance && chown 1000:1000 /app/instance
 USER 1000
 
 COPY --chown=app:app --from=builder ${WORKDIR} .
@@ -64,6 +63,4 @@ EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]z
 
 # Temporarily reduce to 1 worker
-# https://stackoverflow.com/questions/52789177/docker-env-in-cmd
-# https://stackoverflow.com/questions/25962224/running-a-flask-application-at-a-url-that-is-not-the-domain-root
-CMD ["sh", "gunicorn", "--env", "SCRIPT_NAME=${BASE_PATH}", "-w", "1", "-b", "0.0.0.0:5000", "server:app"]
+CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app
