@@ -33,19 +33,16 @@ if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
-    # https://flask-oidc.readthedocs.io/en/latest/
-    # https://stackoverflow.com/questions/29046866/basic-flask-openid-connect-example#29056144
-
     from flaskoidc import FlaskOIDC
     from flaskoidc.config import BaseConfig
 
     CustomConfig(BaseConfig):
         DEBUG = DEBUG_STATE
-        FLASK_OIDC_PROVIDER_NAME = "OIDC"                           # Default:  'google'
-        FLASK_OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
-        FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
-        FLASK_OIDC_CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
-        FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
+        PROVIDER_NAME = "OIDC"                           # Default:  'google'
+        CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
+        CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
+        CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
+        OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 
 
     app = FlaskOIDC(__name__, static_url_path=static_url_path)
