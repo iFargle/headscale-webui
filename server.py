@@ -40,8 +40,6 @@ else:
 
 executor = Executor(app)
 
-app.register_blueprint(app, url_prefix=BASE_PATH)
-
 app.logger.error("Environment ============================ Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
 app.logger.error("FLASK_OIDC_CLIENT_ID: "+os.environ["FLASK_OIDC_CLIENT_ID"])

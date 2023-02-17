@@ -34,6 +34,7 @@ ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV BASE_PATH="/"
+ENV SCRIPT_NAME="/"
 
 # Authentication variables
 ENV AUTH_TYPE="basic"
