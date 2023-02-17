@@ -21,15 +21,15 @@ if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     from flaskoidc import FlaskOIDC
 
-    app = FlaskOIDC(__name__)
-    app.logger.debug("Loading OIDC libraries and configuring app...")
+    app = FlaskOIDC(__name__, root_path=$BASE_PATH)
+    app.logger.error("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
-    app = Flask(__name__)
+    app = Flask(__name__, root_path=$BASE_PATH)
     # Load basic auth libraries:
-    app.logger.debug("Loading basic auth libraries and configuring app...")
+    app.logger.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
 
     from flask_basicauth import BasicAuth
@@ -40,17 +40,16 @@ elif AUTH_TYPE.lower() == "basic":
     basic_auth = BasicAuth(app)
 
 else:
-    app = Flask(__name__)
+    app = Flask(__name__, root_path=$BASE_PATH)
 
-app.logger.debug("===================================== Environment:  ")
-app.logger.debug("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
-app.logger.debug("FLASK_OIDC_CLIENT_ID:               "+os.environ["FLASK_OIDC_CLIENT_ID"])
-app.logger.debug("FLASK_OIDC_CLIENT_SECRET:           "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
-app.logger.debug("FLASK_OIDC_CONFIG_URL:              "+os.environ["FLASK_OIDC_CONFIG_URL"])
-app.logger.debug("BASE_PATH:                          "+os.environ["BASE_PATH"])
-app.logger.debug("AUTH_TYPE:                          "+os.environ["AUTH_TYPE"])
-app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
-app.logger.debug("Authentication Method:  "+AUTH_TYPE.lower())
+app.logger.error("===================================== Environment:  ")
+app.logger.error("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
+app.logger.error("FLASK_OIDC_CLIENT_ID:               "+os.environ["FLASK_OIDC_CLIENT_ID"])
+app.logger.error("FLASK_OIDC_CLIENT_SECRET:           "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
+app.logger.error("FLASK_OIDC_CONFIG_URL:              "+os.environ["FLASK_OIDC_CONFIG_URL"])
+app.logger.error("BASE_PATH:                          "+os.environ["BASE_PATH"])
+app.logger.error("AUTH_TYPE:                          "+os.environ["AUTH_TYPE"])
+app.logger.error("Authentication Method:  "+AUTH_TYPE.lower())
 
 ########################################################################################
 # / pages - User-facing pages
@@ -323,5 +322,5 @@ def build_preauth_key_table():
 ########################################################################################
 # Main thread
 ########################################################################################
-if __name__ == '__main__':
+if __name__, root_path=$BASE_PATH == '__main__':
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
