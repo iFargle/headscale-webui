@@ -18,12 +18,16 @@ if AUTH_TYPE.lower() == "oidc":
     from flaskoidc import FlaskOIDC
 
     app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
+    LOG = create_logger(app)
+
     LOG.error("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
+    LOG = create_logger(app)
+
     # Load basic auth libraries:
     LOG.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -37,9 +41,10 @@ elif AUTH_TYPE.lower() == "basic":
 
 else:
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
+    LOG = create_logger(app)
+
 
 executor = Executor(app)
-LOG = create_logger(app)
 
 
 LOG.error("Environment ============================ Environment:  ")
