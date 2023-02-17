@@ -40,8 +40,7 @@ else:
 
 executor = Executor(app)
 
-app.application_root = BASE_PATH
-app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
+app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=BASE_PATH)
 
 app.logger.error("Environment ============================ Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
