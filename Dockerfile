@@ -23,6 +23,7 @@ ARG WORKDIR
 WORKDIR ${WORKDIR}
 
 RUN adduser app -DHh ${WORKDIR} -u 1000
+RUN mkdir /app/instance && chown 1000:1000 /app/instance
 USER 1000
 
 COPY --chown=app:app --from=builder ${WORKDIR} .
