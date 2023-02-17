@@ -39,7 +39,7 @@ ENV BASIC_AUTH_PASS="pass"
 
 # OIDC variables
 ENV OIDC_DISCOVERY_URL=http://localhost
-ENV OIDC_CLIENT_ID=Headscale WebUI
+ENV OIDC_CLIENT_ID=Headscale-WebUI
 ENV OIDC_CLIENT_SECRET=
 
 # Jenkins build args
