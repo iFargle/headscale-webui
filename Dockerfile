@@ -57,5 +57,7 @@ VOLUME /etc/headscale
 VOLUME /data
 
 EXPOSE 5000/tcp
-ENTRYPOINT ["/app/entrypoint.sh"]
-CMD gunicorn -w 4 -b 0.0.0.0:5000 server:app
+ENTRYPOINT ["/app/entrypoint.sh"]z
+
+# Temporarily reduce to 1 worker
+CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app
