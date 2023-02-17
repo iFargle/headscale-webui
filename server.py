@@ -35,9 +35,6 @@ print("FLASK_OIDC_OVERWRITE_REDIRECT_URI:  "+os.environ["FLASK_OIDC_OVERWRITE_RE
 print("FLASK_OIDC_REDIRECT_URI:            "+os.environ["FLASK_OIDC_REDIRECT_URI"])
 print("BASE_PATH:                          "+os.environ["BASE_PATH"])
 
-static_url_path = '/static'
-if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
-
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
@@ -71,13 +68,11 @@ app.logger.warning("Static Assets:  "+static_url_path)
 # / pages - User-facing pages
 ########################################################################################
 @app.route('/')
-@app.route(BASE_PATH+'/')
 @app.route('/overview')
-@app.route(BASE_PATH+'/overview')
 def overview_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -85,12 +80,11 @@ def overview_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route(BASE_PATH+'/machines', methods=('GET', 'POST'))
 @app.route('/machines', methods=('GET', 'POST'))
 def machines_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -100,12 +94,11 @@ def machines_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route(BASE_PATH+'/users', methods=('GET', 'POST'))
 @app.route('/users', methods=('GET', 'POST'))
 def users_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -115,12 +108,11 @@ def users_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route(BASE_PATH+'/settings', methods=('GET', 'POST'))
 @app.route('/settings', methods=('GET', 'POST'))
 def settings_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass": return redirect(BASE_PATH+url_for(pass_checks))
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
     return render_template('settings.html', 
         url          = headscale.get_url(),
@@ -133,7 +125,6 @@ def settings_page():
         BUILD_DATE   = BUILD_DATE
     )
 
-@app.route(BASE_PATH+'/error')
 @app.route('/error')
 def error_page():
     if helper.access_checks() == "Pass": 
@@ -151,7 +142,6 @@ def error_page():
 # Headscale API Key Endpoints
 ########################################################################################
 
-@app.route(BASE_PATH+'/api/test_key', methods=('GET', 'POST'))
 @app.route('/api/test_key', methods=('GET', 'POST'))
 def test_key_page():
     api_key    = headscale.get_api_key()
@@ -187,7 +177,6 @@ def test_key_page():
     message = json.dumps(key_info)
     return message
 
-@app.route(BASE_PATH+'/api/save_key', methods=['POST'])
 @app.route('/api/save_key', methods=['POST'])
 def save_key_page():
     json_response = request.get_json()
@@ -212,7 +201,6 @@ def save_key_page():
 ########################################################################################
 # Machine API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/update_route', methods=['POST'])
 @app.route('/api/update_route', methods=['POST'])
 def update_route_page():
     json_response = request.get_json()
@@ -223,7 +211,6 @@ def update_route_page():
 
     return headscale.update_route(url, api_key, route_id, current_state)
 
-@app.route(BASE_PATH+'/api/machine_information', methods=['POST'])
 @app.route('/api/machine_information', methods=['POST'])
 def machine_information_page():
     json_response = request.get_json()
@@ -233,7 +220,6 @@ def machine_information_page():
 
     return headscale.get_machine_info(url, api_key, machine_id)
 
-@app.route(BASE_PATH+'/api/delete_machine', methods=['POST'])
 @app.route('/api/delete_machine', methods=['POST'])
 def delete_machine_page():
     json_response = request.get_json()
@@ -243,7 +229,6 @@ def delete_machine_page():
 
     return headscale.delete_machine(url, api_key, machine_id)
 
-@app.route(BASE_PATH+'/api/rename_machine', methods=['POST'])
 @app.route('/api/rename_machine', methods=['POST'])
 def rename_machine_page():
     json_response = request.get_json()
@@ -254,7 +239,6 @@ def rename_machine_page():
 
     return headscale.rename_machine(url, api_key, machine_id, new_name)
 
-@app.route(BASE_PATH+'/api/move_user', methods=['POST'])
 @app.route('/api/move_user', methods=['POST'])
 def move_user_page():
     json_response = request.get_json()
@@ -265,7 +249,6 @@ def move_user_page():
 
     return headscale.move_user(url, api_key, machine_id, new_user)
 
-@app.route(BASE_PATH+'/api/set_machine_tags', methods=['POST'])
 @app.route('/api/set_machine_tags', methods=['POST'])
 def set_machine_tags():
     json_response = request.get_json()
@@ -276,7 +259,6 @@ def set_machine_tags():
 
     return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
 
-@app.route(BASE_PATH+'/api/register_machine', methods=['POST'])
 @app.route('/api/register_machine', methods=['POST'])
 def register_machine():
     json_response = request.get_json()
@@ -290,7 +272,6 @@ def register_machine():
 ########################################################################################
 # User API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/rename_user', methods=['POST'])
 @app.route('/api/rename_user', methods=['POST'])
 def rename_user_page():
     json_response = request.get_json()
@@ -301,7 +282,6 @@ def rename_user_page():
 
     return headscale.rename_user(url, api_key, old_name, new_name)
 
-@app.route(BASE_PATH+'/api/add_user', methods=['POST'])
 @app.route('/api/add_user', methods=['POST'])
 def add_user():
     json_response  = json.dumps(request.get_json())
@@ -310,7 +290,6 @@ def add_user():
 
     return headscale.add_user(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/delete_user', methods=['POST'])
 @app.route('/api/delete_user', methods=['POST'])
 def delete_user():
     json_response  = request.get_json()
@@ -320,7 +299,6 @@ def delete_user():
 
     return headscale.delete_user(url, api_key, user_name)
 
-@app.route(BASE_PATH+'/api/get_users', methods=['POST'])
 @app.route('/api/get_users', methods=['POST'])
 def get_users_page():
     url           = headscale.get_url()
@@ -331,7 +309,6 @@ def get_users_page():
 ########################################################################################
 # Pre-Auth Key API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/add_preauth_key', methods=['POST'])
 @app.route('/api/add_preauth_key', methods=['POST'])
 def add_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -340,7 +317,6 @@ def add_preauth_key():
 
     return headscale.add_preauth_key(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/expire_preauth_key', methods=['POST'])
 @app.route('/api/expire_preauth_key', methods=['POST'])
 def expire_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -349,7 +325,6 @@ def expire_preauth_key():
 
     return headscale.expire_preauth_key(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/build_preauthkey_table', methods=['POST'])
 @app.route('/api/build_preauthkey_table', methods=['POST'])
 def build_preauth_key_table():
     json_response  = request.get_json()
@@ -362,3 +337,4 @@ def build_preauth_key_table():
 ########################################################################################
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
+    app.config["APPLICATION_ROOT"] = $BASE_PATH
