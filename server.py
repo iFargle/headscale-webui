@@ -36,7 +36,7 @@ if AUTH_TYPE.lower() == "oidc":
     from flaskoidc import FlaskOIDC
     from flaskoidc.config import BaseConfig
 
-    CustomConfig(BaseConfig):
+    class CustomConfig(BaseConfig):
         DEBUG = DEBUG_STATE
         PROVIDER_NAME = "OIDC"                           # Default:  'google'
         CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
