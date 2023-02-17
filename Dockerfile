@@ -64,4 +64,6 @@ EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]z
 
 # Temporarily reduce to 1 worker
-CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app
+# https://stackoverflow.com/questions/52789177/docker-env-in-cmd
+# https://stackoverflow.com/questions/25962224/running-a-flask-application-at-a-url-that-is-not-the-domain-root
+CMD ["sh", "gunicorn", "--env", "SCRIPT_NAME=${BASE_PATH}", "-w", "1", "-b", "0.0.0.0:5000", "server:app"]
