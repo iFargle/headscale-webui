@@ -43,7 +43,7 @@ else:
     app = Flask(__name__)
 
 app.application_root = BASE_PATH
-app.config["APPLICATION_ROOT"] = s.environ["BASE_PATH"].replace('"', '')
+app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
 
 app.logger.error("===================================== Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
