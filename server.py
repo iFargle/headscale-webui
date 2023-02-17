@@ -21,13 +21,13 @@ if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     from flaskoidc import FlaskOIDC
 
-    app = FlaskOIDC(__name__, root_path=$BASE_PATH)
+    app = FlaskOIDC(__name__, root_path=BASE_PATH)
     app.logger.error("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
-    app = Flask(__name__, root_path=$BASE_PATH)
+    app = Flask(__name__, root_path=BASE_PATH)
     # Load basic auth libraries:
     app.logger.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -40,7 +40,7 @@ elif AUTH_TYPE.lower() == "basic":
     basic_auth = BasicAuth(app)
 
 else:
-    app = Flask(__name__, root_path=$BASE_PATH)
+    app = Flask(__name__, root_path=BASE_PATH)
 
 app.logger.error("===================================== Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
@@ -322,5 +322,5 @@ def build_preauth_key_table():
 ########################################################################################
 # Main thread
 ########################################################################################
-if __name__, root_path=$BASE_PATH == '__main__':
+if __name__, == '__main__':
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
