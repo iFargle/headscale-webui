@@ -3,8 +3,11 @@ from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
+from flask.logging       import create_logger
+
 
 app = Flask(__name__)
+LOG = create_logger(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
@@ -183,10 +186,10 @@ def update_route(url, api_key, route_id, current_state):
     if current_state == "False": action = "enable"
 
     # Debug
-    #app.logger.info("URL:  "+str(url))
-    #app.logger.info("Route ID:  "+str(route_id))
-    #app.logger.info("Current State:  "+str(current_state))
-    #app.logger.info("Action to take:  "+str(action))
+    # LOG.info("URL:  "+str(url))
+    # LOG.info("Route ID:  "+str(route_id))
+    # LOG.info("Current State:  "+str(current_state))
+    # LOG.info("Action to take:  "+str(action))
 
     response = requests.post(
         str(url)+"/api/v1/routes/"+str(route_id)+"/"+str(action),
@@ -386,6 +389,6 @@ def expire_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
-    # app.logger.info("expire_preauth_key - Return:  "+str(response.json()))
-    # app.logger.info("expire_preauth_key - Status:  "+str(status))
+    ## LOG.info("expire_preauth_key - Return:  "+str(response.json()))
+    ## LOG.info("expire_preauth_key - Status:  "+str(status))
     return {"status": status, "body": response.json()}

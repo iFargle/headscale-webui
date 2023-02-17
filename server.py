@@ -1,7 +1,8 @@
-import json, renderer, headscale, helper, pytz, os
-from flask          import Flask, render_template, request, url_for, redirect, Markup
+import headscale, helper, json, os, pytz, renderer
+from flask          import Flask, Markup, redirect, render_template, request, url_for
 from dateutil       import parser
 from flask_executor import Executor
+from flask.logging  import create_logger
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
@@ -17,14 +18,14 @@ if AUTH_TYPE.lower() == "oidc":
     from flaskoidc import FlaskOIDC
 
     app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
-    app.logger.error("Loading OIDC libraries and configuring app...")
+    LOG.error("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
     # Load basic auth libraries:
-    app.logger.error("Loading basic auth libraries and configuring app...")
+    LOG.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
 
     from flask_basicauth import BasicAuth
@@ -38,13 +39,15 @@ else:
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
 executor = Executor(app)
+LOG = create_logger(app)
 
-app.logger.error("Environment ============================ Environment:  ")
-app.logger.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
-app.logger.error("FLASK_OIDC_CLIENT_ID: "+os.environ["FLASK_OIDC_CLIENT_ID"])
-app.logger.error("FLASK_OIDC_CONFIG_URL: "+os.environ["FLASK_OIDC_CONFIG_URL"])
-app.logger.error("AUTH_TYPE: "+os.environ["AUTH_TYPE"])
-app.logger.error("Environment ============================ Environment  ")
+
+LOG.error("Environment ============================ Environment:  ")
+LOG.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
+LOG.error("FLASK_OIDC_CLIENT_ID: "+os.environ["FLASK_OIDC_CLIENT_ID"])
+LOG.error("FLASK_OIDC_CONFIG_URL: "+os.environ["FLASK_OIDC_CONFIG_URL"])
+LOG.error("AUTH_TYPE: "+os.environ["AUTH_TYPE"])
+LOG.error("Environment ============================ Environment  ")
 
 ########################################################################################
 # / pages - User-facing pages
@@ -134,8 +137,9 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.logger.warning("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
-    app.logger.warning("Renewed:  "+str(renewed))
+    LOG.warning("The below statement will be TRUE if the key has been renewed, ")
+    LOG.warning("or DOES NOT need renewal.  False in all other cases")
+    LOG.warning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 

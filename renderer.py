@@ -1,11 +1,15 @@
+# pylint: disable=line-too-long
+
 import headscale, helper, pytz, os, yaml
 from flask              import Markup, render_template, Flask
 from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
+from flask.logging       import create_logger
 
 app = Flask(__name__)
+LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
@@ -88,23 +92,23 @@ def render_overview():
                     <span class="card-title">General</span>
                     <p>
                         <table>
-                            <tr><td> IP Prefixes </td><td> """; 
+                            <tr><td> IP Prefixes </td><td> """
     if "ip_prefixes" in config_yaml:  general_content += str(config_yaml["ip_prefixes"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
-    <tr><td> Server URL </td><td> """; 
+    <tr><td> Server URL </td><td> """
     if "server_url" in config_yaml:  general_content += str(config_yaml["server_url"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
-    <tr><td> Updates Disabled? </td><td> """; 
+    <tr><td> Updates Disabled? </td><td> """ 
     if "disable_check_updates" in config_yaml:  general_content += str(config_yaml["disable_check_updates"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
-    <tr><td> Ephemeral Node Timeout </td><td> """; 
-    if "ephemeral_node_inactivity_timeout" in config_yaml:  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"]); 
+    <tr><td> Ephemeral Node Timeout </td><td> """
+    if "ephemeral_node_inactivity_timeout" in config_yaml:  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
-    <tr><td> Node Update Check Interval </td><td> """; 
+    <tr><td> Node Update Check Interval </td><td> """
     if "node_update_check_interval" in config_yaml:  general_content += str(config_yaml["node_update_check_interval"])
     else: general_content += "N/A"
     general_content +=""" </td></tr>
@@ -275,7 +279,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # app.logger.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                # LOG.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -315,7 +319,7 @@ def thread_machine_content(machine, machine_content, idx):
                         }) 
                     );
                 }, false
-            ); 
+            )
         </script>
         """
 
@@ -381,7 +385,7 @@ def thread_machine_content(machine, machine_content, idx):
         preauth_key       = str(preauth_key),
         machine_tags      = Markup(tags),
     )))
-    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    LOG.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -395,14 +399,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, numThreads):
-        app.logger.debug("Appending iterable:  "+str(i))
+        LOG.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    app.logger.warning("Starting futures")
+    LOG.warning("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    app.logger.warning("Finished futures")
+    LOG.warning("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)

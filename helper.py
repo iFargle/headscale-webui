@@ -1,7 +1,9 @@
 import os, headscale, requests
-from flask    import Flask
+from flask          import Flask
+from flask.logging  import create_logger
 
 app = Flask(__name__)
+LOG = create_logger(app)
 
 def pretty_print_duration(duration):
     """ Prints a duration in human-readable formats """
@@ -137,20 +139,20 @@ def access_checks():
         server_reachable = True
     else:
         checks_passed = False
-        app.logger.error("Headscale URL: Response 200: FAILED")
+        LOG.error("Headscale URL: Response 200: FAILED")
 
     # Check: /data is rwx for 1000:1000:
     if os.access('/data/', os.R_OK):  data_readable = True
     else:
-        app.logger.error("/data READ: FAILED")
+        LOG.error("/data READ: FAILED")
         checks_passed = False
     if os.access('/data/', os.W_OK):  data_writable = True
     else:
-        app.logger.error("/data WRITE: FAILED")
+        LOG.error("/data WRITE: FAILED")
         checks_passed = False
     if os.access('/data/', os.X_OK):   data_executable = True
     else:
-        app.logger.error("/data EXEC: FAILED")
+        LOG.error("/data EXEC: FAILED")
         checks_passed = False
 
     # Check: /data/key.txt exists and is rw:
@@ -158,29 +160,29 @@ def access_checks():
         file_exists = True
         if os.access('/data/key.txt', os.R_OK): file_readable = True
         else:
-            app.logger.error("/data/key.txt READ: FAILED")
+            LOG.error("/data/key.txt READ: FAILED")
             checks_passed = False
         if os.access('/data/key.txt', os.W_OK):  file_writable = True
         else:
-            app.logger.error("/data/key.txt WRITE: FAILED")
+            LOG.error("/data/key.txt WRITE: FAILED")
             checks_passed = False
-    else: app.logger.error("/data/key.txt EXIST: FAILED - NO ERROR")
+    else: LOG.error("/data/key.txt EXIST: FAILED - NO ERROR")
 
     # Check: /etc/headscale/config.yaml is readable:
     if os.access('/etc/headscale/config.yaml', os.R_OK):  config_readable = True
     elif os.access('/etc/headscale/config.yml', os.R_OK): config_readable = True
     else:
-        app.logger.error("/etc/headscale/config.y(a)ml: READ: FAILED")
+        LOG.error("/etc/headscale/config.y(a)ml: READ: FAILED")
         checks_passed = False
 
     if checks_passed:
-        app.logger.error("All startup checks passed.")
+        LOG.error("All startup checks passed.")
         return "Pass"
 
     message_html = ""
     # Generate the message:
     if not server_reachable:
-        app.logger.error("Server is unreachable")
+        LOG.error("Server is unreachable")
         message = """
         <p>Your headscale server is either unreachable or not properly configured. 
         Please ensure your configuration is correct (Check for 200 status on
@@ -190,7 +192,7 @@ def access_checks():
         message_html += format_error_message("Error", "Headscale unreachable", message)
 
     if not config_readable:
-        app.logger.error("Headscale configuration is not readable")
+        LOG.error("Headscale configuration is not readable")
         message = """
         <p>/etc/headscale/config.yaml not readable.  Please ensure your
         headscale configuration file resides in /etc/headscale and
@@ -200,7 +202,7 @@ def access_checks():
         message_html += format_error_message("Error", "/etc/headscale/config.yaml not readable", message)
 
     if not data_writable:
-        app.logger.error("/data folder is not writable")
+        LOG.error("/data folder is not writable")
         message = """
         <p>/data is not writable.  Please ensure your
         permissions are correct. /data mount should be writable
@@ -210,7 +212,7 @@ def access_checks():
         message_html += format_error_message("Error", "/data not writable", message)
 
     if not data_readable:
-        app.logger.error("/data folder is not readable")
+        LOG.error("/data folder is not readable")
         message = """
         <p>/data is not readable.  Please ensure your
         permissions are correct. /data mount should be readable
@@ -220,7 +222,7 @@ def access_checks():
         message_html += format_error_message("Error", "/data not readable", message)
 
     if not data_executable:
-        app.logger.error("/data folder is not readable")
+        LOG.error("/data folder is not readable")
         message = """
         <p>/data is not executable.  Please ensure your
         permissions are correct. /data mount should be readable
@@ -234,7 +236,7 @@ def access_checks():
         # If it doesn't exist, we assume the user hasn't created it yet.
         # Just redirect to the settings page to enter an API Key
         if not file_writable:
-            app.logger.error("/data/key.txt is not writable")
+            LOG.error("/data/key.txt is not writable")
             message = """
             <p>/data/key.txt is not writable.  Please ensure your
             permissions are correct. /data mount should be writable
@@ -244,7 +246,7 @@ def access_checks():
             message_html += format_error_message("Error", "/data/key.txt not writable", message)
 
         if not file_readable:
-            app.logger.error("/data/key.txt is not readable")
+            LOG.error("/data/key.txt is not readable")
             message = """
             <p>/data/key.txt is not readable.  Please ensure your
             permissions are correct. /data mount should be readable
