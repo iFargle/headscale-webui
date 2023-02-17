@@ -42,6 +42,8 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__)
 
+executor = Executor(app)
+
 app.application_root = BASE_PATH
 app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
 
