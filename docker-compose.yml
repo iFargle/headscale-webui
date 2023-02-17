@@ -6,7 +6,7 @@ services:
     environment:
       - TZ=UTC                                 # Timezone
       - HS_SERVER=localhost                    # Set this to your Headscale server's URL.  It will need to access /api/ on Headscale.
-      - BASE_PATH="/admin"                     # Default, can be anything you want.  Tailscale's Windows app expects "HS_SERVER/admin"
+      - SCRIPT_NAME=/admin                     # This is your applications base path (wsgi requires the name "SCRIPT_NAME")
       - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32"
       - AUTH_TYPE=Basic                        # AUTH_TYPE is either "Basic" or "OIDC" - Removing this will disable authentication
       - BASIC_AUTH_USER=user                   # Used for basic auth - Can be omitted if not using Basic Auth  
@@ -16,6 +16,7 @@ services:
       - FLASK_OIDC_CLIENT_ID=Headscale-WebUI
       - FLASK_OIDC_CLIENT_SECRET=secret
       - FLASK_OIDC_CONFIG_URL=https://auth.$DOMAIN/.well-known/openid-configuration
+      - FLASK_OIDC_OVERWRITE_REDIRECT_URI=/admin # Set this to the URL you want to redirect to after a successful login
     volumes:
       - ./volume:/data                         # Headscale-WebUI's storage.  Make sure ./volume is readable by UID 1000 (chown 1000:1000 ./volume)
       - ./headscale/config/:/etc/headscale/:ro # Headscale's config storage location.  Used to read your Headscale config.

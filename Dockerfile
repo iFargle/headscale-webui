@@ -34,7 +34,6 @@ COPY --chown=app:app --from=builder ${WORKDIR} .
 ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
-ENV BASE_PATH=/
 ENV SCRIPT_NAME=/
 
 # BasicAuth variables
@@ -48,6 +47,7 @@ ENV FLASK_OIDC_CLIENT_ID=Headscale-WebUI
 ENV FLASK_OIDC_CLIENT_SECRET=secret
 ENV FLASK_OIDC_CONFIG_URL=http://localhost
 ENV FLASK_OIDC_FORCE_SCHEME=https
+ENV FLASK_OIDC_OVERWRITE_REDIRECT_URI=/
 
 # Jenkins build args
 ARG GIT_COMMIT_ARG=""

@@ -82,6 +82,7 @@
                <li role="menu-item" class="{{ settings_active   }}">
                   <a href="settings"><i class="material-icons left">settings</i>Settings</a>
                </li>
+               {{ OIDC_NAV_DROPDOWN }}
            </ul>
          </div>
        </nav>
@@ -90,6 +91,8 @@
          <li><a href="machines"><i class="material-icons left">devices_other</i>Machines</a></li>
          <li><a href="users"><i class="material-icons left">people</i>Users</a></li>
          <li><a href="settings"><i class="material-icons left">settings</i>Settings</a></li>
+         <hr>
+         {{ OIDC_NAV_MOBILE }}
        </ul>
       <div class="container">
          {% block content %} {% endblock %}

@@ -525,3 +525,24 @@ def build_preauth_key_table(user_name):
         </li>
         """
     return preauth_keys_collection
+
+def render_oidc_nav_dropdown() {
+
+    htmlPayload = """
+        <!-- Dropdown Structure -->
+        <ul id="dropdown1" class="dropdown-content">
+            <li><a href="#!">Username</a></li>
+            <li><a href="#!">Email</a></li>
+            <li class="divider"></li>
+            <li><a href="#!">Logout</a></li>
+        </ul>
+
+        <li>
+            <a class="dropdown-trigger" href="#!" data-target="dropdown1">
+                <i class="material-icons right">account_circle</i>
+            </a>
+        </li>
+    """
+
+    return Markup(htmlPayload)
+}
