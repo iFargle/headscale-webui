@@ -16,23 +16,6 @@ HS_VERSION  = "v0.20.0"
 DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '')
 
-# OIDC Variables:  https://github.com/verdan/flaskoidc
-#    OIDC_PROVIDER = os.environ.get("FLASK_OIDC_PROVIDER_NAME", "google")
-#    OIDC_SCOPES = os.environ.get("FLASK_OIDC_SCOPES", "openid email profile")
-#    USER_ID_FIELD = os.environ.get("FLASK_OIDC_USER_ID_FIELD", "email")
-#    CLIENT_ID = os.environ.get("FLASK_OIDC_CLIENT_ID", "")
-#    CLIENT_SECRET = os.environ.get("FLASK_OIDC_CLIENT_SECRET", "")
-#    SCHEME = os.environ.get("FLASK_OIDC_FORCE_SCHEME", "http")
-#    REDIRECT_URI = os.environ.get("FLASK_OIDC_REDIRECT_URI", "/auth")
-#    OVERWRITE_REDIRECT_URI = os.environ.get("FLASK_OIDC_OVERWRITE_REDIRECT_URI", "/")
-#    CONFIG_URL = os.environ.get("FLASK_OIDC_CONFIG_URL", "")
-print("===================================== Environment:  ")
-print("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
-print("FLASK_OIDC_CLIENT_ID:               "+os.environ["FLASK_OIDC_CLIENT_ID"])
-print("FLASK_OIDC_CLIENT_SECRET:           "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
-print("FLASK_OIDC_CONFIG_URL:              "+os.environ["FLASK_OIDC_CONFIG_URL"])
-print("BASE_PATH:                          "+os.environ["BASE_PATH"])
-
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
