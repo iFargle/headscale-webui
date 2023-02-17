@@ -24,7 +24,7 @@ FLASK_OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]         # Default:  ''
 FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
 # FLASK_OIDC_FORCE_SCHEME                                     # Default:  'http'
 # FLASK_OIDC_REDIRECT_URI                                     # Default:  '/auth'
-# FLASK_OIDC_CONFIG_URL                                       # Default:  ''
+FLASK_OIDC_CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
 FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 
 static_url_path = '/static'
@@ -38,7 +38,7 @@ if AUTH_TYPE.lower() == "oidc":
 
     from flaskoidc import FlaskOIDC
     app = FlaskOIDC(__name__)
-    
+
     app.logger.debug("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
