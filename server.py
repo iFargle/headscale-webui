@@ -47,7 +47,7 @@ executor = Executor(app)
 app.application_root = BASE_PATH
 app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
 
-app.logger.error("Environment ===================================== Environment:  ")
+app.logger.error("Environment ============================ Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
 app.logger.error("FLASK_OIDC_CLIENT_ID: "+os.environ["FLASK_OIDC_CLIENT_ID"])
 app.logger.error("FLASK_OIDC_CLIENT_SECRET: "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
@@ -55,7 +55,7 @@ app.logger.error("FLASK_OIDC_CONFIG_URL: "+os.environ["FLASK_OIDC_CONFIG_URL"])
 app.logger.error("BASE_PATH: "+os.environ["BASE_PATH"])
 app.logger.error("AUTH_TYPE: "+os.environ["AUTH_TYPE"])
 app.logger.error("app.config['APPLICATION_ROOT']:  "+app.config["APPLICATION_ROOT"])
-app.logger.error("Environment ===================================== Environment  ")
+app.logger.error("Environment ============================ Environment  ")
 
 ########################################################################################
 # / pages - User-facing pages
