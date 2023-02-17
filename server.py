@@ -35,7 +35,7 @@ if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     from flaskoidc import FlaskOIDC
 
-    app = FlaskOIDC(__name__, static_url_path=static_url_path)
+    app = FlaskOIDC(__name__)
     app.logger.debug("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
