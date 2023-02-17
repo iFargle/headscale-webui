@@ -114,12 +114,6 @@ def settings_page():
         HS_VERSION   = os.environ["HS_VERSION"]
     )
 
-
-
-
-
-
-
 @app.route(BASE_PATH+'/error')
 def error_page():
     if helper.access_checks() == "Pass": 

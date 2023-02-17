@@ -22,6 +22,9 @@ FROM python:3.11-alpine
 ARG WORKDIR
 WORKDIR ${WORKDIR}
 
+# For FlaskOIDC library
+RUN mkdir /app/instance && chown 1000:1000 /app/instance
+
 RUN adduser app -DHh ${WORKDIR} -u 1000
 USER 1000
 
@@ -52,6 +55,7 @@ ARG APP_VERSION_ARG=""
 ARG BUILD_DATE_ARG=""
 ARG HS_VERSION_ARG=""
 
+# About section on the Settings page
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 ENV GIT_BRANCH=$GIT_BRANCH_ARG
 ENV APP_VERSION=$APP_VERSION_ARG
