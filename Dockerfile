@@ -30,13 +30,14 @@ USER 1000
 
 COPY --chown=app:app --from=builder ${WORKDIR} .
 
+# General variables
 ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV BASE_PATH=/
 ENV SCRIPT_NAME=/
 
-# Authentication variables
+# BasicAuth variables
 ENV AUTH_TYPE="basic"
 ENV BASIC_AUTH_USER="user"
 ENV BASIC_AUTH_PASS="pass"
