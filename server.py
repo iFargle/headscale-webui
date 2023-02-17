@@ -25,6 +25,7 @@ FLASK_OIDC_CLIENT_SECRET = os.environ["OIDC_CLIENT_SECRET"] # Default:  ''
 # FLASK_OIDC_FORCE_SCHEME                                     # Default:  'http'
 # FLASK_OIDC_REDIRECT_URI                                     # Default:  '/auth'
 FLASK_OIDC_CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
+CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
 FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 
 static_url_path = '/static'
