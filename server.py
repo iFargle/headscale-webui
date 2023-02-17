@@ -59,8 +59,7 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__)
 
-app.logger.warning("Authentication Method:  "+AUTH_TYPE.lower())
-app.logger.warning("Static Assets:  "+static_url_path)
+app.logger.debug("Authentication Method:  "+AUTH_TYPE.lower())
 
 ########################################################################################
 # / pages - User-facing pages
