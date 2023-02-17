@@ -62,13 +62,6 @@ app.logger.warning("Static Assets:  "+static_url_path)
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
-
-@app.route('/login')
-@app.route(BASE_PATH+'/login')
-@oidc.require_login
-def login():
-    return redirect(BBASEURL+url_for('overview'))
-
 @app.route('/')
 @app.route(BASE_PATH+'/')
 @app.route('/overview')
