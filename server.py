@@ -59,6 +59,13 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__)
 
+app.logger.debug("===================================== Environment:  ")
+app.logger.debug("FLASK_OIDC_PROVIDER_NAME:           "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
+app.logger.debug("FLASK_OIDC_CLIENT_ID:               "+os.environ["FLASK_OIDC_CLIENT_ID"])
+app.logger.debug("FLASK_OIDC_CLIENT_SECRET:           "+os.environ["FLASK_OIDC_CLIENT_SECRET"])
+app.logger.debug("FLASK_OIDC_CONFIG_URL:              "+os.environ["FLASK_OIDC_CONFIG_URL"])
+app.logger.debug("BASE_PATH:                          "+os.environ["BASE_PATH"])
+app.logger.debug("AUTH_TYPE:                          "+os.environ["AUTH_TYPE"])
 app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
 app.logger.debug("Authentication Method:  "+AUTH_TYPE.lower())
 
