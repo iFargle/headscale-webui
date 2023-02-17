@@ -12,19 +12,6 @@ DEBUG_STATE     = False
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = "/static"
 
-class PrefixMiddleware(object):
-    def __init__(self, app, prefix=''):
-        self.app = app
-        self.prefix = prefix
-    def __call__(self, environ, start_response):
-        if environ['PATH_INFO'].startswith(self.prefix):
-            environ['PATH_INFO'] = environ['PATH_INFO'][len(self.prefix):]
-            environ['SCRIPT_NAME'] = self.prefix
-            return self.app(environ, start_response)
-        else:
-            start_response('404', [('Content-Type', 'text/plain')])
-            return ["This url does not belong to the app.".encode()]
-
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
@@ -53,7 +40,7 @@ else:
 
 executor = Executor(app)
 
-app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=BASE_PATH)
+app.register_blueprint(bp, url_prefix=BASE_PATH)
 
 app.logger.error("Environment ============================ Environment:  ")
 app.logger.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
