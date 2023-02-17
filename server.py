@@ -337,4 +337,4 @@ def build_preauth_key_table():
 ########################################################################################
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
-    app.config["APPLICATION_ROOT"] = $BASE_PATH
+    app.config["APPLICATION_ROOT"] = os.environ["BASE_PATH"].replace('"', '')
