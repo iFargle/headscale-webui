@@ -5,29 +5,30 @@ from flask_executor import Executor
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
-COLOR_NAV   = "blue-grey darken-1"
-COLOR_BTN   = "blue-grey darken-3"
-BASE_PATH   = os.environ["BASE_PATH"].replace('"', '')
-BUILD_DATE  = os.environ["BUILD_DATE"]
-APP_VERSION = os.environ["APP_VERSION"]
-GIT_COMMIT  = os.environ["GIT_COMMIT"]
-GIT_BRANCH  = os.environ["GIT_BRANCH"]
-HS_VERSION  = "v0.20.0"
-DEBUG_STATE = False
-AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '')
+COLOR_NAV       = "blue-grey darken-1"
+COLOR_BTN       = "blue-grey darken-3"
+BASE_PATH       = os.environ["BASE_PATH"].replace('"', '')
+BUILD_DATE      = os.environ["BUILD_DATE"]
+APP_VERSION     = os.environ["APP_VERSION"]
+GIT_COMMIT      = os.environ["GIT_COMMIT"]
+GIT_BRANCH      = os.environ["GIT_BRANCH"]
+HS_VERSION      = "v0.20.0"
+DEBUG_STATE     = False
+AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
+STATIC_URL_PATH = BASE_PATH+"/static" if BASE_PATH != "/" else "/static"
 
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
     from flaskoidc import FlaskOIDC
 
-    app = FlaskOIDC(__name__, static_url_path=BASE_PATH+"/static")
+    app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
     app.logger.error("Loading OIDC libraries and configuring app...")
     # TODO:
     # If OIDC is enabled, add user info and a logout button to the top bar.
 
 elif AUTH_TYPE.lower() == "basic":
-    app = Flask(__name__, static_url_path=BASE_PATH+"/static")
+    app = Flask(__name__, static_url_path=STATIC_URL_PATH)
     # Load basic auth libraries:
     app.logger.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -40,7 +41,7 @@ elif AUTH_TYPE.lower() == "basic":
     basic_auth = BasicAuth(app)
 
 else:
-    app = Flask(__name__, static_url_path=BASE_PATH+"/static")
+    app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
 executor = Executor(app)
 
