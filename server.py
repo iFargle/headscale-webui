@@ -7,7 +7,6 @@ from flask_executor import Executor
 # Colors:  https://materializecss.com/color.html
 COLOR_NAV       = "blue-grey darken-1"
 COLOR_BTN       = "blue-grey darken-3"
-BASE_PATH       = os.environ["BASE_PATH"].replace('"', '')
 DEBUG_STATE     = False
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = "/static"
