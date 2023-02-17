@@ -33,8 +33,8 @@ COPY --chown=app:app --from=builder ${WORKDIR} .
 ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
-ENV BASE_PATH="/"
-ENV SCRIPT_NAME="/"
+ENV BASE_PATH=/
+ENV SCRIPT_NAME=/
 
 # Authentication variables
 ENV AUTH_TYPE="basic"
