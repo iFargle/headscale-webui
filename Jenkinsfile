@@ -6,7 +6,8 @@ pipeline {
     }
     environment {
         APP_VERSION = 'v0.4.0'
-        BUILD_DATE = ''
+        HS_VERSION  = "v0.20.0" // Version of Headscale this is compatible with
+        BUILD_DATE  = ''
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -29,6 +30,7 @@ pipeline {
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
                         + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
                         + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
+                        + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                         + " ."
                     )
                     ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
@@ -37,6 +39,7 @@ pipeline {
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
                         + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
                         + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
+                        + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                         + " ."
                     )
                 }

@@ -8,11 +8,6 @@ from flask_executor import Executor
 COLOR_NAV       = "blue-grey darken-1"
 COLOR_BTN       = "blue-grey darken-3"
 BASE_PATH       = os.environ["BASE_PATH"].replace('"', '')
-BUILD_DATE      = os.environ["BUILD_DATE"]
-APP_VERSION     = os.environ["APP_VERSION"]
-GIT_COMMIT      = os.environ["GIT_COMMIT"]
-GIT_BRANCH      = os.environ["GIT_BRANCH"]
-HS_VERSION      = "v0.20.0"
 DEBUG_STATE     = False
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = BASE_PATH+"/static" if BASE_PATH != "/" else "/static"
@@ -112,12 +107,18 @@ def settings_page():
         url          = headscale.get_url(),
         COLOR_NAV    = COLOR_NAV,
         COLOR_BTN    = COLOR_BTN,
-        HS_VERSION   = HS_VERSION,
-        APP_VERSION  = APP_VERSION,
-        GIT_COMMIT   = GIT_COMMIT,
-        GIT_BRANCH   = GIT_BRANCH,
-        BUILD_DATE   = BUILD_DATE
+        BUILD_DATE   = os.environ["BUILD_DATE"],
+        APP_VERSION  = os.environ["APP_VERSION"],
+        GIT_COMMIT   = os.environ["GIT_COMMIT"],
+        GIT_BRANCH   = os.environ["GIT_BRANCH"],
+        HS_VERSION   = os.environ["HS_VERSION"]
     )
+
+
+
+
+
+
 
 @app.route(BASE_PATH+'/error')
 def error_page():
