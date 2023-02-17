@@ -30,9 +30,6 @@ FLASK_OIDC_OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 static_url_path = '/static'
 if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
 
-app.logger.warning("Authentication Method:  "+AUTH_TYPE.lower())
-app.logger.warning("Static Assets:  "+static_url_path)
-
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # Load OIDC libraries
@@ -61,7 +58,8 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__, static_url_path=static_url_path)
 
-# executor = Executor(app)
+app.logger.warning("Authentication Method:  "+AUTH_TYPE.lower())
+app.logger.warning("Static Assets:  "+static_url_path)
 
 ########################################################################################
 # / pages - User-facing pages
