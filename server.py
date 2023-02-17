@@ -44,7 +44,7 @@ if AUTH_TYPE.lower() == "oidc":
         CONFIG_URL = os.environ["OIDC_DISCOVERY_URL"]    # Default:  ''
         OVERWRITE_REDIRECT_URI = BASE_PATH               # Default:  '/'
 
-    printf("using config "+FLASK_OIDC_CONFIG_URL)
+    print("using config "+FLASK_OIDC_CONFIG_URL)
     app = FlaskOIDC(__name__, static_url_path=static_url_path)
     app.config.from_object(CustomConfig)
 
