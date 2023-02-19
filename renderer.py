@@ -8,9 +8,6 @@ from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
 
-app = FlaskOIDC(__name__)
-app.config.from_object(CustomConfig)
-
 app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
