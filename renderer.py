@@ -16,8 +16,9 @@ LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
-    test =   OAuth2Token.all()
-    LOG.debug("Test:  "+test)
+    with app.app_context():
+        test =   OAuth2Token.all()
+        LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
