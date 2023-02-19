@@ -1,6 +1,6 @@
 # pylint: disable=line-too-long
 
-import headscale, helper, pytz, os, yaml, flaskoidc
+import headscale, helper, pytz, os, yaml
 from flask              import Markup, render_template, Flask
 from datetime           import datetime
 from dateutil           import parser
@@ -8,9 +8,12 @@ from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = init_app(app=app)
 LOG = create_logger(app)
 executor = Executor(app)
+
+LOG.debug("Flask App Dump:  "+str(app.config))
 
 def render_overview():
     with app.app_context():
