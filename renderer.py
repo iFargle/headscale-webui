@@ -7,12 +7,12 @@ from dateutil           import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
+from flask_sqlalchemy   import SQLAlchemy
 
 # app = Flask(__name__)
-app = init_app(app=app)
+app = SQLAlchemy.init_app(app=app)
 LOG = create_logger(app)
 executor = Executor(app)
-
 LOG.debug("Flask App Dump:  "+str(app.config))
 
 def render_overview():
