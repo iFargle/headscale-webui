@@ -13,7 +13,7 @@ LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
-    test = OAuth2Token.all()
+    test = app.OAuth2Token.all()
     LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -533,7 +533,7 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def render_oidc_nav_dropdown(username):
-    test = OAuth2Token.all()
+    test = app.OAuth2Token.all()
     LOG.debug("Test:  "+test)
 
     html_payload = """
