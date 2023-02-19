@@ -47,7 +47,7 @@ if AUTH_TYPE.lower() == "oidc":
     """
 
     app.config.update({
-#        'SECRET_KEY': 'SomethingNotEntirelySecret',
+        'SECRET_KEY': os.environ["KEY"].replace('"', ''),
         'TESTING': DEBUG_STATE,
         'DEBUG': DEBUG_STATE,
         'OIDC_CLIENT_SECRETS': authelia_client_secrets,
