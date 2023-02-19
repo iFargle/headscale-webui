@@ -56,7 +56,7 @@ pipeline {
                     }
                     ghcrImage.inside { 
                         sh 'ls -lah /app'
-                        sh '/app/entrypoint.sh'
+                        sh 'poetry self show'
                         sh 'python --version'
                     }
                     sh 'docker image prune --force'
