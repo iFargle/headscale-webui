@@ -61,7 +61,6 @@ if AUTH_TYPE.lower() == "oidc":
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
-
 elif AUTH_TYPE.lower() == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
     LOG.error("Loading basic auth libraries and configuring app...")
@@ -72,10 +71,6 @@ elif AUTH_TYPE.lower() == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
-
-else:
-    app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-    LOG = create_logger(app)
 
 ########################################################################################
 # / pages - User-facing pages
