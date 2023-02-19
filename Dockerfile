@@ -35,19 +35,17 @@ ENV TZ="UTC"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV SCRIPT_NAME=/
+ENV DOMAIN_NAME=https://localhost
 
 # BasicAuth variables
 ENV AUTH_TYPE="basic"
 ENV BASIC_AUTH_USER="user"
 ENV BASIC_AUTH_PASS="pass"
 
-# OIDC variables
-ENV FLASK_OIDC_PROVIDER_NAME="OIDC"
-ENV FLASK_OIDC_CLIENT_ID=Headscale-WebUI
-ENV FLASK_OIDC_CLIENT_SECRET=secret
-ENV FLASK_OIDC_CONFIG_URL=http://localhost
-ENV FLASK_OIDC_FORCE_SCHEME=https
-ENV FLASK_OIDC_OVERWRITE_REDIRECT_URI=/
+# Flask OIDC Variables
+ENV OIDC_ISSUER=https://localhost
+ENV OIDC_CLIENT_ID=Headscale-WebUI
+ENV OIDC_CLIENT_SECRET=secret
 
 # Jenkins build args
 ARG GIT_COMMIT_ARG=""

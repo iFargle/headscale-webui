@@ -12,30 +12,60 @@ DEBUG_STATE     = False
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = "/static"
 
+# Initiate the Flask application:
+app = Flask(__name__, static_url_path=STATIC_URL_PATH)
+LOG  = create_logger(app)
+executor = Executor(app)
+
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
-    from flaskoidc import FlaskOIDC
-    from flaskoidc.config import BaseConfig
-
-    # Custom configuration class, a subclass of BaseConfig
-    class CustomConfig(BaseConfig):
-        DEBUG = True
-
-    app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
-    LOG = create_logger(app)
-    app.config.from_object(CustomConfig)
+    # https://flask-oidc2.readthedocs.io/en/latest/#
+    # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
+    # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
+    from flask_oidc import OpenIDConnect
+    DOMAIN_NAME       = os.environ["DOMAIN_NAME"]
+    BASE_PATH         = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
+    OIDC_ISSUER       = os.environ["OIDC_ISSUER"].replace('"','')
+    OIDC_SECRET       = os.environ["OIDC_CLIENT_SECRET"]
+    OIDC_CLIENT_ID    = os.environ["OIDC_CLIENT_ID"]
+    # Construct client_secrets.json:
+    authelia_client_secrets = """
+    {
+        'web': {
+            'issuer': '"""+OIDC_ISSUER+"""',
+            'auth_uri': '"""+OIDC_ISSUER+"""/api/oidc/auth',
+            'client_id': '"""+OIDC_CLIENT_ID+"""',
+            'client_secret': '"""+OIDC_SECRET+"""',
+            'redirect_uris': ['"""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback'],
+            'userinfo_uri': '"""+OIDC_ISSUER+"""/api/oidc/userinfo', 
+            'token_uri': '"""+OIDC_ISSUER+"""/api/oidc/token',
+            'token_introspection_uri': '"""+OIDC_ISSUER+"""/api/oidc/token/introspect'
+        }
+    }
+    """
+
+    app.config.update({
+#        'SECRET_KEY': 'SomethingNotEntirelySecret',
+        'TESTING': DEBUG_STATE,
+        'DEBUG': DEBUG_STATE,
+        'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+        'OIDC_ID_TOKEN_COOKIE_SECURE': False,
+        'OIDC_REQUIRE_VERIFIED_EMAIL': False,
+        'OIDC_USER_INFO_ENABLED': True,
+        'OIDC_OPENID_REALM': 'flask-demo',
+        'OIDC_SCOPES': ['openid', 'email', 'profile'],
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+    })
+
+    oidc = OpenIDConnect(app)
 
 
 elif AUTH_TYPE.lower() == "basic":
-    app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-    LOG = create_logger(app)
-
-    # Load basic auth libraries:
-    LOG.error("Loading basic auth libraries and configuring app...")
     # https://flask-basicauth.readthedocs.io/en/latest/
-
+    LOG.error("Loading basic auth libraries and configuring app...")
     from flask_basicauth import BasicAuth
+
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
     app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
     app.config['BASIC_AUTH_FORCE']    = True
@@ -45,10 +75,6 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
     LOG = create_logger(app)
-
-
-executor = Executor(app)
-
 
 LOG.error("Environment ============================ Environment:  ")
 LOG.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])

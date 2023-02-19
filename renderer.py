@@ -7,18 +7,12 @@ from dateutil           import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
-from flask_sqlalchemy   import SQLAlchemy
 
-# app = Flask(__name__)
-app = SQLAlchemy.init_app(app=Flask(__name__))
+app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
-LOG.debug("Flask App Dump:  "+str(app.config))
 
 def render_overview():
-    with app.app_context():
-        test =   flaskoidc.models.OAuth2Token.all()
-        LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -537,9 +531,6 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def render_oidc_nav_dropdown(username):
-    test = app.OAuth2Token.all()
-    LOG.debug("Test:  "+test)
-
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
