@@ -1,6 +1,6 @@
 # pylint: disable=line-too-long
 
-import headscale, helper, pytz, os, yaml
+import headscale, helper, pytz, os, yaml, flaskoidc
 from flask              import Markup, render_template, Flask
 from datetime           import datetime
 from dateutil           import parser
