@@ -13,6 +13,8 @@ LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
+    test = Oauth2.all()
+    LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
