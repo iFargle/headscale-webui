@@ -1,4 +1,4 @@
-import headscale, helper, json, os, pytz, renderer
+import headscale, helper, json, os, pytz, renderer, secrets
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
 from flask_executor import Executor
@@ -45,7 +45,7 @@ if AUTH_TYPE.lower() == "oidc":
     """
 
     app.config.update({
-        'SECRET_KEY': os.environ["KEY"].replace('"', ''),
+        'SECRET_KEY': secrets.token_urlsafe(32),
         'TESTING': DEBUG_STATE,
         'DEBUG': DEBUG_STATE,
         'OIDC_CLIENT_SECRETS': 'authelia_client_secrets.json',
@@ -56,7 +56,7 @@ if AUTH_TYPE.lower() == "oidc":
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
-    
+
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
