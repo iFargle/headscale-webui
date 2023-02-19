@@ -8,16 +8,13 @@ from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
 
-# Testing..
-from flaskoidc.models import OAuth2Token
-
 app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
     with app.app_context():
-        test =   OAuth2Token.all()
+        test =   flaskoidc.models.OAuth2Token.all()
         LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
