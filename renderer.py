@@ -6,9 +6,13 @@ from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
-from flask.logging       import create_logger
+from flask.logging      import create_logger
 
-app = Flask(__name__)
+if os.environ["AUTH_TYPE"].replace('"', '').lower() == "oidc":
+    from flaskoidc import FlaskOIDC
+    app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
+else:
+    app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
 
@@ -126,7 +130,7 @@ def render_overview():
             <div class="col s12 m6">
                 <div class="card hoverable">
                     <div class="card-content">
-                        <span class="card-title">OIDC</span>
+                        <span class="card-title">Headscale OIDC</span>
                         <p>
                             <table>   
                                 <tr><td> Issuer </td><td> """
@@ -530,9 +534,11 @@ def build_preauth_key_table(user_name):
         """
     return preauth_keys_collection
 
-def render_oidc_nav_dropdown():
+def render_oidc_nav_dropdown(username):
+    test = Oauth2.all()
+    LOG.debug("Test:  "+test)
 
-    htmlPayload = """
+    html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
             <li><a href="#!">Username</a></li>
@@ -548,4 +554,4 @@ def render_oidc_nav_dropdown():
         </li>
     """
 
-    return Markup(htmlPayload)
+    return Markup(html_payload)
