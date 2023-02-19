@@ -13,7 +13,7 @@ LOG = create_logger(app)
 executor = Executor(app)
 
 def render_overview():
-    test = app.OAuth2Token.all()
+    test = app.model.OAuth2Token.all()
     LOG.debug("Test:  "+test)
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
