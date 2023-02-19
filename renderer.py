@@ -11,12 +11,9 @@ from flask.logging      import create_logger
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = "/static"
 
-if AUTH_TYPE.lower() == "oidc":
-    from flaskoidc import FlaskOIDC
-    app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
-    LOG = create_logger(app)
+if AUTH_TYPE.lower() == "oidc": from flaskoidc import FlaskOIDC
 
-else: app = Flask(__name__)
+app = init_app()
 LOG = create_logger(app)
 executor = Executor(app)
 
