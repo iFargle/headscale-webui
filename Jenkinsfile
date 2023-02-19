@@ -59,6 +59,7 @@ pipeline {
                         sh '/app/entrypoint.sh'
                         sh 'python --version'
                     }
+                    sh 'docker image prune --force'
                 }
             }
         }
@@ -82,6 +83,16 @@ pipeline {
                             forgejoImage.push("testing")
                         }
                     }
+                }
+            }
+        }
+        stage('Clean') {
+            options { timeout(time: 3, unit: 'MINUTES') }
+            steps {
+                script {
+                    sh 'du -hsx /jenkins'
+                    sh 'docker image prune --force'
+                    sh 'du -hsx /jenkins'
                 }
             }
         }
