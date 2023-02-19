@@ -50,7 +50,7 @@ if AUTH_TYPE.lower() == "oidc":
         'SECRET_KEY': os.environ["KEY"].replace('"', ''),
         'TESTING': DEBUG_STATE,
         'DEBUG': DEBUG_STATE,
-        'OIDC_CLIENT_SECRETS': authelia_client_secrets,
+        'OIDC_CLIENT_SECRETS': 'authelia_client_secrets.json',
         'OIDC_ID_TOKEN_COOKIE_SECURE': False,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,
