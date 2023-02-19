@@ -14,15 +14,18 @@ STATIC_URL_PATH = "/static"
 
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
-    # Load OIDC libraries
     from flaskoidc import FlaskOIDC
+    from flaskoidc.config import BaseConfig
+
+    # Custom configuration class, a subclass of BaseConfig
+    CustomConfig(BaseConfig):
+        DEBUG = True
 
     app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
     LOG = create_logger(app)
-
+    app.config.from_object(CustomConfig)
     LOG.error("Loading OIDC libraries and configuring app...")
-    # TODO:
-    # If OIDC is enabled, add user info and a logout button to the top bar.
+
 
 elif AUTH_TYPE.lower() == "basic":
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)

@@ -8,12 +8,10 @@ from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
 
-AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
-STATIC_URL_PATH = "/static"
+app = FlaskOIDC(__name__)
+app.config.from_object(CustomConfig)
 
-if AUTH_TYPE.lower() == "oidc": from flaskoidc import FlaskOIDC
-
-app = init_app()
+app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
 
