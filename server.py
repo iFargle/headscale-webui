@@ -23,8 +23,6 @@ if AUTH_TYPE.lower() == "oidc":
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
 
-    from flask_oidc import OpenIDConnect
-
     DOMAIN_NAME       = os.environ["DOMAIN_NAME"]
     BASE_PATH         = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
     OIDC_ISSUER       = os.environ["OIDC_ISSUER"].replace('"','')
@@ -58,7 +56,8 @@ if AUTH_TYPE.lower() == "oidc":
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
-
+    
+    from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
 

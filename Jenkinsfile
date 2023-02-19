@@ -14,7 +14,7 @@ pipeline {
         timestamps()
     }
     stages {
-        stage ('Environment') {
+        stage ('ENV') {
             steps {
                 sh 'printenv'
                 script { BUILD_DATE = java.time.LocalDate.now() }
