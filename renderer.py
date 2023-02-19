@@ -8,11 +8,7 @@ from concurrent.futures import wait, ALL_COMPLETED
 from flask_executor     import Executor
 from flask.logging      import create_logger
 
-if os.environ["AUTH_TYPE"].replace('"', '').lower() == "oidc":
-    from flaskoidc import FlaskOIDC
-    app = FlaskOIDC(__name__)
-else:
-    app = Flask(__name__)
+app = Flask(__name__)
 LOG = create_logger(app)
 executor = Executor(app)
 
