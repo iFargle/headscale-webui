@@ -1,8 +1,7 @@
 import headscale, helper, json, os, pytz, renderer
-from flask          import Flask, Markup, redirect, render_template, request, url_for
+from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
 from flask_executor import Executor
-from flask.logging  import create_logger
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
@@ -14,7 +13,7 @@ STATIC_URL_PATH = "/static"
 
 # Initiate the Flask application:
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-LOG  = create_logger(app)
+LOG = logging.create_logger(app)
 executor = Executor(app)
 
 # Set Authentication type:
@@ -23,7 +22,9 @@ if AUTH_TYPE.lower() == "oidc":
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
+    
     from flask_oidc import OpenIDConnect
+
     DOMAIN_NAME       = os.environ["DOMAIN_NAME"]
     BASE_PATH         = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
     OIDC_ISSUER       = os.environ["OIDC_ISSUER"].replace('"','')
