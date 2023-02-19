@@ -22,7 +22,7 @@ if AUTH_TYPE.lower() == "oidc":
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
-    
+
     from flask_oidc import OpenIDConnect
 
     DOMAIN_NAME       = os.environ["DOMAIN_NAME"]
@@ -50,7 +50,7 @@ if AUTH_TYPE.lower() == "oidc":
 #        'SECRET_KEY': 'SomethingNotEntirelySecret',
         'TESTING': DEBUG_STATE,
         'DEBUG': DEBUG_STATE,
-        'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+        'OIDC_CLIENT_SECRETS': authelia_client_secrets,
         'OIDC_ID_TOKEN_COOKIE_SECURE': False,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,
@@ -76,13 +76,6 @@ elif AUTH_TYPE.lower() == "basic":
 else:
     app = Flask(__name__, static_url_path=STATIC_URL_PATH)
     LOG = create_logger(app)
-
-LOG.error("Environment ============================ Environment:  ")
-LOG.error("FLASK_OIDC_PROVIDER_NAME: "+os.environ["FLASK_OIDC_PROVIDER_NAME"])
-LOG.error("FLASK_OIDC_CLIENT_ID: "+os.environ["FLASK_OIDC_CLIENT_ID"])
-LOG.error("FLASK_OIDC_CONFIG_URL: "+os.environ["FLASK_OIDC_CONFIG_URL"])
-LOG.error("AUTH_TYPE: "+os.environ["AUTH_TYPE"])
-LOG.error("Environment ============================ Environment  ")
 
 ########################################################################################
 # / pages - User-facing pages
