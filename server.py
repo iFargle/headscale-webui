@@ -18,7 +18,7 @@ if AUTH_TYPE.lower() == "oidc":
     from flaskoidc.config import BaseConfig
 
     # Custom configuration class, a subclass of BaseConfig
-    CustomConfig(BaseConfig):
+    class CustomConfig(BaseConfig):
         DEBUG = True
 
     app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
