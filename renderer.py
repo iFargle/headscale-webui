@@ -10,7 +10,7 @@ from flask.logging      import create_logger
 
 if os.environ["AUTH_TYPE"].replace('"', '').lower() == "oidc":
     from flaskoidc import FlaskOIDC
-    app = FlaskOIDC(__name__, static_url_path=STATIC_URL_PATH)
+    app = FlaskOIDC(__name__)
 else:
     app = Flask(__name__)
 LOG = create_logger(app)
