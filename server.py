@@ -29,7 +29,6 @@ executor = Executor(app)
 if AUTH_TYPE.lower() == "oidc":
     # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/ 
     #
-    # https://flask-oidc2.readthedocs.io/en/latest/#
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     # https://github.com/steinarvk/flask_oidc_demo 
@@ -47,8 +46,8 @@ if AUTH_TYPE.lower() == "oidc":
             "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/authorization",
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
-            "redirect_uris":  [
-                \""""+DOMAIN_NAME+BASE_PATH+"""/*"
+            "redirect_uris": [
+                "https://headscale.sysctl.io/admin/oidc_callback"
             ],
             "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
             "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
@@ -66,11 +65,11 @@ if AUTH_TYPE.lower() == "oidc":
         'TESTING': DEBUG_STATE,
         'DEBUG': DEBUG_STATE,
         'OIDC_CLIENT_SECRETS': '/app/instance/secrets.json',
-        'OIDC_ID_TOKEN_COOKIE_SECURE': False,
+        'OIDC_ID_TOKEN_COOKIE_SECURE': True,
         'OIDC_REQUIRE_VERIFIED_EMAIL': False,
         'OIDC_USER_INFO_ENABLED': True,
         'OIDC_OPENID_REALM': 'Headscale-WebUI',
-        'OIDC_SCOPES': ['openid', 'email', 'profile'],
+        'OIDC_SCOPES': ['openid', 'profile', 'email'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
     from flask_oidc import OpenIDConnect
