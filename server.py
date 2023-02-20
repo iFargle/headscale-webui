@@ -100,10 +100,10 @@ else:
 # / pages - User-facing pages
 ########################################################################################
 # Testing OIDC page...
-@app.route('/oidctest')
-@oidc.require_login
-def oidctest_page():
-    return 'Welcome %s' % oidc.user_getfield('email')
+#@app.route('/oidctest')
+#@oidc.require_login
+#def oidctest_page():
+#    return 'Welcome %s' % oidc.user_getfield('email')
 
 @app.route('/')
 @app.route('/overview')
