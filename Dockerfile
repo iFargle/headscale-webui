@@ -32,6 +32,7 @@ COPY --chown=app:app --from=builder ${WORKDIR} .
 
 # General variables
 ENV TZ="UTC"
+ENV COLOR="blue-grey"
 ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV SCRIPT_NAME=/

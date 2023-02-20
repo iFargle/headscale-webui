@@ -9,8 +9,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
-COLOR_NAV       = "blue-grey darken-1"
-COLOR_BTN       = "blue-grey darken-3"
+COLOR           = os.environ["COLOR"].replace('"', '')
+COLOR_NAV       = COLOR+" darken-1"
+COLOR_BTN       = COLOR+" darken-3"
 DEBUG_STATE     = True
 AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
 STATIC_URL_PATH = "/static"
@@ -87,12 +88,12 @@ elif AUTH_TYPE.lower() == "basic":
     basic_auth = BasicAuth(app)
     # Make a fake class.  If someone knows a better way to dynamically load these... please fix this.
     class oidc():
-        def require_login():
+        def require_login(self=""):
             pass
 else:
     # Make a fake class.  If someone knows a better way to dynamically load these... please fix this.
     class oidc():
-        def require_login():
+        def require_login(self=""):
             pass
 
 ########################################################################################
