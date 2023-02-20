@@ -45,8 +45,8 @@ if AUTH_TYPE.lower() == "oidc":
         }
     }
     """
-    LOG.debug("Secrets")
-    LOG.debug(client_secrets)
+    LOG.error("Secrets")
+    LOG.error(client_secrets)
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
     
