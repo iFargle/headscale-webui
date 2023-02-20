@@ -43,7 +43,6 @@ if AUTH_TYPE.lower() == "oidc":
         }
     }
     """
-    os.
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
     
