@@ -72,7 +72,7 @@ if AUTH_TYPE.lower() == "oidc":
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
-    from oidc import OpenIDConnect
+    from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
 elif AUTH_TYPE.lower() == "basic":
