@@ -39,7 +39,7 @@ if AUTH_TYPE.lower() == "oidc":
     app.config.update(
         {
             'OIDC_REDIRECT_URI': REDIRECT_URI,
-            'SECRET_KEY': OIDC_SECRET,
+            'SECRET_KEY': secrets.token_urlsafe(32),
             'PERMANENT_SESSION_LIFETIME': datetime.timedelta(days=7).total_seconds(),
             'DEBUG': DEBUG_STATE
         }
