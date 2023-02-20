@@ -1,11 +1,16 @@
 # pylint: disable=wrong-import-order
 
-import os, headscale, requests
 from flask          import Flask
 from flask.logging  import create_logger
 
 app = Flask(__name__)
 LOG = create_logger(app)
+
+AUTH_TYPE = os.environ["AUTH_TYPE"].replace('"','').lower()
+
+if AUTH_TYPE == "oidc":
+    from flask_oidc import OpenIDConnect
+    oidc = OpenIDConnect(app)
 
 def pretty_print_duration(duration):
     """ Prints a duration in human-readable formats """
@@ -261,6 +266,9 @@ def access_checks():
 
 def load_checks():
     """ Bundles all the checks into a single function to call easier """
+    # If Auth Type is OIDC, check if a user is logged in:
+    if AUTH_TYPE == "oidc": 
+        if not oidc.user_loggedin: return "login_page"
     # General error checks.  See the function for more info:
     if access_checks() != "Pass": return 'error_page'
     # If the API key fails, redirect to the settings page:
