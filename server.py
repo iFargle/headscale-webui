@@ -41,10 +41,9 @@ if AUTH_TYPE.lower() == "oidc":
     OIDC_SECRET       = os.environ["OIDC_CLIENT_SECRET"]
     OIDC_CLIENT_ID    = os.environ["OIDC_CLIENT_ID"]
     # Construct client_secrets.json:
-    client_secrets = """
-    {
+    client_secrets = """{
         "web": {
-            "issuer": \""""+OIDC_ISSUER+"""",d
+            "issuer": \""""+OIDC_ISSUER+"""",
             "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/authorization",
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
