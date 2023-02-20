@@ -25,7 +25,7 @@ LOG = logging.create_logger(app)
 executor = Executor(app)
 
 ########################################################################################
-# Set Authentication type:
+# Set Authentication type.  Currently "OIDC" and "BASIC"
 ########################################################################################
 if AUTH_TYPE == "oidc":
     # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/ 
