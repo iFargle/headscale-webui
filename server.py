@@ -16,7 +16,9 @@ app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 LOG = logging.create_logger(app)
 executor = Executor(app)
 
+########################################################################################
 # Set Authentication type:
+########################################################################################
 if AUTH_TYPE.lower() == "oidc":
     # https://flask-oidc2.readthedocs.io/en/latest/#
     # https://gist.github.com/thomasdarimont/1d45dc9aa857b831ff2eff221b79d179a/ 
@@ -33,7 +35,7 @@ if AUTH_TYPE.lower() == "oidc":
     {
         "web": {
             "issuer": \""""+OIDC_ISSUER+"""",
-            "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/auth",
+            "auth_uri": \""""+OIDC_ISSUER+"""/",
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
             "redirect_uris":  [\""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"],
