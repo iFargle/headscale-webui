@@ -19,7 +19,7 @@ executor = Executor(app)
 # Set Authentication type:
 if AUTH_TYPE.lower() == "oidc":
     # https://flask-oidc2.readthedocs.io/en/latest/#
-    # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
+    # https://gist.github.com/thomasdarimont/1d45dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
 
@@ -31,15 +31,15 @@ if AUTH_TYPE.lower() == "oidc":
     # Construct client_secrets.json:
     client_secrets = """
     {
-        'web': {
-            'issuer': '"""+OIDC_ISSUER+"""',
-            'auth_uri': '"""+OIDC_ISSUER+"""/api/oidc/auth',
-            'client_id': '"""+OIDC_CLIENT_ID+"""',
-            'client_secret': '"""+OIDC_SECRET+"""',
-            'redirect_uris': ['"""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback'],
-            'userinfo_uri': '"""+OIDC_ISSUER+"""/api/oidc/userinfo', 
-            'token_uri': '"""+OIDC_ISSUER+"""/api/oidc/token',
-            'token_introspection_uri': '"""+OIDC_ISSUER+"""/api/oidc/token/introspect'
+        "web": {
+            "issuer": \""""+OIDC_ISSUER+"""",
+            "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/auth",
+            "client_id": \""""+OIDC_CLIENT_ID+"""",
+            "client_secret": \""""+OIDC_SECRET+"""",
+            "redirect_uris":  \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"],
+            "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
+            "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
+            "token_introspection_uri": \""""+OIDC_ISSUER+"""/api/oidc/token/introspect"
         }
     }
     """
