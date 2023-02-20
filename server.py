@@ -85,9 +85,15 @@ elif AUTH_TYPE.lower() == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
-    oidc = ""
+    # Make a fake class.  If someone knows a better way to dynamically load these... please fix this.
+    class oidc():
+        def require_login():
+            pass
 else:
-    oidc = ""
+    # Make a fake class.  If someone knows a better way to dynamically load these... please fix this.
+    class oidc():
+        def require_login():
+            pass
 
 ########################################################################################
 # / pages - User-facing pages
