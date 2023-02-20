@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, wrong-import-order
 
 import headscale, helper, pytz, os, yaml
 from flask              import Markup, render_template, Flask, logging
@@ -29,10 +29,8 @@ def render_overview():
     # Overview of the server's machines, users, preauth keys, API key expiration, server version
     
     # Get all machines:
-    machines_count = 0
     machines = headscale.get_machines(url, api_key)
-    for machine in machines["machines"]:
-        machines_count += 1
+    machines_count = len(machines["machines"])
 
     # Get all routes:
     routes = headscale.get_routes(url,api_key)
@@ -324,8 +322,8 @@ def thread_machine_content(machine, machine_content, idx):
 
     # Get the machine IP's
     machine_ips = "<ul>"
-    for ip in machine["ipAddresses"]:
-        machine_ips = machine_ips+"<li>"+ip+"</li>"
+    for ip_address in machine["ipAddresses"]:
+        machine_ips = machine_ips+"<li>"+ip_address+"</li>"
     machine_ips = machine_ips+"</ul>"
 
     # Format the dates for easy readability
@@ -394,10 +392,10 @@ def render_machines_cards():
 
     #########################################
     # Thread this entire thing.  
-    numThreads = len(machines_list["machines"])
+    num_threads = len(machines_list["machines"])
     iterable = []
     machine_content = {}
-    for i in range (0, numThreads):
+    for i in range (0, num_threads):
         LOG.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
@@ -416,7 +414,7 @@ def render_machines_cards():
     content = "<div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>"
     # Print the content
 
-    for index in range(0, numThreads):
+    for index in range(0, num_threads):
         content = content+str(sorted_machines[index])
         # content = content+str(sorted_machines[index])
 
@@ -529,14 +527,14 @@ def build_preauth_key_table(user_name):
         """
     return preauth_keys_collection
 
-def render_oidc_nav_dropdown(username):
+def render_oidc_nav_dropdown(user_name, email_address):
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
-            <li><a href="#!">Username</a></li>
-            <li><a href="#!">Email</a></li>
+            <li><a href="#!">User:  """+user_name+"""</a></li>
+            <li><a href="#!">Email:  """+email_address+"""</a></li>
             <li class="divider"></li>
-            <li><a href="#!">Logout</a></li>
+            <li><a href="logout">Logout</a></li>
         </ul>
 
         <li>

@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-order
+
 import headscale, helper, json, os, pytz, renderer, secrets
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
@@ -21,7 +23,7 @@ executor = Executor(app)
 ########################################################################################
 if AUTH_TYPE.lower() == "oidc":
     # https://flask-oidc2.readthedocs.io/en/latest/#
-    # https://gist.github.com/thomasdarimont/1d45dc9aa857b831ff2eff221b79d179a/ 
+    # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     LOG.error("Loading OIDC libraries and configuring app...")
 

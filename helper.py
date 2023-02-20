@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-order
+
 import os, headscale, requests
 from flask          import Flask
 from flask.logging  import create_logger
@@ -87,7 +89,7 @@ def get_color(import_id, item_type = ""):
     index = import_id % len(colors)
     return colors[index]
 
-def format_error_message(error_type, title, message):
+def format_message(error_type, title, message):
     """ Defines a generic 'collection' as error/warning/info messages """
     content = """
         <ul class="collection">
@@ -189,7 +191,7 @@ def access_checks():
         """+url+"""/api/v1 failed.  Response:  """+str(response.status_code)+""".)</p>
         """
 
-        message_html += format_error_message("Error", "Headscale unreachable", message)
+        message_html += format_message("Error", "Headscale unreachable", message)
 
     if not config_readable:
         LOG.error("Headscale configuration is not readable")
@@ -199,7 +201,7 @@ def access_checks():
         is named "config.yaml" or "config.yml"</p>
         """
 
-        message_html += format_error_message("Error", "/etc/headscale/config.yaml not readable", message)
+        message_html += format_message("Error", "/etc/headscale/config.yaml not readable", message)
 
     if not data_writable:
         LOG.error("/data folder is not writable")
@@ -209,7 +211,7 @@ def access_checks():
         by UID/GID 1000:1000.</p>
         """
 
-        message_html += format_error_message("Error", "/data not writable", message)
+        message_html += format_message("Error", "/data not writable", message)
 
     if not data_readable:
         LOG.error("/data folder is not readable")
@@ -219,7 +221,7 @@ def access_checks():
         by UID/GID 1000:1000.</p>
         """
 
-        message_html += format_error_message("Error", "/data not readable", message)
+        message_html += format_message("Error", "/data not readable", message)
 
     if not data_executable:
         LOG.error("/data folder is not readable")
@@ -229,7 +231,7 @@ def access_checks():
         by UID/GID 1000:1000. (chown 1000:1000 /path/to/data && chmod -R 755 /path/to/data)</p>
         """
 
-        message_html += format_error_message("Error", "/data not executable", message)
+        message_html += format_message("Error", "/data not executable", message)
 
 
     if file_exists:
@@ -243,7 +245,7 @@ def access_checks():
             by UID/GID 1000:1000.</p>
             """
 
-            message_html += format_error_message("Error", "/data/key.txt not writable", message)
+            message_html += format_message("Error", "/data/key.txt not writable", message)
 
         if not file_readable:
             LOG.error("/data/key.txt is not readable")
@@ -253,7 +255,7 @@ def access_checks():
             by UID/GID 1000:1000.</p>
             """
 
-            message_html += format_error_message("Error", "/data/key.txt not readable", message)
+            message_html += format_message("Error", "/data/key.txt not readable", message)
 
     return message_html
 
