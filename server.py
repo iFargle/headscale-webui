@@ -29,7 +29,7 @@ if AUTH_TYPE.lower() == "oidc":
     OIDC_SECRET       = os.environ["OIDC_CLIENT_SECRET"]
     OIDC_CLIENT_ID    = os.environ["OIDC_CLIENT_ID"]
     # Construct client_secrets.json:
-    authelia_client_secrets = """
+    client_secrets = """
     {
         'web': {
             'issuer': '"""+OIDC_ISSUER+"""',
@@ -43,6 +43,9 @@ if AUTH_TYPE.lower() == "oidc":
         }
     }
     """
+    with open("secrets.json") as secrets_json:
+        secrets_json.write(client_secrets)
+    
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
         'TESTING': DEBUG_STATE,
