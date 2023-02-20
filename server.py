@@ -78,10 +78,11 @@ if AUTH_TYPE == "oidc":
 
     # Check if OIDC user is logged in before routing to any page:
     @app.before_request
-    @oidc.require_login
     def check_oidc_credentials():
-        if oidc.user_loggedin: return 1
-        return 0
+        if oidc.user_loggedin: log_in()
+    @oidc.require_login
+    def log_in():
+        if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
