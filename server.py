@@ -36,7 +36,7 @@ if AUTH_TYPE.lower() == "oidc":
             "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/auth",
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
-            "redirect_uris":  \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"],
+            "redirect_uris":  [\""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"],
             "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
             "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
             "token_introspection_uri": \""""+OIDC_ISSUER+"""/api/oidc/token/introspect"
