@@ -94,7 +94,7 @@ if AUTH_TYPE == "oidc":
         LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
         if not oidc.user_loggedin: 
             LOG.error("User is not logged in.  Redirecting to login")
-            return redirect(url_for('login'))
+            return redirect(url_for('login_page'))
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
