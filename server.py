@@ -45,11 +45,13 @@ if AUTH_TYPE.lower() == "oidc":
         }
     )
 
-    ISSUER = OIDC_ISSUER
-    CLIENT = OIDC_CLIENT_ID+"@oidc_provider"
-    OIDC_PROVIDER = 'oidc_provider'
-    CONFIG = ProviderConfiguration(issuer=ISSUER, client_metadata=ClientMetadata(CLIENT, OIDC_SECRET))
-    oidc = OIDCAuthentication({OIDC_PROVIDER: CONFIG})
+    CLIENT_METADATA = ClientMetadata(
+        client_id=OIDC_CLIENT_ID,
+        client_secret=OIDC_SECRET,
+        post_logout_redirect_uris=[DOMAIN_NAME+'/logout'])
+
+    CONFIG = ProviderConfiguration(issuer=OIDC_ISSUER, client_metadata=CLIENT_METADATA)
+    auth = OIDCAuthentication({'default': CONFIG}, app)
 
 # Testing another OIDC library
 # if AUTH_TYPE.lower() == "oidc":
@@ -114,7 +116,7 @@ elif AUTH_TYPE.lower() == "basic":
 ########################################################################################
 # Testing OIDC page...
 @app.route('/oidctest')
-@auth.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def oidctest_page():
     user_session = UserSession(flask.session)
     return jsonify(access_token=user_session.access_token,
@@ -123,7 +125,7 @@ def oidctest_page():
 
 @app.route('/')
 @app.route('/overview')
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def overview_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
@@ -136,7 +138,7 @@ def overview_page():
     )
 
 @app.route('/machines', methods=('GET', 'POST'))
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def machines_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
@@ -151,7 +153,7 @@ def machines_page():
     )
 
 @app.route('/users', methods=('GET', 'POST'))
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def users_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
@@ -166,7 +168,7 @@ def users_page():
     )
 
 @app.route('/settings', methods=('GET', 'POST'))
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def settings_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
@@ -184,7 +186,7 @@ def settings_page():
     )
 
 @app.route('/error')
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def error_page():
     if helper.access_checks() == "Pass": 
         return redirect(url_for('overview_page'))
@@ -202,7 +204,7 @@ def error_page():
 ########################################################################################
 
 @app.route('/api/test_key', methods=('GET', 'POST'))
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def test_key_page():
     api_key    = headscale.get_api_key()
     url        = headscale.get_url()
@@ -239,7 +241,7 @@ def test_key_page():
     return message
 
 @app.route('/api/save_key', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def save_key_page():
     json_response = request.get_json()
     api_key       = json_response['api_key']
@@ -264,7 +266,7 @@ def save_key_page():
 # Machine API Endpoints
 ########################################################################################
 @app.route('/api/update_route', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def update_route_page():
     json_response = request.get_json()
     route_id      = json_response['route_id']
@@ -275,7 +277,7 @@ def update_route_page():
     return headscale.update_route(url, api_key, route_id, current_state)
 
 @app.route('/api/machine_information', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def machine_information_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -285,7 +287,7 @@ def machine_information_page():
     return headscale.get_machine_info(url, api_key, machine_id)
 
 @app.route('/api/delete_machine', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def delete_machine_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -295,7 +297,7 @@ def delete_machine_page():
     return headscale.delete_machine(url, api_key, machine_id)
 
 @app.route('/api/rename_machine', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def rename_machine_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -306,7 +308,7 @@ def rename_machine_page():
     return headscale.rename_machine(url, api_key, machine_id, new_name)
 
 @app.route('/api/move_user', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def move_user_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -317,7 +319,7 @@ def move_user_page():
     return headscale.move_user(url, api_key, machine_id, new_user)
 
 @app.route('/api/set_machine_tags', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def set_machine_tags():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -328,7 +330,7 @@ def set_machine_tags():
     return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
 
 @app.route('/api/register_machine', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def register_machine():
     json_response = request.get_json()
     machine_key   = json_response['key']
@@ -342,7 +344,7 @@ def register_machine():
 # User API Endpoints
 ########################################################################################
 @app.route('/api/rename_user', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def rename_user_page():
     json_response = request.get_json()
     old_name      = json_response['old_name']
@@ -353,7 +355,7 @@ def rename_user_page():
     return headscale.rename_user(url, api_key, old_name, new_name)
 
 @app.route('/api/add_user', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def add_user():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -362,7 +364,7 @@ def add_user():
     return headscale.add_user(url, api_key, json_response)
 
 @app.route('/api/delete_user', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def delete_user():
     json_response  = request.get_json()
     user_name = json_response['name']
@@ -372,7 +374,7 @@ def delete_user():
     return headscale.delete_user(url, api_key, user_name)
 
 @app.route('/api/get_users', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def get_users_page():
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -383,7 +385,7 @@ def get_users_page():
 # Pre-Auth Key API Endpoints
 ########################################################################################
 @app.route('/api/add_preauth_key', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def add_preauth_key():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -392,7 +394,7 @@ def add_preauth_key():
     return headscale.add_preauth_key(url, api_key, json_response)
 
 @app.route('/api/expire_preauth_key', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def expire_preauth_key():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -401,7 +403,7 @@ def expire_preauth_key():
     return headscale.expire_preauth_key(url, api_key, json_response)
 
 @app.route('/api/build_preauthkey_table', methods=['POST'])
-@oidc.oidc_auth(OIDC_PROVIDER)
+@auth.oidc_auth('default')
 def build_preauth_key_table():
     json_response  = request.get_json()
     user_name = json_response['name']
