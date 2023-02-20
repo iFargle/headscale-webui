@@ -1,5 +1,5 @@
-def forgejoImage
-def ghcrImage
+def privateImage // My personal git / container registry
+def publicImage  // GitHub Container Registry and Docker Hub
 pipeline {
     agent {
         label 'linux-x64'
@@ -24,7 +24,7 @@ pipeline {
             options { timeout(time: 30, unit: 'MINUTES') }
             steps {
                 script {
-                    forgejoImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                         + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
@@ -33,7 +33,7 @@ pipeline {
                         + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                         + " ."
                     )
-                    ghcrImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                    publicImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                         "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                         + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                         + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
@@ -49,12 +49,12 @@ pipeline {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
                 script {
-                    forgejoImage.inside { 
+                    privateImage.inside { 
                         sh 'ls -lah /app'
                         sh 'python --version'
                         sh 'pip list'
                     }
-                    ghcrImage.inside { 
+                    publicImage.inside { 
                         sh 'ls -lah /app'
                         sh 'python --version'
                         sh 'pip list'
@@ -68,18 +68,22 @@ pipeline {
                 script {
                     if (env.BRANCH_NAME == 'main') {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                            forgejoImage.push("latest")
-                            forgejoImage.push(APP_VERSION)
+                            privateImage.push("latest")
+                            privateImage.push(APP_VERSION)
                         }
                         docker.withRegistry('https://ghcr.io/', 'github-ifargle-pat') {
-                            ghcrImage.push("latest")
-                            ghcrImage.push(APP_VERSION)
+                            publicImage.push("latest")
+                            publicImage.push(APP_VERSION)
+                        }
+                        docker.withRegistry('https://hub.docker.com/', 'dockerhub-ifargle-pat') {
+                            publicImage.push("latest")
+                            publicImage.push(APP_VERSION)
                         }
                     } else {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                            forgejoImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
-                            forgejoImage.push("${env.BRANCH_NAME}")
-                            forgejoImage.push("testing")
+                            privateImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
+                            privateImage.push("${env.BRANCH_NAME}")
+                            privateImage.push("testing")
                         }
                     }
                 }
