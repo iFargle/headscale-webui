@@ -52,10 +52,12 @@ pipeline {
                     forgejoImage.inside { 
                         sh 'ls -lah /app'
                         sh 'python --version'
+                        sh 'pip list'
                     }
                     ghcrImage.inside { 
                         sh 'ls -lah /app'
                         sh 'python --version'
+                        sh 'pip list'
                     }
                 }
             }
