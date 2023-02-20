@@ -79,12 +79,16 @@ if AUTH_TYPE == "oidc":
     # Check if OIDC user is logged in before routing to any page:
     @app.before_request
     def check_oidc_credentials():
+        LOG.error("Checking if the user is logged in...:  "+oidc.user_loggedin)
         if not oidc.user_loggedin: log_in()
     @oidc.require_login
     def log_in():
+        LOG.error("Logging in the user... ")
         # Some basic sanity checks:
         pass_checks = str(helper.load_checks())
+        LOG.error("Running sanity checks")
         if pass_checks != "Pass": return redirect(url_for(pass_checks))
+        LOG.error("Checks passed.  redirecting..")
         return redirect(url_for('overview'))
 
 elif AUTH_TYPE == "basic":
