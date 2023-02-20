@@ -76,11 +76,6 @@ if AUTH_TYPE == "oidc":
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
-    # Check if OIDC user is logged in before routing to any page:
-    @app.before_request
-    def check_oidc_credentials():
-        LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
-        if not oidc.user_loggedin: log_in()
     @oidc.require_login
     def log_in():
         LOG.error("Logging in the user... ")
@@ -90,6 +85,12 @@ if AUTH_TYPE == "oidc":
         if pass_checks != "Pass": return redirect(url_for(pass_checks))
         LOG.error("Checks passed.  redirecting..")
         return redirect(url_for('overview'))
+
+    # Check if OIDC user is logged in before routing to any page:
+    @app.before_request
+    def check_oidc_credentials():
+        LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
+        if not oidc.user_loggedin: log_in()
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
