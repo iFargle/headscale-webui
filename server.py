@@ -76,6 +76,7 @@ if AUTH_TYPE == "oidc":
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
+    @app.route('/login')
     @oidc.require_login
     def log_in():
         LOG.error("Logging in the user... ")
