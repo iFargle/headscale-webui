@@ -13,7 +13,7 @@ COLOR           = os.environ["COLOR"].replace('"', '')
 COLOR_NAV       = COLOR+" darken-1"
 COLOR_BTN       = COLOR+" darken-3"
 DEBUG_STATE     = True
-AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '')
+AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '').lower()
 STATIC_URL_PATH = "/static"
 
 # Initiate the Flask application:
@@ -27,7 +27,7 @@ executor = Executor(app)
 ########################################################################################
 # Set Authentication type:
 ########################################################################################
-if AUTH_TYPE.lower() == "oidc":
+if AUTH_TYPE == "oidc":
     # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/ 
     #
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
@@ -76,7 +76,14 @@ if AUTH_TYPE.lower() == "oidc":
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
-elif AUTH_TYPE.lower() == "basic":
+    # Check if OIDC user is logged in before routing to any page:
+    @app.before_request
+    @oidc.require_login
+    def check_oidc_credentials():
+        if oidc.user_loggedin: return 1
+        return 0
+
+elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
     LOG.error("Loading basic auth libraries and configuring app...")
     from flask_basicauth import BasicAuth
@@ -95,20 +102,6 @@ elif AUTH_TYPE.lower() == "basic":
 ## @oidc.require_login
 #def oidctest_page():
 #    return 'Welcome %s' % oidc.user_getfield('email')
-
-def has_no_empty_params(rule):
-    defaults = rule.defaults if rule.defaults is not None else ()
-    arguments = rule.arguments if rule.arguments is not None else ()
-    return len(defaults) >= len(arguments)
-
-@app.route("/site-map")
-def site_map():
-    links = []
-    for rule in app.url_map.iter_rules():
-        url = url_for(rule.endpoint, **(rule.defaults or {}))
-        links.append((url, rule.endpoint))
-    # links is now a list of url, endpoint tuples
-    return Markup(links)
 
 @app.route('/')
 @app.route('/overview')
