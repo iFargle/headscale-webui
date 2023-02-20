@@ -82,6 +82,8 @@ if AUTH_TYPE == "oidc":
         if not oidc.user_loggedin: log_in()
     @oidc.require_login
     def log_in():
+        # Some basic sanity checks:
+        pass_checks = str(helper.load_checks())
         if pass_checks != "Pass": return redirect(url_for(pass_checks))
         return redirect(url_for('overview'))
 
