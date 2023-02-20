@@ -85,6 +85,9 @@ elif AUTH_TYPE.lower() == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
+    oidc = ""
+else:
+    oidc = ""
 
 ########################################################################################
 # / pages - User-facing pages
