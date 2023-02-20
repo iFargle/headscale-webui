@@ -93,9 +93,7 @@ pipeline {
             options { timeout(time: 3, unit: 'MINUTES') }
             steps {
                 script {
-                    sh 'du -hsx /jenkins'
-                    sh 'docker image prune --force'
-                    sh 'du -hsx /jenkins'
+                    sh 'docker system prune --force'
                 }
             }
         }
