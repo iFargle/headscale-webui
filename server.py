@@ -79,7 +79,7 @@ if AUTH_TYPE == "oidc":
     # Check if OIDC user is logged in before routing to any page:
     @app.before_request
     def check_oidc_credentials():
-        LOG.error("Checking if the user is logged in...:  "+oidc.user_loggedin)
+        LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
         if not oidc.user_loggedin: log_in()
     @oidc.require_login
     def log_in():
