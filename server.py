@@ -48,7 +48,7 @@ if AUTH_TYPE == "oidc":
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
             "redirect_uris": [
-                "https://headscale.sysctl.io/admin/oidc_callback"
+                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
             ],
             "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
             "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
@@ -90,7 +90,9 @@ if AUTH_TYPE == "oidc":
     @app.before_request
     def check_oidc_credentials():
         LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
-        if not oidc.user_loggedin: log_in()
+        if oidc.user_loggedin == False: 
+            LOG.error("User is not logged in.  Redirecting to login")
+            log_in()
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
