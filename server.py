@@ -77,9 +77,9 @@ if AUTH_TYPE == "oidc":
     oidc = OpenIDConnect(app)
 
     # Check if OIDC user is logged in before routing to any page:
-    @app.before_request
+    @app.route('/login')
     @oidc.require_login
-    def check_oidc_credentials():
+    def login_page():
         LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
         LOG.error("oidc.user_getfield('email'):  "+oidc.user_getfield('email'))
         if not oidc.user_loggedin: 
