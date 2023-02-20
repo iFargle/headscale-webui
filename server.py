@@ -78,7 +78,7 @@ if AUTH_TYPE == "oidc":
 
     @app.route('/login')
     @oidc.require_login
-    def log_in():
+    def login_page():
         LOG.error("Logging in the user... ")
         # Some basic sanity checks:
         pass_checks = str(helper.load_checks())
