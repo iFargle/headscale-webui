@@ -48,7 +48,7 @@ if AUTH_TYPE.lower() == "oidc":
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
             "redirect_uris":  [
-                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
+                \""""+DOMAIN_NAME+BASE_PATH+"""/*"
             ],
             "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
             "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
@@ -56,6 +56,8 @@ if AUTH_TYPE.lower() == "oidc":
         }
     }
     """
+    LOG.error("CLIENT_SECRETS")
+    LOG.error(client_secrets)
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
     
