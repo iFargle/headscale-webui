@@ -27,7 +27,7 @@ executor = Executor(app)
 # Set Authentication type:
 ########################################################################################
 if AUTH_TYPE.lower() == "oidc":
-    # Currently using: flask-oidc2 - https://pypi.org/project/flask-oidc2/ 
+    # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/ 
     #
     # https://flask-oidc2.readthedocs.io/en/latest/#
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
@@ -72,7 +72,7 @@ if AUTH_TYPE.lower() == "oidc":
         'OIDC_SCOPES': ['openid', 'email', 'profile'],
         'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
     })
-    from flask_oidc import OpenIDConnect
+    from oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
 elif AUTH_TYPE.lower() == "basic":
