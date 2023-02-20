@@ -17,7 +17,9 @@ STATIC_URL_PATH = "/static"
 
 # Initiate the Flask application:
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 LOG = logging.create_logger(app)
 executor = Executor(app)
 
