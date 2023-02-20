@@ -93,10 +93,7 @@ elif AUTH_TYPE.lower() == "basic":
 @app.route('/oidctest')
 @oidc.require_login
 def oidctest_page():
-    user_session = UserSession(flask.session)
-    return jsonify(access_token=user_session.access_token,
-                   id_token=user_session.id_token,
-                   userinfo=user_session.userinfo)
+    return 'Welcome %s' % oidc.user_getfield('email')
 
 @app.route('/')
 @app.route('/overview')
