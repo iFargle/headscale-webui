@@ -51,15 +51,12 @@ pipeline {
                 script {
                     forgejoImage.inside { 
                         sh 'ls -lah /app'
-                        sh '/app/entrypoint.sh'
                         sh 'python --version'
                     }
                     ghcrImage.inside { 
                         sh 'ls -lah /app'
-                        sh 'poetry self show'
                         sh 'python --version'
                     }
-                    sh 'docker image prune --force'
                 }
             }
         }
