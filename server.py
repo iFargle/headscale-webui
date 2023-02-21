@@ -90,9 +90,9 @@ def enable_oidc(func):
     @wraps(func)
     def decorator(*args,**kwargs):
         if AUTH_TYPE != "oidc":
-            return func(args,kwargs)
+            return func()
         oidc.require_login(func)
-        func(args,kwargs)
+        func()
     return decorator
 ########################################################################################
 # / pages - User-facing pages
