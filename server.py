@@ -1,6 +1,7 @@
 # pylint: disable=wrong-import-order
 
 import headscale, helper, json, os, pytz, renderer, secrets, urllib
+from werkzeug       import wrappers
 from functools      import wraps
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
@@ -91,18 +92,14 @@ elif AUTH_TYPE == "basic":
 
     basic_auth = BasicAuth(app)
     # Make a fake decorator for oidc.require_login
-    class oidc:
+    class oidc():
         def require_login(func):
-            def inner():
-                func()
-            return inner
+            return wrapper
 else:
     # Make a fake decorator for oidc.require_login
-    class oidc:
+    class oidc():
         def require_login(func):
-            def inner():
-                func()
-            return inner
+            return wrapper
 
 ########################################################################################
 # Set Authentication type - Dynamically load function decorators
