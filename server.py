@@ -98,7 +98,7 @@ def enable_oidc(func):
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
-@app.route('/')
+@app.route('/', endpoints='overview_page')
 @app.route('/overview', endpoints='overview_page')
 @enable_oidc
 def overview_page():
