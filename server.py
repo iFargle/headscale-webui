@@ -99,7 +99,7 @@ def enable_oidc(func):
                 func(*args, **kwargs)
             oidc.require_login(func)
         return wrapper_decorator_enable_oidc
-    wrapper_decorator_enable_oidc.__name__ = func.__name__
+    decorator_enable_oidc.__name__ = func.__name__
     return decorator_enable_oidc
 ########################################################################################
 # / pages - User-facing pages
