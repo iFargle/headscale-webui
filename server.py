@@ -94,15 +94,15 @@ elif AUTH_TYPE == "basic":
     # Make a fake decorator for oidc.require_login
     class oidc():
         def require_login(func):
-            def inner(*args, **kwargs):
-                func(*args, **kwargs)
+            def inner():
+                pass
             return inner
 else:
     # Make a fake decorator for oidc.require_login
     class oidc():
         def require_login(func):
-            def inner(*args, **kwargs):
-                func(*args, **kwargs)
+            def inner():
+                pass
             return inner
 ########################################################################################
 # Set Authentication type - Dynamically load function decorators
