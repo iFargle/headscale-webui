@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import os
+import os, headscale, requests
 from flask          import Flask
 from flask.logging  import create_logger
 
