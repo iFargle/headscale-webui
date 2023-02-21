@@ -88,7 +88,7 @@ elif AUTH_TYPE == "basic":
     basic_auth = BasicAuth(app)
 
 
-
+@app.before_first_request
 def check_oidc(arg=""):
     # Get a list of all routes and apply the @oidc.require_login decorator:
     LOG.error("check_oidc(arg):  "+str(arg))
@@ -111,7 +111,6 @@ def check_oidc(arg=""):
 def site_map_page():
     return ['%s' % rule for rule in app.url_map.iter_rules()]
 
-@app.before_first_request(check_oidc)
 @app.route('/')
 @app.route('/overview')
 def overview_page():
