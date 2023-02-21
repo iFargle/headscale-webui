@@ -89,14 +89,12 @@ elif AUTH_TYPE == "basic":
     basic_auth = BasicAuth(app)
 
 def check_auth_type(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        LOG.error("check_oidc(arg):  "+str(f))
-        if AUTH_TYPE == "oidc":
-            flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
-            for route in flask_routes:
-                LOG.error("Applying OIDC Require_Login to route:  "+str(f))
-                oidc.require_login(app.route(f))
+    LOG.error("check_oidc(arg):  "+str(f))
+    if AUTH_TYPE == "oidc":
+        flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
+        for route in flask_routes:
+            LOG.error("Applying OIDC Require_Login to route:  "+str(f))
+            oidc.require_login(app.route(f))
 
 ########################################################################################
 # / pages - User-facing pages
