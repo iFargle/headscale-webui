@@ -80,10 +80,14 @@ elif AUTH_TYPE == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
+    # Make a fake decorator for oidc.require_login
+    class oidc:
+        def require_login(self, func):
+            return 0
 else:
     # Make a fake decorator for oidc.require_login
     class oidc:
-        def require_login(f):
+        def require_login(self, func):
             return 0
 
 ########################################################################################
