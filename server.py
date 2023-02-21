@@ -92,12 +92,12 @@ elif AUTH_TYPE == "basic":
     basic_auth = BasicAuth(app)
     # Make a fake decorator for oidc.require_login
     class oidc:
-        def require_login(self, func):
+        def require_login(self):
             return 0
 else:
     # Make a fake decorator for oidc.require_login
     class oidc:
-        def require_login(self, func):
+        def require_login(self):
             return 0
 
 ########################################################################################
