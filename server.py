@@ -89,7 +89,7 @@ elif AUTH_TYPE == "basic":
 
 
 
-def check_oidc(arg):
+def check_oidc(arg=""):
     # Get a list of all routes and apply the @oidc.require_login decorator:
     LOG.error("check_oidc(arg):  "+str(arg))
     if AUTH_TYPE == "oidc":
