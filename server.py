@@ -100,10 +100,6 @@ elif AUTH_TYPE == "basic":
 #def oidctest_page():
 #    return 'Welcome %s' % oidc.user_getfield('email')
 
-@app.route("/site-map")
-def site_map():
-    return Markup(links)
-
 @app.route('/')
 @app.route('/overview')
 def overview_page():
