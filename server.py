@@ -90,9 +90,12 @@ elif AUTH_TYPE == "basic":
 
 def check_auth_type(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if AUTH_TYPE == "oidc":  oidc.require_login(f)
-        return f(*args, **kwargs)
+    if AUTH_TYPE == "oidc":
+        @oidc.require_login(f)
+        def decorated_function(*args, **kwargs):
+            LOG.error("Applying OIDC's require_login() to "+f)
+            oidc.require_login(f)
+            return f(*args, **kwargs)
     return decorated_function
 
 ########################################################################################
