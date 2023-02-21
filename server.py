@@ -88,30 +88,17 @@ elif AUTH_TYPE == "basic":
 
     basic_auth = BasicAuth(app)
 
+########################################################################################
+# Set Authentication type.
+########################################################################################
 def check_auth_type(f):
     if AUTH_TYPE == "oidc":
         @wraps(f)
-        def decorated_function(*args, **kwargs):
-            LOG.error("Applying OIDC's require_login() to "+str(f))
-            oidc.require_login(f)
-            return f(*args, **kwargs)
-    return decorated_function
+        @oidc.require_login(f)
 
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
-# Testing OIDC page...
-## @app.route('/oidctest')
-## @check_auth_type
-# f oidctest_page():
-#    return 'Welcome %s' % oidc.user_getfield('email')
-
-# Get URL list
-@app.route('/site-map')
-@check_auth_type
-def site_map_page():
-    return ['%s' % rule for rule in app.url_map.iter_rules()]
-
 @app.route('/')
 @app.route('/overview')
 @check_auth_type
