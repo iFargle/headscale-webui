@@ -83,7 +83,7 @@ elif AUTH_TYPE == "basic":
 
 ########################################################################################
 # Set Authentication type - Dynamically load function decorators
-# https://wiki.python.org/moin/PythonDecoratorLibrary#Enable.2FDisable_Decorators 
+# https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
 ########################################################################################
 def enable_oidc(func):
     LOG.error("in enable_oidc")
@@ -91,9 +91,10 @@ def enable_oidc(func):
         LOG.error("in enable_oidc-wrapper wrapper")
         if AUTH_TYPE == "oidc":
             oidc.require_login(func)
-        LOG.error("Applied oidc.require_login to func "+str(func))
+            LOG.error("Applied oidc.require_login to func "+str(func))
         return func(*args, **kwargs)
     LOG.error ("Returning wrapper")
+    wrapper.__name__ = func.__name__
     return wrapper
 ########################################################################################
 # / pages - User-facing pages
