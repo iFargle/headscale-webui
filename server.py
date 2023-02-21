@@ -91,15 +91,15 @@ elif AUTH_TYPE == "basic":
 # Set Authentication type - Dynamically load function decorators
 # https://wiki.python.org/moin/PythonDecoratorLibrary#Enable.2FDisable_Decorators 
 ########################################################################################
-def feature_flag(flag):
-    def decorator_feature_flag(func):
+def auth_type(flag):
+    def decorator_auth_type(func):
         @wraps(func)
-        def wrapper_decorator_feature_flag(*args, **kwargs):
+        def wrapper_decorator_auth_type(*args, **kwargs):
             if flag is not "oidc":
                 func(*args, **kwargs)
             oidc.require_login(func)
-        return wrapper_decorator_feature_flag
-    return decorator_feature_flag
+        return wrapper_decorator_auth_type
+    return decorator_auth_type
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
