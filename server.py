@@ -43,7 +43,8 @@ if AUTH_TYPE == "oidc":
             "client_id": \""""+OIDC_CLIENT_ID+"""",
             "client_secret": \""""+OIDC_SECRET+"""",
             "redirect_uris": [
-                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
+                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback",
+                "https://headscale.sysctl.io/admin/oidc_callback"
             ],
             "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
             "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
@@ -54,6 +55,9 @@ if AUTH_TYPE == "oidc":
 
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
+    LOG.debug("Client Secrets:  ")
+    with open("/app/instance/secrets.json", "r+") as secrets_json:
+        LOG.debug(secrets.json.read())
     
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
