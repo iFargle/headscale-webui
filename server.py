@@ -96,7 +96,8 @@ def check_oidc(arg=""):
         flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
         for route in flask_routes:
             LOG.error("Applying OIDC Require_Login to route:  "+route)
-            oidc.require_login(route)
+            LOG.error("Testing:  "+str(app.route(route)))
+            oidc.require_login(app.route(route))
 
 ########################################################################################
 # / pages - User-facing pages
