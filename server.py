@@ -1,9 +1,12 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets
+import headscale, helper, json, os, pytz, renderer, secrets, urllib
+from functools      import wraps
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
 from flask_executor import Executor
+
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
@@ -16,8 +19,9 @@ STATIC_URL_PATH = "/static"
 
 # Initiate the Flask application:
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-LOG = logging.create_logger(app)
-executor = Executor(app)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 ########################################################################################
 # Set Authentication type.  Currently "OIDC" and "BASIC"
