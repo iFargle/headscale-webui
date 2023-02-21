@@ -87,15 +87,13 @@ elif AUTH_TYPE == "basic":
 # https://wiki.python.org/moin/PythonDecoratorLibrary#Enable.2FDisable_Decorators 
 ########################################################################################
 def enable_oidc(func):
-    def decorator_enable_oidc(func):
-        def wrapper_decorator_enable_oidc():
-            if AUTH_TYPE != "oidc":
-                func()
-                return
-            oidc.require_login(func)
+    def wrapper_decorator_enable_oidc():
+        if AUTH_TYPE != "oidc":
             func()
-        return wrapper_decorator_enable_oidc
-    return decorator_enable_oidc
+            return
+        oidc.require_login(func)
+        func()
+    return wrapper_decorator_enable_oidc
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
