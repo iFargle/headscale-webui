@@ -92,7 +92,7 @@ def enable_oidc(func):
         if AUTH_TYPE != "oidc":
             return func()
         oidc.require_login(func)
-        func()
+        return func()
     return decorator
 ########################################################################################
 # / pages - User-facing pages
