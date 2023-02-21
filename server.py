@@ -57,7 +57,7 @@ if AUTH_TYPE == "oidc":
         secrets_json.write(client_secrets)
     LOG.debug("Client Secrets:  ")
     with open("/app/instance/secrets.json", "r+") as secrets_json:
-        LOG.debug(secrets.json.read())
+        LOG.debug(secrets_json.read())
     
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
