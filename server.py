@@ -77,10 +77,12 @@ if AUTH_TYPE == "oidc":
     oidc = OpenIDConnect(app)
 
     # Get a list of all routes and apply the @oidc.require_login decorator:
-    flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
-    for route in flask_routes:
-        LOG.error("Applying OIDC Require_Login to route:  "+route)
-        oidc.require_login(route)
+    @app.before_first_request()
+    def protect_routes()
+        flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
+        for route in flask_routes:
+            LOG.error("Applying OIDC Require_Login to route:  "+route)
+            oidc.require_login(route)
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
