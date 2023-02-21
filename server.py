@@ -95,6 +95,8 @@ def check_auth_type(f):
     if AUTH_TYPE == "oidc":
         @wraps(f)
         @oidc.require_login(f)
+        def login():
+            return 0
 
 ########################################################################################
 # / pages - User-facing pages
