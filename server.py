@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets
+import headscale, helper, json, os, pytz, renderer, secrets, urllib
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
 from flask_executor import Executor
@@ -79,7 +79,6 @@ if AUTH_TYPE == "oidc":
     # Decorate all functions with @oidc.require_login:
     # Get a list of all public pages:
     def list_routes():
-        import urllib
         output = []
         for rule in app.url_map.iter_rules():
 
@@ -94,7 +93,6 @@ if AUTH_TYPE == "oidc":
 
         for line in sorted(output):
             LOG.error(line)
-    list_routes()
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
     LOG.error("Loading basic auth libraries and configuring app...")
