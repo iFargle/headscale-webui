@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets, urllib
+import headscale, helper, json, os, pytz, renderer, secrets
 from functools      import wraps
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
@@ -87,6 +87,7 @@ elif AUTH_TYPE == "basic":
 # https://wiki.python.org/moin/PythonDecoratorLibrary#Enable.2FDisable_Decorators 
 ########################################################################################
 def enable_oidc(func):
+    @wraps(f)
     def wrapper_decorator_enable_oidc():
         if AUTH_TYPE != "oidc":
             func()
