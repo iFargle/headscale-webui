@@ -78,9 +78,23 @@ if AUTH_TYPE == "oidc":
 
     # Decorate all functions with @oidc.require_login:
     # Get a list of all public pages:
-    LOG.error("app.url_map")
-    LOG.error(app.url_map)
+    def list_routes():
+        import urllib
+        output = []
+        for rule in app.url_map.iter_rules():
 
+            options = {}
+            for arg in rule.arguments:
+                options[arg] = "[{0}]".format(arg)
+
+            methods = ','.join(rule.methods)
+            url = url_for(rule.endpoint, **options)
+            line = urllib.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+            output.append(line)
+
+        for line in sorted(output):
+            LOG.error(line)
+    list_routes()
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
     LOG.error("Loading basic auth libraries and configuring app...")
@@ -370,9 +384,4 @@ def build_preauth_key_table():
 # Main thread
 ########################################################################################
 if __name__ == '__main__':
-
-    # Decorate all functions with @oidc.require_login:
-    # Get a list of all public pages:
-    LOG.error("app.url_map -- __main__")
-    LOG.error(app.url_map)
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
