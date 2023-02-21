@@ -1,7 +1,6 @@
 # pylint: disable=wrong-import-order
 
 import headscale, helper, json, os, pytz, renderer, secrets
-from functools      import wraps
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
 from flask_executor import Executor
@@ -88,21 +87,19 @@ elif AUTH_TYPE == "basic":
 ########################################################################################
 def enable_oidc(func):
     LOG.error("in enable_oidc")
-    @wraps(func)
-    def decorator():
-        LOG.error("in enable_oidc-decorator wrapper")
-        if AUTH_TYPE != "oidc":
-            return func()
-        oidc.require_login(func)
+    def wrapper(*args, **kwargs):
+        LOG.error("in enable_oidc-wrapper wrapper")
+        if AUTH_TYPE == "oidc":
+            oidc.require_login(func)
         LOG.error("Applied oidc.require_login to func "+str(func))
-        return func()
-    LOG.error ("Returning decorator")
-    return decorator
+        return func(*args, **kwargs)
+    LOG.error ("Returning wrapper")
+    return wrapper
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
 @app.route('/')
-@app.route('/overview')
+@app.route('/overview', endpoints='overview_page')
 @enable_oidc
 def overview_page():
     # Some basic sanity checks:
@@ -115,7 +112,7 @@ def overview_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/machines', methods=('GET', 'POST'))
+@app.route('/machines', methods=('GET', 'POST'), endpoints='machines_page')
 @enable_oidc
 def machines_page():
     # Some basic sanity checks:
@@ -130,7 +127,7 @@ def machines_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/users', methods=('GET', 'POST'))
+@app.route('/users', methods=('GET', 'POST'), endpoints='users_page')
 @enable_oidc
 def users_page():
     # Some basic sanity checks:
@@ -145,7 +142,7 @@ def users_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/settings', methods=('GET', 'POST'))
+@app.route('/settings', methods=('GET', 'POST'), endpoints='settings_page')
 @enable_oidc
 def settings_page():
     # Some basic sanity checks:
@@ -163,7 +160,7 @@ def settings_page():
         HS_VERSION   = os.environ["HS_VERSION"]
     )
 
-@app.route('/error')
+@app.route('/error', endpoints='error_page')
 @enable_oidc
 def error_page():
     if helper.access_checks() == "Pass": 
@@ -181,7 +178,7 @@ def error_page():
 # Headscale API Key Endpoints
 ########################################################################################
 
-@app.route('/api/test_key', methods=('GET', 'POST'))
+@app.route('/api/test_key', methods=('GET', 'POST'), endpoints='test_key_page')
 @enable_oidc
 def test_key_page():
     api_key    = headscale.get_api_key()
@@ -218,7 +215,7 @@ def test_key_page():
     message = json.dumps(key_info)
     return message
 
-@app.route('/api/save_key', methods=['POST'])
+@app.route('/api/save_key', methods=['POST'], endpoints='save_key_page')
 @enable_oidc
 def save_key_page():
     json_response = request.get_json()
@@ -243,7 +240,7 @@ def save_key_page():
 ########################################################################################
 # Machine API Endpoints
 ########################################################################################
-@app.route('/api/update_route', methods=['POST'])
+@app.route('/api/update_route', methods=['POST'], endpoints='update_route_page')
 @enable_oidc
 def update_route_page():
     json_response = request.get_json()
@@ -254,7 +251,7 @@ def update_route_page():
 
     return headscale.update_route(url, api_key, route_id, current_state)
 
-@app.route('/api/machine_information', methods=['POST'])
+@app.route('/api/machine_information', methods=['POST'], endpoints='machine_information_page')
 @enable_oidc
 def machine_information_page():
     json_response = request.get_json()
@@ -264,7 +261,7 @@ def machine_information_page():
 
     return headscale.get_machine_info(url, api_key, machine_id)
 
-@app.route('/api/delete_machine', methods=['POST'])
+@app.route('/api/delete_machine', methods=['POST'], endpoints='delete_machine_page')
 @enable_oidc
 def delete_machine_page():
     json_response = request.get_json()
@@ -274,7 +271,7 @@ def delete_machine_page():
 
     return headscale.delete_machine(url, api_key, machine_id)
 
-@app.route('/api/rename_machine', methods=['POST'])
+@app.route('/api/rename_machine', methods=['POST'], endpoints='rename_machine_page')
 @enable_oidc
 def rename_machine_page():
     json_response = request.get_json()
@@ -285,18 +282,18 @@ def rename_machine_page():
 
     return headscale.rename_machine(url, api_key, machine_id, new_name)
 
-@app.route('/api/move_user', methods=['POST'])
+@app.route('/api/move_user', methods=['POST'], endpoints='move_user_page')
 @enable_oidc
 def move_user_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
-    new_user = json_response['new_user']
+    new_user      = json_response['new_user']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
     return headscale.move_user(url, api_key, machine_id, new_user)
 
-@app.route('/api/set_machine_tags', methods=['POST'])
+@app.route('/api/set_machine_tags', methods=['POST'], endpoints='set_machine_tags')
 @enable_oidc
 def set_machine_tags():
     json_response = request.get_json()
@@ -307,12 +304,12 @@ def set_machine_tags():
 
     return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
 
-@app.route('/api/register_machine', methods=['POST'])
+@app.route('/api/register_machine', methods=['POST'], endpoints='register_machine')
 @enable_oidc
 def register_machine():
     json_response = request.get_json()
     machine_key   = json_response['key']
-    user     = json_response['user']
+    user          = json_response['user']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -321,7 +318,7 @@ def register_machine():
 ########################################################################################
 # User API Endpoints
 ########################################################################################
-@app.route('/api/rename_user', methods=['POST'])
+@app.route('/api/rename_user', methods=['POST'], endpoints='rename_user_page')
 @enable_oidc
 def rename_user_page():
     json_response = request.get_json()
@@ -332,7 +329,7 @@ def rename_user_page():
 
     return headscale.rename_user(url, api_key, old_name, new_name)
 
-@app.route('/api/add_user', methods=['POST'])
+@app.route('/api/add_user', methods=['POST'], endpoints='add_user')
 @enable_oidc
 def add_user():
     json_response  = json.dumps(request.get_json())
@@ -341,17 +338,17 @@ def add_user():
 
     return headscale.add_user(url, api_key, json_response)
 
-@app.route('/api/delete_user', methods=['POST'])
+@app.route('/api/delete_user', methods=['POST'], endpoints='delete_user')
 @enable_oidc
 def delete_user():
     json_response  = request.get_json()
-    user_name = json_response['name']
+    user_name      = json_response['name']
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
     return headscale.delete_user(url, api_key, user_name)
 
-@app.route('/api/get_users', methods=['POST'])
+@app.route('/api/get_users', methods=['POST'], endpoints='get_users_page')
 @enable_oidc
 def get_users_page():
     url           = headscale.get_url()
@@ -362,7 +359,7 @@ def get_users_page():
 ########################################################################################
 # Pre-Auth Key API Endpoints
 ########################################################################################
-@app.route('/api/add_preauth_key', methods=['POST'])
+@app.route('/api/add_preauth_key', methods=['POST'], endpoints='add_preauth_key')
 @enable_oidc
 def add_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -371,7 +368,7 @@ def add_preauth_key():
 
     return headscale.add_preauth_key(url, api_key, json_response)
 
-@app.route('/api/expire_preauth_key', methods=['POST'])
+@app.route('/api/expire_preauth_key', methods=['POST'], endpoints='expire_preauth_key')
 @enable_oidc
 def expire_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -380,7 +377,7 @@ def expire_preauth_key():
 
     return headscale.expire_preauth_key(url, api_key, json_response)
 
-@app.route('/api/build_preauthkey_table', methods=['POST'])
+@app.route('/api/build_preauthkey_table', methods=['POST'], endpoints='build_preauth_key_table')
 @enable_oidc
 def build_preauth_key_table():
     json_response  = request.get_json()
