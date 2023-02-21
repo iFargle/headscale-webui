@@ -370,4 +370,9 @@ def build_preauth_key_table():
 # Main thread
 ########################################################################################
 if __name__ == '__main__':
+
+    # Decorate all functions with @oidc.require_login:
+    # Get a list of all public pages:
+    LOG.error("app.url_map -- __main__")
+    LOG.error(app.url_map)
     app.run(host="0.0.0.0", debug=DEBUG_STATE)
