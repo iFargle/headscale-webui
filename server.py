@@ -91,7 +91,7 @@ elif AUTH_TYPE == "basic":
 
 def check_oidc(arg):
     # Get a list of all routes and apply the @oidc.require_login decorator:
-    LOG.error("check_oidc(arg): arg:  "+arg)
+    LOG.error("check_oidc(arg): arg:  "+str(arg))
     if AUTH_TYPE == "oidc":
         flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
         for route in flask_routes:
