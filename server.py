@@ -76,14 +76,22 @@ if AUTH_TYPE == "oidc":
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
 
-    # Check if OIDC user is logged in before routing to any page:
-    @app.route('/login')
-    @oidc.require_login
-    def login_page():
-        LOG.error("Checking if the user is logged in...:  "+str(oidc.user_loggedin))
-        LOG.error("oidc.user_getfield('email'):  "+oidc.user_getfield('email'))
-        if not oidc.user_loggedin: 
-            LOG.error("User is not logged in.  Redirecting to login")
+    # Decorate all functions with @oidc.require_login:
+    # Get a list of all public pages:
+
+    def has_no_empty_params(rule):
+        defaults = rule.defaults if rule.defaults is not None else ()
+        arguments = rule.arguments if rule.arguments is not None else ()
+        return len(defaults) >= len(arguments)
+
+    links = []
+    for rule in app.url_map.iter_rules():
+        # Filter out rules we can't navigate to in a browser
+        # and rules that require parameters
+        if has_no_empty_params(rule):
+            url = url_for(rule.endpoint, **(rule.defaults or {}))
+            links.append((url, rule.endpoint))
+    # links is now a list of url, endpoint tuples
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -103,6 +111,10 @@ elif AUTH_TYPE == "basic":
 #@app.route('/oidctest')
 #def oidctest_page():
 #    return 'Welcome %s' % oidc.user_getfield('email')
+
+@app.route("/site-map")
+def site_map():
+    return Markup(links)
 
 @app.route('/')
 @app.route('/overview')
