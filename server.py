@@ -87,7 +87,7 @@ elif AUTH_TYPE == "basic":
 # https://wiki.python.org/moin/PythonDecoratorLibrary#Enable.2FDisable_Decorators 
 ########################################################################################
 def enable_oidc(func):
-    @wraps(f)
+    @wraps(func)
     def wrapper_decorator_enable_oidc():
         if AUTH_TYPE != "oidc":
             func()
