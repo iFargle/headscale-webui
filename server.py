@@ -88,12 +88,12 @@ elif AUTH_TYPE == "basic":
 ########################################################################################
 def enable_oidc(func):
     def decorator_enable_oidc(func):
-        def wrapper_decorator_enable_oidc(*args, **kwargs):
+        def wrapper_decorator_enable_oidc():
             if AUTH_TYPE != "oidc":
-                func(*args, **kwargs)
+                func()
                 return
             oidc.require_login(func)
-            func(*args, **kwargs)
+            func()
         return wrapper_decorator_enable_oidc
     return decorator_enable_oidc
 ########################################################################################
