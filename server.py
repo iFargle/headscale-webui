@@ -91,11 +91,7 @@ elif AUTH_TYPE == "basic":
 def check_auth_type(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if AUTH_TYPE == "oidc":
-            flask_routes = ['%s' % rule for rule in app.url_map.iter_rules()]
-            for route in flask_routes:
-                LOG.error("Applying OIDC Require_Login to route:  "+str(f))
-                oidc.require_login(f)
+        if AUTH_TYPE == "oidc":  oidc.require_login(f)
         return f(*args, **kwargs)
     return decorated_function
 
