@@ -89,8 +89,8 @@ elif AUTH_TYPE == "basic":
     basic_auth = BasicAuth(app)
 
 def check_auth_type(f):
-    @wraps(f)
     if AUTH_TYPE == "oidc":
+        @wraps(f)
         @oidc.require_login(f)
         def decorated_function(*args, **kwargs):
             LOG.error("Applying OIDC's require_login() to "+f)
