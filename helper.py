@@ -7,9 +7,9 @@ from flask.logging  import create_logger
 app = Flask(__name__)
 LOG = create_logger(app)
 
-def pretty_print_duration(duration):
+def pretty_print_duration(duration, delta_type=""):
     """ Prints a duration in human-readable formats """
-    if int(duration.seconds) > 0:
+    if delta_type == "expiry":
         days, seconds = duration.days, duration.seconds
         hours = (days * 24 + seconds // 3600)
         mins  = (seconds % 3600) // 60
@@ -17,15 +17,15 @@ def pretty_print_duration(duration):
         if days  > 0: return str(days ) + " days ago"     if days  >  1 else str(days ) + " day ago"
         if hours > 0: return str(hours) + " hours ago"    if hours >  1 else str(hours) + " hour ago"
         if mins  > 0: return str(mins ) + " minutes ago"  if mins  >  1 else str(mins ) + " minute ago"
-        return str(secs ) + " seconds ago"  if secs  >= 1 or secs == 0 else str(secs ) + " second ago"
+        return str(secs ) + " seconds ago"   if secs  >= 1 or secs == 0 else str(secs ) + " second ago"
     days, seconds = abs(int(duration.days)), abs(int(duration.seconds))
     hours = (days * 24 + seconds // 3600)
     mins  = (seconds % 3600) // 60
     secs  = seconds % 60
-    if days  > 0: return "in "+str(days ) + " days"      if days  >  1 else str(days ) + " day"
+    if days  > 0: return "in "+ str(days ) + " days"     if days  >  1 else str(days ) + " day"
     if hours > 0: return "in "+ str(hours) + " hours"    if hours >  1 else str(hours) + " hour"
     if mins  > 0: return "in "+ str(mins ) + " minutes"  if mins  >  1 else str(mins ) + " minute"
-    return "in "+ str(secs ) + " seconds"  if secs  >= 1 or secs == 0 else str(secs ) + " second"
+    return "in "+ str(secs ) + " seconds"   if secs  >= 1 or secs == 0 else str(secs ) + " second"
 def text_color_duration(duration):
     """ Prints a color based on duratioin (imported as seconds) """
 
