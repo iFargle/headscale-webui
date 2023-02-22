@@ -46,7 +46,7 @@ if AUTH_TYPE == "oidc":
     response = requests.get(str(OIDC_AUTH_URL))
     oidc_info = response.json()
 
-    LOG.error("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_infO))
+    LOG.error("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
 
     client_secrets = """{
         "web": {
