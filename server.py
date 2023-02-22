@@ -244,6 +244,11 @@ def error_page():
         ERROR_MESSAGE = Markup(helper.access_checks())
     )
 
+@app.route('/logout')
+def logout_page():
+    if AUTH_TYPE == "oidc":
+        oidc.logout()
+    return redirect(url_for('overview_page'))
 ########################################################################################
 # /api pages
 ########################################################################################

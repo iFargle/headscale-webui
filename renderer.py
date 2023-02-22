@@ -532,6 +532,8 @@ def oidc_nav_dropdown(user_name, email_address, name):
     LOG.error("Username:  "+str(user_name))
     LOG.error("Email:  "+str(email_address))
     html_payload = """
+    <div class="divider"></div>
+    <ul class="right hide-on-med-and-down">
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
             <li><a href="#!">User:  """+name+"""</a></li>
@@ -546,6 +548,7 @@ def oidc_nav_dropdown(user_name, email_address, name):
                 """+name+""" <i class="material-icons right">account_circle</i>
             </a>
         </li>
+    </ul>
     """
 
     return Markup(html_payload)
