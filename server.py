@@ -95,7 +95,7 @@ elif AUTH_TYPE == "basic":
     class oidc(object):
         def require_login(self, view_func):
             @wraps(view_func)
-            def decorated(*args, **kwargs): # Do nothing
+            def decorated(*args, **kwargs):
                 return view_func(*args, **kwargs)
             return decorated
 else:
@@ -103,7 +103,7 @@ else:
     class oidc(object):
         def require_login(self, view_func):
             @wraps(view_func)
-            def decorated(*args, **kwargs): # Do nothing
+            def decorated(*args, **kwargs):
                 return view_func(*args, **kwargs)
             return decorated
 ########################################################################################
@@ -124,8 +124,8 @@ else:
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
-@app.route('/', endpoint='overview_page')
-@app.route('/overview', endpoint='overview_page')
+@app.route('/')
+@app.route('/overview')
 @oidc.require_login
 def overview_page():
     # Some basic sanity checks:
@@ -138,7 +138,7 @@ def overview_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/machines', methods=('GET', 'POST'), endpoint='machines_page')
+@app.route('/machines', methods=('GET', 'POST'))
 @oidc.require_login
 def machines_page():
     # Some basic sanity checks:
@@ -153,7 +153,7 @@ def machines_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/users', methods=('GET', 'POST'), endpoint='users_page')
+@app.route('/users', methods=('GET', 'POST'))
 @oidc.require_login
 def users_page():
     # Some basic sanity checks:
@@ -168,7 +168,7 @@ def users_page():
         COLOR_BTN   = COLOR_BTN
     )
 
-@app.route('/settings', methods=('GET', 'POST'), endpoint='settings_page')
+@app.route('/settings', methods=('GET', 'POST'))
 @oidc.require_login
 def settings_page():
     # Some basic sanity checks:
@@ -186,7 +186,7 @@ def settings_page():
         HS_VERSION   = os.environ["HS_VERSION"]
     )
 
-@app.route('/error', endpoint='error_page')
+@app.route('/error')
 @oidc.require_login
 def error_page():
     if helper.access_checks() == "Pass": 
@@ -204,7 +204,7 @@ def error_page():
 # Headscale API Key Endpoints
 ########################################################################################
 
-@app.route('/api/test_key', methods=('GET', 'POST'), endpoint='test_key_page')
+@app.route('/api/test_key', methods=('GET', 'POST'))
 @oidc.require_login
 def test_key_page():
     api_key    = headscale.get_api_key()
@@ -241,7 +241,7 @@ def test_key_page():
     message = json.dumps(key_info)
     return message
 
-@app.route('/api/save_key', methods=['POST'], endpoint='save_key_page')
+@app.route('/api/save_key', methods=['POST'])
 @oidc.require_login
 def save_key_page():
     json_response = request.get_json()
@@ -266,7 +266,7 @@ def save_key_page():
 ########################################################################################
 # Machine API Endpoints
 ########################################################################################
-@app.route('/api/update_route', methods=['POST'], endpoint='update_route_page')
+@app.route('/api/update_route', methods=['POST'])
 @oidc.require_login
 def update_route_page():
     json_response = request.get_json()
@@ -277,7 +277,7 @@ def update_route_page():
 
     return headscale.update_route(url, api_key, route_id, current_state)
 
-@app.route('/api/machine_information', methods=['POST'], endpoint='machine_information_page')
+@app.route('/api/machine_information', methods=['POST'])
 @oidc.require_login
 def machine_information_page():
     json_response = request.get_json()
@@ -287,7 +287,7 @@ def machine_information_page():
 
     return headscale.get_machine_info(url, api_key, machine_id)
 
-@app.route('/api/delete_machine', methods=['POST'], endpoint='delete_machine_page')
+@app.route('/api/delete_machine', methods=['POST'])
 @oidc.require_login
 def delete_machine_page():
     json_response = request.get_json()
@@ -297,7 +297,7 @@ def delete_machine_page():
 
     return headscale.delete_machine(url, api_key, machine_id)
 
-@app.route('/api/rename_machine', methods=['POST'], endpoint='rename_machine_page')
+@app.route('/api/rename_machine', methods=['POST'])
 @oidc.require_login
 def rename_machine_page():
     json_response = request.get_json()
@@ -308,7 +308,7 @@ def rename_machine_page():
 
     return headscale.rename_machine(url, api_key, machine_id, new_name)
 
-@app.route('/api/move_user', methods=['POST'], endpoint='move_user_page')
+@app.route('/api/move_user', methods=['POST'])
 @oidc.require_login
 def move_user_page():
     json_response = request.get_json()
@@ -319,7 +319,7 @@ def move_user_page():
 
     return headscale.move_user(url, api_key, machine_id, new_user)
 
-@app.route('/api/set_machine_tags', methods=['POST'], endpoint='set_machine_tags')
+@app.route('/api/set_machine_tags', methods=['POST'])
 @oidc.require_login
 def set_machine_tags():
     json_response = request.get_json()
@@ -330,7 +330,7 @@ def set_machine_tags():
 
     return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
 
-@app.route('/api/register_machine', methods=['POST'], endpoint='register_machine')
+@app.route('/api/register_machine', methods=['POST'])
 @oidc.require_login
 def register_machine():
     json_response = request.get_json()
@@ -344,7 +344,7 @@ def register_machine():
 ########################################################################################
 # User API Endpoints
 ########################################################################################
-@app.route('/api/rename_user', methods=['POST'], endpoint='rename_user_page')
+@app.route('/api/rename_user', methods=['POST'])
 @oidc.require_login
 def rename_user_page():
     json_response = request.get_json()
@@ -355,7 +355,7 @@ def rename_user_page():
 
     return headscale.rename_user(url, api_key, old_name, new_name)
 
-@app.route('/api/add_user', methods=['POST'], endpoint='add_user')
+@app.route('/api/add_user', methods=['POST'])
 @oidc.require_login
 def add_user():
     json_response  = json.dumps(request.get_json())
@@ -364,7 +364,7 @@ def add_user():
 
     return headscale.add_user(url, api_key, json_response)
 
-@app.route('/api/delete_user', methods=['POST'], endpoint='delete_user')
+@app.route('/api/delete_user', methods=['POST'])
 @oidc.require_login
 def delete_user():
     json_response  = request.get_json()
@@ -374,7 +374,7 @@ def delete_user():
 
     return headscale.delete_user(url, api_key, user_name)
 
-@app.route('/api/get_users', methods=['POST'], endpoint='get_users_page')
+@app.route('/api/get_users', methods=['POST'])
 @oidc.require_login
 def get_users_page():
     url           = headscale.get_url()
@@ -385,7 +385,7 @@ def get_users_page():
 ########################################################################################
 # Pre-Auth Key API Endpoints
 ########################################################################################
-@app.route('/api/add_preauth_key', methods=['POST'], endpoint='add_preauth_key')
+@app.route('/api/add_preauth_key', methods=['POST'])
 @oidc.require_login
 def add_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -394,7 +394,7 @@ def add_preauth_key():
 
     return headscale.add_preauth_key(url, api_key, json_response)
 
-@app.route('/api/expire_preauth_key', methods=['POST'], endpoint='expire_preauth_key')
+@app.route('/api/expire_preauth_key', methods=['POST'])
 @oidc.require_login
 def expire_preauth_key():
     json_response  = json.dumps(request.get_json())
@@ -403,7 +403,7 @@ def expire_preauth_key():
 
     return headscale.expire_preauth_key(url, api_key, json_response)
 
-@app.route('/api/build_preauthkey_table', methods=['POST'], endpoint='build_preauth_key_table')
+@app.route('/api/build_preauthkey_table', methods=['POST'])
 @oidc.require_login
 def build_preauth_key_table():
     json_response  = request.get_json()
