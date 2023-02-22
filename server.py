@@ -1,11 +1,10 @@
 # pylint: disable=wrong-import-order
 
 import headscale, helper, json, os, pytz, renderer, secrets
-from functools      import wraps
-from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
-from dateutil       import parser
-from flask_executor import Executor
-
+from functools                     import wraps
+from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
+from dateutil                      import parser
+from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Global vars
@@ -18,12 +17,10 @@ AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '').lower()
 STATIC_URL_PATH = "/static"
 
 # Initiate the Flask application:
-app = Flask(__name__, static_url_path=STATIC_URL_PATH)
-LOG = logging.create_logger(app)
-executor = Executor(app)
-app.wsgi_app = ProxyFix(
-    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
-)
+app          = Flask(__name__, static_url_path=STATIC_URL_PATH)
+LOG          = logging.create_logger(app)
+executor     = Executor(app)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 ########################################################################################
 # Set Authentication type.  Currently "OIDC" and "BASIC"
@@ -278,16 +275,21 @@ def test_key_page():
 
     # Set the current timezone and local time
     timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time = timezone.localize(datetime.now())
 
     # Format the dates for easy readability
-    expiration_parse   = parser.parse(key_info['expiration'])
-    expiration_local   = expiration_parse.astimezone(timezone)
-    expiration_time    = str(expiration_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
+    creation_parse   = parser.parse(key_info['createdAt'])
+    creation_local   = creation_parse.astimezone(timezone)
+    creation_delta   = local_time - creation_local
+    creation_print   = helper.pretty_print_duration(creation_delta)
+    creation_time    = str(creation_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(creation_print)+")"
 
-    creation_parse     = parser.parse(key_info['createdAt'])
-    creation_local     = creation_parse.astimezone(timezone)
-    creation_time      = str(creation_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
-    
+    expiration_parse = parser.parse(key_info['expiration'])
+    expiration_local = expiration_parse.astimezone(timezone)
+    expiration_delta = expiration_local - local_time
+    expiration_print = helper.pretty_print_duration(expiration_delta, "expiry")
+    expiration_time  = str(expiration_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiration_print)+")"
+
     key_info['expiration'] = expiration_time
     key_info['createdAt']  = creation_time
 

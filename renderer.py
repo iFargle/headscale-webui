@@ -174,7 +174,7 @@ def render_overview():
             <tr><td> Region Code  </td><td> """
             if "region_code" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
             else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
+            derp_content+= """ </td></tr>headscale-webui/renderer.py
             <tr><td> Region Name  </td><td> """
             if "region_name" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
             else: derp_content+= "N/A"
@@ -351,7 +351,7 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
     expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
     
-    LOG.error(machine["name"]+": expiry_delta ("+str(expiry_delta)+"):  "+str(expiry_delta.days)+"d "+str(expiry_delta.seconds)+"s")
+    LOG.debug(machine["name"]+": expiry_delta ("+str(expiry_delta)+"):  "+str(expiry_delta.days)+"d "+str(expiry_delta.seconds)+"s")
 
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
@@ -451,8 +451,8 @@ def render_users_cards():
         content = content + render_template(
             'users_card.html', 
             status_badge            = Markup(status_badge),
-            user_name          = user["name"],
-            user_id            = user["id"],
+            user_name               = user["name"],
+            user_id                 = user["id"],
             preauth_keys_collection = Markup(preauth_keys_collection)
         ) 
     content = content+"</div>"
@@ -509,14 +509,14 @@ def build_preauth_key_table(user_name):
         # Class for the javascript function to look for to toggle the hide function
         hide_expired = "expired-row" if not key_usable else ""
 
-        btn_reusable      = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
-        btn_ephemeral     = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
-        btn_used          = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
-        btn_usable        = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
+        btn_reusable  = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
+        btn_ephemeral = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
+        btn_used      = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
+        btn_usable    = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
 
         # Other buttons:
-        btn_delete        = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
-        tooltip_data      = "Expiration:  "+expiration_time
+        btn_delete    = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
+        tooltip_data  = "Expiration:  "+expiration_time
 
         # TR ID will look like "1-albert-tr"
         preauth_keys_collection = preauth_keys_collection+"""
@@ -540,8 +540,8 @@ def oidc_nav_dropdown(user_name, email_address, name):
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
-            <li><a href="#!"><i class="material-icons">account_box</i> """+user_name+"""</a></li>
-            <li><a href="#!"><i class="material-icons">email</i> """+email_address+"""</a></li>
+            <li><i class="material-icons">account_box</i> """+user_name+"""</li>
+            <li><i class="material-icons">email</i> """+email_address+"""</li>
             <li class="divider"></li>
             <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
         </ul>
