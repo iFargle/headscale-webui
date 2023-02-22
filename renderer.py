@@ -347,7 +347,7 @@ def thread_machine_content(machine, machine_content, idx):
 
     expiry_parse     = parser.parse(machine["expiry"])
     expiry_local     = expiry_parse.astimezone(timezone)
-    expiry_delta     = local_time - expiry_local
+    expiry_delta     = expiry_local - local_time
     expiry_print     = helper.pretty_print_duration(expiry_delta)
     expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
 
@@ -538,12 +538,11 @@ def oidc_nav_dropdown(user_name, email_address, name):
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
-            <li><a href="#!">User:  """+name+"""</a></li>
-            <li><a href="#!">Username:  """+user_name+"""</a></li>
-            <li><a href="#!">Email:  """+email_address+"""</a></li>
+            <li><a href="#!">User: """+user_name+"""</a></li>
+            <li><a href="#!">Email: """+email_address+"""</a></li>
             <li class="divider"></li>
             <li><a href="logout">Logout</a></li>
-        </ul>dd
+        </ul>
         <li>
             <a class="dropdown-trigger" href="#!" data-target="dropdown1">
                 """+name+""" <i class="material-icons right">account_circle</i>
@@ -556,19 +555,7 @@ def oidc_nav_dropdown(user_name, email_address, name):
 def oidc_nav_mobile(user_name, email_address, name):
 # https://materializecss.github.io/materialize/sidenav.html
     html_payload = """
-        <!-- Dropdown Structure -->
-        <ul id="dropdown1" class="dropdown-content">
-            <li><a href="#!">User:  """+user_name+"""</a></li>
-            <li><a href="#!">Email:  """+email_address+"""</a></li>
-            <li class="divider"></li>
-            <li><a href="logout">Logout</a></li>
-        </ul>
-
-        <li>
-            <a class="dropdown-trigger" href="#!" data-target="dropdown1">
-                <i class="material-icons right">account_circle</i>
-            </a>
-        </li>
+         <li><hr><a href="logout"><i class="material-icons left">exit_to_app</i>Logout</a></li>
     """
     html_payload = ""
     return Markup(html_payload)
