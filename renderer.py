@@ -381,11 +381,11 @@ def thread_machine_content(machine, machine_content, idx):
         advertised_routes = Markup(routes),
         exit_node_badge   = Markup(exit_node_badge),
         status_badge      = Markup(status_badge),
-        user_badge   = Markup(user_badge),
+        user_badge        = Markup(user_badge),
         last_update_time  = str(last_update_time),
         last_seen_time    = str(last_seen_time),
         created_time      = str(created_time),
-        expiry_time   = str(expiry_time),
+        expiry_time       = str(expiry_time),
         preauth_key       = str(preauth_key),
         machine_tags      = Markup(tags),
     )))
