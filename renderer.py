@@ -351,7 +351,7 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_print     = helper.pretty_print_duration(expiry_delta)
     expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
 
-    LOG.debug("Machine "+str(machine["name"])+" expiry:  "+str(expiry_parse))
+    LOG.error("Machine "+str(machine["name"])+" expiry:  "+str(expiry_parse))
 
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
@@ -405,7 +405,7 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, num_threads):
-        LOG.debug("Appending iterable:  "+str(i))
+        LOG.error("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
     LOG.warning("Starting futures")
