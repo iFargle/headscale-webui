@@ -153,6 +153,15 @@ def machines_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getinfo("email")
+        user_name     = oidc.user_getinfo("username")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -171,6 +180,15 @@ def users_page():
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getinfo("email")
+        user_name     = oidc.user_getinfo("username")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+
     cards = renderer.render_users_cards()
     return render_template('users.html',
         cards = cards,
@@ -187,6 +205,16 @@ def settings_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getinfo("email")
+        user_name     = oidc.user_getinfo("username")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+        
     GIT_COMMIT_LINK = Markup("<a href='https://github.com/iFargle/headscale-webui/commit/"+os.environ["GIT_COMMIT"]+"'>"+str(os.environ["GIT_COMMIT"])[0:7]+"</a>")
 
     return render_template('settings.html', 
