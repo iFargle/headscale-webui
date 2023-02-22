@@ -1,7 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets, urllib
-from werkzeug       import wrappers
+import headscale, helper, json, os, pytz, renderer, secrets
 from functools      import wraps
 from flask          import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil       import parser
@@ -91,7 +90,12 @@ elif AUTH_TYPE == "basic":
     app.config['BASIC_AUTH_FORCE']    = True
 
     basic_auth = BasicAuth(app)
+    ########################################################################################
+    # Set Authentication type - Dynamically load function decorators
+    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
+    ########################################################################################
     # Make a fake decorator for oidc.require_login
+    # If anyone knows a better way of doing this, please let me know.
     class OpenIDConnect():
         def require_login(self, view_func):
             @wraps(view_func)
@@ -101,7 +105,12 @@ elif AUTH_TYPE == "basic":
     oidc = OpenIDConnect()
 
 else:
+    ########################################################################################
+    # Set Authentication type - Dynamically load function decorators
+    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
+    ########################################################################################
     # Make a fake decorator for oidc.require_login
+    # If anyone knows a better way of doing this, please let me know.
     class OpenIDConnect():
         def require_login(self, view_func):
             @wraps(view_func)
@@ -110,21 +119,6 @@ else:
             return decorated
     oidc = OpenIDConnect()
 
-########################################################################################
-# Set Authentication type - Dynamically load function decorators
-# https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
-########################################################################################
-#def enable_oidc(func):
-#    LOG.error("in enable_oidc")
-#    def wrapper(*args, **kwargs):
-#        LOG.error("in enable_oidc-wrapper wrapper")
-#        if AUTH_TYPE == "oidc":
-#            oidc.require_login(func)
-#            LOG.error("Applied oidc.require_login to func "+str(func))
-#        return func(*args, **kwargs)
-#    LOG.error ("Returning wrapper")
-#    wrapper.__name__ = func.__name__
-#    return wrapper
 ########################################################################################
 # / pages - User-facing pages
 ########################################################################################
@@ -136,10 +130,21 @@ def overview_page():
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getinfo("email")
+        user_name     = oidc.user_getinfo("username")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+
     return render_template('overview.html',
         render_page = renderer.render_overview(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
 @app.route('/machines', methods=('GET', 'POST'))
@@ -154,7 +159,9 @@ def machines_page():
         cards            = cards,
         headscale_server = headscale.get_url(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
 @app.route('/users', methods=('GET', 'POST'))
@@ -169,7 +176,9 @@ def users_page():
         cards = cards,
         headscale_server = headscale.get_url(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
 @app.route('/settings', methods=('GET', 'POST'))
@@ -178,14 +187,17 @@ def settings_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
+    GIT_COMMIT_LINK = Markup("<a href='https://github.com/iFargle/headscale-webui/commit/"+os.environ["GIT_COMMIT"]+"'>"+str(os.environ["GIT_COMMIT"])[0:7]+"</a>")
 
     return render_template('settings.html', 
         url          = headscale.get_url(),
         COLOR_NAV    = COLOR_NAV,
         COLOR_BTN    = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE,
         BUILD_DATE   = os.environ["BUILD_DATE"],
         APP_VERSION  = os.environ["APP_VERSION"],
-        GIT_COMMIT   = os.environ["GIT_COMMIT"],
+        GIT_COMMIT   = GIT_COMMIT_LINK,
         GIT_BRANCH   = os.environ["GIT_BRANCH"],
         HS_VERSION   = os.environ["HS_VERSION"]
     )
