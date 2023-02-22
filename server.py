@@ -134,8 +134,8 @@ def overview_page():
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getinfo("email")
-        user_name     = oidc.user_getinfo("username")
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
 
@@ -158,8 +158,8 @@ def machines_page():
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getinfo("email")
-        user_name     = oidc.user_getinfo("username")
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
     
@@ -184,8 +184,8 @@ def users_page():
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getinfo("email")
-        user_name     = oidc.user_getinfo("username")
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
 
@@ -210,11 +210,11 @@ def settings_page():
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getinfo("email")
-        user_name     = oidc.user_getinfo("username")
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
-        
+
     GIT_COMMIT_LINK = Markup("<a href='https://github.com/iFargle/headscale-webui/commit/"+os.environ["GIT_COMMIT"]+"'>"+str(os.environ["GIT_COMMIT"])[0:7]+"</a>")
 
     return render_template('settings.html', 
