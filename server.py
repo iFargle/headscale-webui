@@ -90,7 +90,7 @@ elif AUTH_TYPE == "basic":
     app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
     app.config['BASIC_AUTH_FORCE']    = True
 
-    basic_auth = BasicAuth()
+    basic_auth = BasicAuth(app)
     # Make a fake decorator for oidc.require_login
     class OpenIDConnect():
         def require_login(self, view_func):
