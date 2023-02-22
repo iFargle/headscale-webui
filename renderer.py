@@ -355,7 +355,6 @@ def thread_machine_content(machine, machine_content, idx):
     LOG.error(machine["name"]+": expiry_delta ("+str(expiry_delta)+"):  "+str(expiry_delta.days)+"d "+str(expiry_delta.seconds)+"s")
     LOG.error(machine["name"]+": testasdf     ("+str(testasdf)    +"):  "+str(testasdf.days)    +"d "+str(testasdf.seconds)    +"s")
 
-    if 
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
