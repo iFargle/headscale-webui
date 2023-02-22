@@ -528,6 +528,8 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def oidc_nav_dropdown(user_name, email_address):
+    LOG.error("Username:  "+str(user_name))
+    LOG.error("Email:  "+str(email_address))
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
