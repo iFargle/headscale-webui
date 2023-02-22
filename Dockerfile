@@ -37,14 +37,14 @@ ENV HS_SERVER="http://localhost/"
 ENV KEY=""
 ENV SCRIPT_NAME=/
 ENV DOMAIN_NAME=https://localhost
+ENV AUTH_TYPE=""
 
 # BasicAuth variables
-ENV AUTH_TYPE="basic"
 ENV BASIC_AUTH_USER="user"
 ENV BASIC_AUTH_PASS="pass"
 
 # Flask OIDC Variables
-ENV OIDC_ISSUER=https://localhost
+ENV OIDC_AUTH_URL=https://localhost
 ENV OIDC_CLIENT_ID=Headscale-WebUI
 ENV OIDC_CLIENT_SECRET=secret
 

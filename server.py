@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets
+import headscale, helper, json, os, pytz, renderer, secrets, requests
 from functools                     import wraps
 from datetime                      import datetime
 from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
@@ -10,15 +10,14 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
-COLOR           = os.environ["COLOR"].replace('"', '')
-COLOR_NAV       = COLOR+" darken-1"
-COLOR_BTN       = COLOR+" darken-3"
-DEBUG_STATE     = True
-AUTH_TYPE       = os.environ["AUTH_TYPE"].replace('"', '').lower()
-STATIC_URL_PATH = "/static"
+COLOR       = os.environ["COLOR"].replace('"', '').lower()
+COLOR_NAV   = COLOR+" darken-1"
+COLOR_BTN   = COLOR+" darken-3"
+DEBUG_STATE = True
+AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
 
 # Initiate the Flask application:
-app          = Flask(__name__, static_url_path=STATIC_URL_PATH)
+app          = Flask(__name__, static_url_path="/static")
 LOG          = logging.create_logger(app)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
@@ -34,25 +33,33 @@ if AUTH_TYPE == "oidc":
     # https://github.com/steinarvk/flask_oidc_demo 
     LOG.error("Loading OIDC libraries and configuring app...")
 
-    DOMAIN_NAME       = os.environ["DOMAIN_NAME"]
-    BASE_PATH         = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
-    OIDC_ISSUER       = os.environ["OIDC_ISSUER"].replace('"','')
-    OIDC_SECRET       = os.environ["OIDC_CLIENT_SECRET"]
-    OIDC_CLIENT_ID    = os.environ["OIDC_CLIENT_ID"]
+    DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
+    BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
+    OIDC_SECRET    = os.environ["OIDC_CLIENT_SECRET"]
+    OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]
+    OIDC_AUTH_URL  = os.environ["OIDC_AUTH_URL"]
+
     # Construct client_secrets.json:
+    # TODO: Re-implement this using the well-known endpoint:
+    # https://auth.sysctl.io/.well-known/openid-configuration 
+
+    response = requests.get(str(OIDC_AUTH_URL))
+    oidc_info = response.json()
+
+    LOG.error("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_infO))
+
     client_secrets = """{
         "web": {
-            "issuer": \""""+OIDC_ISSUER+"""",
-            "auth_uri": \""""+OIDC_ISSUER+"""/api/oidc/authorization",
-            "client_id": \""""+OIDC_CLIENT_ID+"""",
-            "client_secret": \""""+OIDC_SECRET+"""",
+            "issuer": \""""+oidc_info["issuer"]+"""\",
+            "auth_uri": \""""+oidc_info[""]+"""\",
+            "client_id": \""""+OIDC_CLIENT_ID+"""\",
+            "client_secret": \""""+OIDC_SECRET+"""\",
             "redirect_uris": [
-                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback",
-                "https://headscale.sysctl.io/admin/oidc_callback"
+                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
             ],
-            "userinfo_uri": \""""+OIDC_ISSUER+"""/api/oidc/userinfo", 
-            "token_uri": \""""+OIDC_ISSUER+"""/api/oidc/token",
-            "token_introspection_uri": \""""+OIDC_ISSUER+"""/api/oidc/introspection"
+            "userinfo_uri": \""""+oidc_info["userinfo_endpoint"]+"""\", 
+            "token_uri": \""""+oidc_info["token_endpoint"]+"""\",
+            "token_introspection_uri": \""""+oidc_info["introspection_endpoint"]+"""\"
         }
     }
     """
@@ -61,7 +68,7 @@ if AUTH_TYPE == "oidc":
         secrets_json.write(client_secrets)
     LOG.debug("Client Secrets:  ")
     with open("/app/instance/secrets.json", "r+") as secrets_json:
-        LOG.debug(secrets_json.read())
+        LOG.error(secrets_json.read())
     
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
