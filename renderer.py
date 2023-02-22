@@ -345,6 +345,12 @@ def thread_machine_content(machine, machine_content, idx):
     created_print     = helper.pretty_print_duration(created_delta)
     created_time      = str(created_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(created_print)+")"
 
+    expiry_parse     = parser.parse(machine["expiry"])
+    expiry_local     = expiry_parse.astimezone(timezone)
+    expiry_delta     = local_time - expiry_local
+    expiry_print     = helper.pretty_print_duration(expiry_delta)
+    expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
@@ -379,6 +385,7 @@ def thread_machine_content(machine, machine_content, idx):
         last_update_time  = str(last_update_time),
         last_seen_time    = str(last_seen_time),
         created_time      = str(created_time),
+        expiry_time   = str(expiry_time),
         preauth_key       = str(preauth_key),
         machine_tags      = Markup(tags),
     )))
@@ -528,9 +535,6 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def oidc_nav_dropdown(user_name, email_address, name):
-    LOG.error("Name:  "+str(name))
-    LOG.error("Username:  "+str(user_name))
-    LOG.error("Email:  "+str(email_address))
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
@@ -539,8 +543,7 @@ def oidc_nav_dropdown(user_name, email_address, name):
             <li><a href="#!">Email:  """+email_address+"""</a></li>
             <li class="divider"></li>
             <li><a href="logout">Logout</a></li>
-        </ul>
-
+        </ul>dd
         <li>
             <a class="dropdown-trigger" href="#!" data-target="dropdown1">
                 """+name+""" <i class="material-icons right">account_circle</i>
