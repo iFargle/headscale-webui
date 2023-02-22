@@ -349,6 +349,7 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_local     = expiry_parse.astimezone(timezone)
     expiry_delta     = expiry_local - local_time
     expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
+
     if str(expiry_local.strftime('%Y')) in ("0001",  "9999", "0000"):
         expiry_time  = "No expiration date."
     elif int(expiry_local.strftime('%Y')) > int(expiry_local.strftime('%Y'))+2:
