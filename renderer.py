@@ -350,10 +350,10 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_delta     = expiry_local - local_time
     expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
     if str(expiry_local.strftime('%Y')) == "0001" or "9999" or "0000":
-        expiry_time      = "No expiration date."
+        expiry_time  = "No expiration date."
     else: 
-        expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    
+        expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+    expiring_soon = True if expiry_delta.days < 200 else False
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
@@ -366,9 +366,9 @@ def thread_machine_content(machine, machine_content, idx):
 
     # Generate the various badges:
     status_badge      = "<i class='material-icons left tooltipped "+text_color+"' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
-    user_badge   = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
+    user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_node else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
-
+    expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
         'machines_card.html', 
@@ -390,6 +390,7 @@ def thread_machine_content(machine, machine_content, idx):
         created_time      = str(created_time),
         expiry_time       = str(expiry_time),
         preauth_key       = str(preauth_key),
+        expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
     )))
     LOG.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
