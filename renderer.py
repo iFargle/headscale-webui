@@ -351,8 +351,8 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_print     = helper.pretty_print_duration(expiry_delta)
     expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
 
-    LOG.error("created_delta.seconds:  "+created_delta.seconds)
-    LOG.error("expiry_delta.seconds:  "+expiry_delta.seconds)
+    LOG.error("created_delta.seconds:  "+str(created_delta.seconds))
+    LOG.error("expiry_delta.seconds:  "+str(expiry_delta.seconds))
 
 
     # Get the first 10 characters of the PreAuth Key:
