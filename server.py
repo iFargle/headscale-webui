@@ -90,7 +90,7 @@ elif AUTH_TYPE == "basic":
     app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
     app.config['BASIC_AUTH_FORCE']    = True
 
-    basic_auth = BasicAuth(app)
+    basic_auth = BasicAuth()
     # Make a fake decorator for oidc.require_login
     class OpenIDConnect(app):
         def require_login(self, view_func):
@@ -98,17 +98,17 @@ elif AUTH_TYPE == "basic":
             def decorated(*args, **kwargs):
                 return view_func(*args, **kwargs)
             return decorated
-    oidc = OpenIDConnect(app)
+    oidc = OpenIDConnect()
 
 else:
     # Make a fake decorator for oidc.require_login
-    class OpenIDConnect(app):
+    class OpenIDConnect():
         def require_login(self, view_func):
             @wraps(view_func)
             def decorated(*args, **kwargs):
                 return view_func(*args, **kwargs)
             return decorated
-    oidc = OpenIDConnect(app)
+    oidc = OpenIDConnect()
 
 ########################################################################################
 # Set Authentication type - Dynamically load function decorators
