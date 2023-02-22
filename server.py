@@ -93,17 +93,19 @@ elif AUTH_TYPE == "basic":
     basic_auth = BasicAuth(app)
     # Make a fake decorator for oidc.require_login
     class oidc():
-        def require_login(func):
-            def inner():
-                pass
-            return inner
+        def require_login(self, view_func):
+            @wraps(view_func)
+            def decorated(*args, **kwargs): # Do nothing
+                return view_func(*args, **kwargs)
+            return decorated
 else:
     # Make a fake decorator for oidc.require_login
     class oidc():
-        def require_login(func):
-            def inner():
-                pass
-            return inner
+        def require_login(self, view_func):
+            @wraps(view_func)
+            def decorated(*args, **kwargs): # Do nothing
+                return view_func(*args, **kwargs)
+            return decorated
 ########################################################################################
 # Set Authentication type - Dynamically load function decorators
 # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
