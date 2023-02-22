@@ -51,7 +51,7 @@ if AUTH_TYPE == "oidc":
     client_secrets = """{
         "web": {
             "issuer": \""""+oidc_info["issuer"]+"""\",
-            "auth_uri": \""""+oidc_info[""]+"""\",
+            "auth_uri": \""""+oidc_info["authorization_endpoint"]+"""\",
             "client_id": \""""+OIDC_CLIENT_ID+"""\",
             "client_secret": \""""+OIDC_SECRET+"""\",
             "redirect_uris": [
