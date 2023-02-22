@@ -349,10 +349,11 @@ def thread_machine_content(machine, machine_content, idx):
     expiry_local     = expiry_parse.astimezone(timezone)
     expiry_delta     = expiry_local - local_time
     expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
-    expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+    if str(expiry_local.strftime('%Y')) == "0001" or "9999" or "0000":
+        expiry_time      = "No expiration date."
+    else: 
+        expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
     
-    LOG.debug(machine["name"]+": expiry_delta ("+str(expiry_delta)+"):  "+str(expiry_delta.days)+"d "+str(expiry_delta.seconds)+"s")
-
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
