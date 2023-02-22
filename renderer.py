@@ -347,13 +347,9 @@ def thread_machine_content(machine, machine_content, idx):
 
     expiry_parse     = parser.parse(machine["expiry"])
     expiry_local     = expiry_parse.astimezone(timezone)
-    expiry_delta     = expiry_local - local_time
+    expiry_delta     = local_time - expiry_local
     expiry_print     = helper.pretty_print_duration(expiry_delta)
     expiry_time      = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-
-    LOG.error("created_delta.seconds:  "+str(created_delta.seconds))
-    LOG.error("expiry_delta.seconds:  "+str(expiry_delta.seconds))
-
 
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
