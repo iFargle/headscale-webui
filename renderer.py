@@ -353,7 +353,9 @@ def thread_machine_content(machine, machine_content, idx):
         expiry_time  = "No expiration date."
     else: 
         expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    expiring_soon = True if expiry_delta.days < 200 else False
+    LOG.error("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+
+    expiring_soon = True if int(expiry_delta.days) < 200 else False
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
