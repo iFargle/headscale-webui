@@ -83,8 +83,8 @@
                <li role="menu-item" class="{{ settings_active   }}">
                   <a href="settings"><i class="material-icons left">settings</i>Settings</a>
                </li>
+               {% block OIDC_NAV_DROPDOWN %}{% endblock %}
             </ul>
-            {% block OIDC_NAV_DROPDOWN %}{% endblock %}
          </div>
        </nav>
        <ul class="sidenav" id="mobile">
