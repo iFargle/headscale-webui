@@ -135,7 +135,7 @@ def overview_page():
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
-        user_name     = oidc.user_getfield("username")
+        user_name     = oidc.user_getfield("preferred_username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
 
@@ -159,7 +159,7 @@ def machines_page():
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
-        user_name     = oidc.user_getfield("username")
+        user_name     = oidc.user_getfield("preferred_username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
     
@@ -185,7 +185,7 @@ def users_page():
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
-        user_name     = oidc.user_getfield("username")
+        user_name     = oidc.user_getfield("preferred_username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
 
@@ -211,7 +211,7 @@ def settings_page():
     OIDC_NAV_MOBILE = Markup("")
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
-        user_name     = oidc.user_getfield("username")
+        user_name     = oidc.user_getfield("preferred_username")
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
 
