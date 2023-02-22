@@ -92,7 +92,7 @@ elif AUTH_TYPE == "basic":
 
     basic_auth = BasicAuth(app)
     # Make a fake decorator for oidc.require_login
-    class OpenIDConnect(object):
+    class OpenIDConnect(app):
         def require_login(self, view_func):
             @wraps(view_func)
             def decorated(*args, **kwargs):
@@ -102,7 +102,7 @@ elif AUTH_TYPE == "basic":
 
 else:
     # Make a fake decorator for oidc.require_login
-    class OpenIDConnect(object):
+    class OpenIDConnect(app):
         def require_login(self, view_func):
             @wraps(view_func)
             def decorated(*args, **kwargs):
