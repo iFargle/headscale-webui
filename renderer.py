@@ -527,13 +527,15 @@ def build_preauth_key_table(user_name):
         """
     return preauth_keys_collection
 
-def oidc_nav_dropdown(user_name, email_address):
+def oidc_nav_dropdown(user_name, email_address, name):
+    LOG.error("Name:  "+str(name))
     LOG.error("Username:  "+str(user_name))
     LOG.error("Email:  "+str(email_address))
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content">
-            <li><a href="#!">User:  """+user_name+"""</a></li>
+            <li><a href="#!">User:  """+name+"""</a></li>
+            <li><a href="#!">Username:  """+user_name+"""</a></li>
             <li><a href="#!">Email:  """+email_address+"""</a></li>
             <li class="divider"></li>
             <li><a href="logout">Logout</a></li>
@@ -541,14 +543,14 @@ def oidc_nav_dropdown(user_name, email_address):
 
         <li>
             <a class="dropdown-trigger" href="#!" data-target="dropdown1">
-                <i class="material-icons right">account_circle</i>
+                """+name+""" <i class="material-icons right">account_circle</i>
             </a>
         </li>
     """
 
     return Markup(html_payload)
 
-def oidc_nav_mobile(user_name, email_address):
+def oidc_nav_mobile(user_name, email_address, name):
 # https://materializecss.github.io/materialize/sidenav.html
     html_payload = """
         <!-- Dropdown Structure -->

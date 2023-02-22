@@ -136,8 +136,9 @@ def overview_page():
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
-        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
@@ -160,8 +161,9 @@ def machines_page():
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
-        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
@@ -186,8 +188,9 @@ def users_page():
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
-        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
@@ -212,8 +215,9 @@ def settings_page():
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address)
-        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address)
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     GIT_COMMIT_LINK = Markup("<a href='https://github.com/iFargle/headscale-webui/commit/"+os.environ["GIT_COMMIT"]+"'>"+str(os.environ["GIT_COMMIT"])[0:7]+"</a>")
 
