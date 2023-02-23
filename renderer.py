@@ -546,30 +546,16 @@ def build_preauth_key_table(user_name):
 def oidc_nav_dropdown(user_name, email_address, name):
     html_payload = """
         <!-- Dropdown Structure -->
-        <ul id="dropdown1" class="dropdown-content">
-            <li><a href=""><i class="material-icons prefix">account_box</i> """+user_name+"""</li></a>
-            <li><a href=""><i class="material-icons prefix">email</i> """+email_address+"""</li></a>
-            <li class="divider"></li>
-            <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
-        </ul>
-        <li>
-            <a class="dropdown-trigger" href="#!" data-target="dropdown1">
-                """+name+""" <i class="material-icons right">account_circle</i>
-            </a>
-        </li>
-    """
-    html_payload = """
-        <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
             <ul class="collection dropdown-oidc-collection">
-                <li class="collection-item avatar">
+                <li class="collection-item dropdown-oidc-collection avatar">
                     <i class="material-icons circle">email</i>
-                    <span class="title">Email</span>
+                    <span class="dropdown-oidc-collection title">Email</span>
                     <p>"""+email_address+"""</p>
                 </li>
-                <li class="collection-item avatar">
+                <li class="collection-item dropdown-oidc-collection avatar">
                     <i class="material-icons circle">person_outline</i>
-                    <span class="title">Username</span>
+                    <span class="dropdown-oidc-collection title">Username</span>
                     <p>"""+user_name+"""</p>
                 </li>
             </ul>
