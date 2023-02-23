@@ -40,13 +40,9 @@ if AUTH_TYPE == "oidc":
     OIDC_AUTH_URL  = os.environ["OIDC_AUTH_URL"]
 
     # Construct client_secrets.json:
-    # TODO: Re-implement this using the well-known endpoint:
-    # https://auth.sysctl.io/.well-known/openid-configuration 
-
     response = requests.get(str(OIDC_AUTH_URL))
     oidc_info = response.json()
-
-    LOG.error("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
+    LOG.debug("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
 
     client_secrets = """{
         "web": {
@@ -68,7 +64,8 @@ if AUTH_TYPE == "oidc":
         secrets_json.write(client_secrets)
     LOG.debug("Client Secrets:  ")
     with open("/app/instance/secrets.json", "r+") as secrets_json:
-        LOG.error(secrets_json.read())
+        LOG.debug("/app/instances/secrets.json:")
+        LOG.debug(secrets_json.read())
     
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
