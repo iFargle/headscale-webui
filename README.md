@@ -7,7 +7,7 @@
 <h2 align="center">Headscale-WebUI</h3>
 
 <p align="center">
-  A web UI for Headscale for small-scale deployments
+  A simple Headscale web UI for small-scale deployments.
 </p>
 
 ---
