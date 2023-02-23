@@ -5,3 +5,14 @@
 .collapsible span.badge {
     margin-left: 5px;
 }
+
+.dropdown-oidc {
+    top: 64px !important;
+    width: 200px !important;
+    left: unset !important;
+    right: 10px !important;
+}
+
+.dropdown-oidc-collection {
+    /* test */
+}
