@@ -1,8 +1,17 @@
-# headscale-webui
-## This is a simple front-end for a Headscale server  
-#### PR's, questions, bug-fixes, feature requests are welcome!
+<p align="center">
+  <a href="https://github.com/juanfont/headscale">
+    <img src="static/img/headscale3-dots.png" width="250">
+  </a>
+</p>
+
+<h2 align="center">Headscale-WebUI</h3>
+
+<p align="center">
+  A web UI for Headscale for small-scale deployments
+</p>
+
 ---
-Allows you to do the following:
+# Features
 1.  Enable/Disable routes and exit nodes
 2.  Add, move, rename, and remove machines
 3.  Add and remove users/namespaces
@@ -25,7 +34,7 @@ Allows you to do the following:
 
 ---
 
-# Installation:
+# Installation
 ## Docker Compose changes:
 1.  Change the following variables in ![docker-compose.yml](docker-compose.yml) (default values are shown):
 ```
