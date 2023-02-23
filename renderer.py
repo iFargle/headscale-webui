@@ -64,8 +64,8 @@ def render_overview():
             if not key["reusable"] and not key["used"] and not key_expired: usable_keys_count += 1
 
     overview_content  = """
-        <div class="col s12 m6">
-            <div class="card hoverable">
+        <div class="col s12">
+            <div class="card z-depth-1">
                 <div class="card-content">
                     <span class="card-title">Stats</span>
                     <p>
@@ -83,8 +83,8 @@ def render_overview():
     """
     # Overview of general configs from the YAML
     general_content  = """
-        <div class="col s12 m6">
-            <div class="card hoverable">
+        <div class="col s12">
+            <div class="card z-depth-1">
                 <div class="card-content">
                     <span class="card-title">General</span>
                     <p>
@@ -120,8 +120,8 @@ def render_overview():
     oidc_content = ""
     if "oidc" in config_yaml:
         oidc_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
+            <div class="col s12">
+                <div class="card z-depth-1">
                     <div class="card-content">
                         <span class="card-title">Headscale OIDC</span>
                         <p>
@@ -155,10 +155,10 @@ def render_overview():
 
     derp_content = ""
     if "derp" in config_yaml:
-        if "server" in config_yaml["derp"]:
+        if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"] == "True":
             derp_content  = """
-                <div class="col s12 m6">
-                    <div class="card hoverable">
+                <div class="col s12">
+                    <div class="card z-depth-1">
                         <div class="card-content">
                             <span class="card-title">Built-in DERP</span>
                             <p>
@@ -198,8 +198,8 @@ def render_overview():
     #     The DNS config
     if "dns_config" in config_yaml:
         dns_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
+            <div class="col s12">
+                <div class="card z-depth-1">
                     <div class="card-content">
                         <span class="card-title">DNS</span>
                         <p>
