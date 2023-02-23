@@ -11,8 +11,20 @@
     width: 200px !important;
     left: unset !important;
     right: 10px !important;
+    cursor: unset !important;
+    height: unset !important;
 }
 
 .dropdown-oidc-collection {
-    /* test */
+    border: unset !important;
+    margin: unset !important;
+}
+
+.dropdown-oidc-collection .collection-item {
+    padding: 10px !important;
+}
+
+.dropdown-oidc-collection .title {
+    color: unset !important;
+    padding: unset !important;
 }
