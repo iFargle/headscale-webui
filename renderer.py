@@ -101,7 +101,7 @@ def render_overview():
     overview_content = """
     <div class="row">
         <div class="col s12">
-            <ul class="collection with-header">
+            <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Server Statistics</h4></li>
                 <li class="collection-item"><div>Machines Added       <div class="secondary-content overview-page">"""+ str(machines_count)                               +"""</div></div></li>
                 <li class="collection-item"><div>Users Added          <div class="secondary-content overview-page">"""+ str(user_count)                                   +"""</div></div></li>
@@ -115,7 +115,7 @@ def render_overview():
     general_content = """
     <div class="row">
         <div class="col s12">
-            <ul class="collection with-header">
+            <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>General Information</h4></li>
                 <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
                 <li class="collection-item"><div>Server URL                        <div class="secondary-content overview-page">"""+ server_url                        +"""</div></div></li>
@@ -129,7 +129,7 @@ def render_overview():
     oidc_content = """
     <div class="row">
         <div class="col s12">
-            <ul class="collection with-header">
+            <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Headscale OIDC Information</h4></li>
                 <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
                 <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
@@ -143,7 +143,7 @@ def render_overview():
     derp_content = """
     <div class="row">
         <div class="col s12">
-            <ul class="collection with-header">
+            <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Embedded DERP Information</h4></li>
                 <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
                 <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
@@ -157,7 +157,7 @@ def render_overview():
     dns_content = """
     <div class="row">
         <div class="col s12">
-            <ul class="collection with-header">
+            <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>DNS Information</h4></li>
                 <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
                 <li class="collection-item"><div>MagicDNS        <div class="secondary-content overview-page">"""+  magic_dns    +"""</div></div></li>
