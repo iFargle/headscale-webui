@@ -162,10 +162,12 @@ def render_overview():
     # Remove OIDC if it isn't available:
     if "oidc" not in config_yaml: oidc_content = ""
     # Remove DERP if it isn't available or isn't enabled
-    if "derp" not in config_yaml: oidc_content = ""
+    if "derp" not in config_yaml: 
+        oidc_content = ""
     if "derp" in config_yaml:
-        if config_yaml["derp"]["enabled"] == "False":
-            oidc_content = ""
+        if server in config_yaml["derp"]:
+            if config_yaml["derp"]["server"]["enabled"] == "False":
+                oidc_content = ""
 
     # TODO:  
     #     Whether there are custom DERP servers
