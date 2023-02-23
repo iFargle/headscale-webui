@@ -1,16 +1,17 @@
     <ul class="collapsible popout" id="{{ machine_id }}-main-collapsible" onclick="load_machine_card_content({{machine_id}})">
         <li>
             <div class="collapsible-header ">
-                <div class="col s6">
+                <div class="col s8 m6">
                     {{ status_badge }}
                     <span class="truncate hover-container" id="{{ machine_id }}-name-container">
                         {{ machine_id }}. {{ given_name }}
                     </span>
                 </div>
                     </span>
-                <div class="col s6 activator">
-                    {{ user_badge }}
-                    {{ exit_node_badge }}
+                <div class="col s4 m6 activator">
+                    {{ user_badge       }}
+                    {{ exit_node_badge  }}
+                    {{ expiration_badge }}
                 </div>
             </div>
             <div class="collapsible-body">
@@ -57,9 +58,14 @@
                         <p>{{ last_update_time }}</p>
                     </li>
                     <li class="collection-item avatar">
-                      <i class="material-icons circle">update</i>
+                      <i class="material-icons circle">history</i>
                       <span class="title">Created At</span>
                         <p>{{ created_time }}</p>
+                    </li>
+                    <li class="collection-item avatar">
+                      <i class="material-icons circle">hourglass_empty</i>
+                      <span class="title">Expiration</span>
+                        <p>{{ expiry_time }}</p>
                     </li>
                     <li class="collection-item avatar">
                       <i class="material-icons circle">key</i>

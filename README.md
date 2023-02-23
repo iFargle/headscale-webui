@@ -1,8 +1,17 @@
-# headscale-webui
-## This is a simple front-end for a Headscale server.  
-#### PR's, questions, bug-fixes, feature requests are welcome!
+<p align="center">
+  <a href="https://github.com/juanfont/headscale">
+    <img src="static/img/headscale3-dots.png" width="250">
+  </a>
+</p>
+
+<h2 align="center">Headscale-WebUI</h3>
+
+<p align="center">
+  A web UI for Headscale for small-scale deployments
+</p>
+
 ---
-Allows you to do the following:
+# Features
 1.  Enable/Disable routes and exit nodes
 2.  Add, move, rename, and remove machines
 3.  Add and remove users/namespaces
@@ -15,19 +24,38 @@ Allows you to do the following:
     * Last seen by the control server
     * Last update with the control server
     * Creation date
+    * Expiration date (will also display a badge when nearing expiration)
     * PreAuth key associated with the machine
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
+7.  Basic and OIDC Authentication
+    * OIDC Authentication tested with Authelia
+8.  Change your color theme! See MaterializeCSS Documentation for Colors for examples.
 
 ---
 
-# Installation:
+# Installation
 ## Docker Compose changes:
-1.  Change the following variables in docker-compose.yml:
-    1.  TZ - Change to your timezone.  Example: Asia/Tokyo
-    2.  HS_SERVER - Change to your headscale's URL
-    3.  BASE_PATH - This will be the path your server is served on.  Because the Windows Tailscale GUI expects <HS_SERVER/admin>, I usually put this as "/admin"
-    4.  KEY - Your encryption key to store your headscale API key on disk.  Generate a new one with "openssl rand -base64 32".  Do not forget the quotations around the key when entering.
+1.  Change the following variables in ![docker-compose.yml](docker-compose.yml) (default values are shown):
+```
+- TZ=Asia/Tokyo                          # Change to your current timezone
+# Use just the base color, ie "red" and not "red darken-3"
+- COLOR=red                              # See MaterializeCSS Docs ![here](https://materializecss.com/color.html) for more colors.
+- HS_SERVER=http://localhost      # Reachable endpoint for your Headscale server
+- DOMAIN_NAME=http://localhost    # The base domain name for this container.
+- SCRIPT_NAME=/                   # This is your applications base path (wsgi requires the name "SCRIPT_NAME")
+- KEY=""                          # Generate with "openssl rand -base64 32" - used to encrypt your key on disk.
+- AUTH_TYPE=oidc                  # AUTH_TYPE is either Basic or OIDC.  Empty for no authentication
+
+# ENV for Basic Auth (Used only if AUTH_TYPE is "Basic").  Can be omitted if you aren't using Basic Auth
+- BASIC_AUTH_USER=SomeUser        # Used for basic auth
+- BASIC_AUTH_PASS=SomeSecretPass  # Used for basic auth
+
+# ENV for OIDC (Used only if AUTH_TYPE is "OIDC").  Can be omitted if you aren't using OIDC
+- OIDC_AUTH_URL=https://auth.$DOMAIN/.well-known/openid-configuration # URL for your OIDC issuer's well-known endpoint
+- OIDC_CLIENT_ID=Headscale-WebUI    # Your OIDC Issuer's Client ID for Headscale-WebUI
+- OIDC_CLIENT_SECRET=secret  # Your OIDC Issuer's Secret Key for Headscale-WebUI
+```
 2. You will also need to change the volumes:
     1.  /data - Where your encryption key will reside.  Can be anywhere writable by UID 1000
     2.  /etc/headscale/ - This is your Headscale configuration file.
@@ -65,16 +93,28 @@ proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
     auth_basic_user_file /etc/nginx/htpasswd;
 }
 ```
+* Remove auth_basic if you are using the built-in OIDC or BasicAuth
 
 ---
 # Screenshots:
 Overview Page:
-![Overview](screenshots/overview.png)
+![Overview](screenshots/oidc_overview.png)
 Users Page:
 ![Users](screenshots/users.png)
-New Machine Modal:
-![Add a new machine](screenshots/add-machine.png)
+Machine Information:
+![Add a new machine](screenshots/machines_expanded.png)
 Machines Page:
 ![Machine Details](screenshots/machines.png)
 Settings Page showing an API Key Test:
 ![API Key Test](screenshots/settings.png)
+
+---
+# Tech used:
+* Python - ![Link](https://www.python.org/)
+* Poetry - ![Link](https://python-poetry.org/)
+* MaterializeCSS - ![Link](https://github.com/Dogfalo/materialize)
+* jQuery - ![Link](https://jquery.com/)
+
+For Python libraries, see ![pyproject.toml](pyproject.toml)
+
+If you use this project, please reach out!  It keeps me motivated!  Thank you!

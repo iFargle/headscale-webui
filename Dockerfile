@@ -22,30 +22,51 @@ FROM python:3.11-alpine
 ARG WORKDIR
 WORKDIR ${WORKDIR}
 
+# For FlaskOIDC library
+RUN mkdir /app/instance && chown 1000:1000 /app/instance
+
 RUN adduser app -DHh ${WORKDIR} -u 1000
 USER 1000
 
 COPY --chown=app:app --from=builder ${WORKDIR} .
 
+# General variables
 ENV TZ="UTC"
-ENV HS_SERVER="http://localhost/"
+ENV COLOR="blue-grey"
+ENV HS_SERVER=http://localhost/
 ENV KEY=""
-ENV BASE_PATH="http://127.0.0.1/"
+ENV SCRIPT_NAME=/
+ENV DOMAIN_NAME=http://localhost
+ENV AUTH_TYPE=""
+
+# BasicAuth variables
+ENV BASIC_AUTH_USER=""
+ENV BASIC_AUTH_PASS=""
+
+# Flask OIDC Variables
+ENV OIDC_AUTH_URL=https://localhost
+ENV OIDC_CLIENT_ID=Headscale-WebUI
+ENV OIDC_CLIENT_SECRET=secret
 
 # Jenkins build args
 ARG GIT_COMMIT_ARG=""
 ARG GIT_BRANCH_ARG=""
 ARG APP_VERSION_ARG=""
 ARG BUILD_DATE_ARG=""
+ARG HS_VERSION_ARG=""
 
+# About section on the Settings page
 ENV GIT_COMMIT=$GIT_COMMIT_ARG
 ENV GIT_BRANCH=$GIT_BRANCH_ARG
 ENV APP_VERSION=$APP_VERSION_ARG
 ENV BUILD_DATE=$BUILD_DATE_ARG
+ENV HS_VERSION=$HS_VERSION_ARG
 
 VOLUME /etc/headscale
 VOLUME /data
 
 EXPOSE 5000/tcp
-ENTRYPOINT ["/app/entrypoint.sh"]
-CMD gunicorn -w 4 -b 0.0.0.0:5000 server:app
+ENTRYPOINT ["/app/entrypoint.sh"]z
+
+# Temporarily reduce to 1 worker
+CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app

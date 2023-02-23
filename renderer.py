@@ -1,11 +1,14 @@
+# pylint: disable=line-too-long, wrong-import-order
+
 import headscale, helper, pytz, os, yaml
-from flask              import Markup, render_template, Flask
+from flask              import Markup, render_template, Flask, logging
 from datetime           import datetime
 from dateutil           import parser
-from concurrent.futures import wait, ALL_COMPLETED
+from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
 app = Flask(__name__)
+LOG = logging.create_logger(app)
 executor = Executor(app)
 
 def render_overview():
@@ -26,10 +29,8 @@ def render_overview():
     # Overview of the server's machines, users, preauth keys, API key expiration, server version
     
     # Get all machines:
-    machines_count = 0
     machines = headscale.get_machines(url, api_key)
-    for machine in machines["machines"]:
-        machines_count += 1
+    machines_count = len(machines["machines"])
 
     # Get all routes:
     routes = headscale.get_routes(url,api_key)
@@ -62,132 +63,131 @@ def render_overview():
             if key["reusable"] and not key_expired: usable_keys_count += 1
             if not key["reusable"] and not key["used"] and not key_expired: usable_keys_count += 1
 
-    overview_content  = """
-        <div class="col s12 m6">
-            <div class="card hoverable">
-                <div class="card-content">
-                    <span class="card-title">Stats</span>
-                    <p>
-                        <table>
-                            <tr><td> Machines            </td><td> """+ str(machines_count)                                +""" </td></tr>
-                            <tr><td> Users               </td><td> """+ str(user_count)                                    +""" </td></tr>
-                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count)                             +""" </td></tr>
-                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)     +""" </td></tr>
-                            <tr><td> Enabled/Total Exits</td><td>  """+ str(exits_enabled_count) +"""/"""+str(exits_count) +""" </td></tr>
-                        </table>
-                    </p>
-                </div>
-            </div>
-        </div>
-    """
-    # Overview of general configs from the YAML
-    general_content  = """
-        <div class="col s12 m6">
-            <div class="card hoverable">
-                <div class="card-content">
-                    <span class="card-title">General</span>
-                    <p>
-                        <table>
-                            <tr><td> IP Prefixes </td><td> """; 
-    if "ip_prefixes" in config_yaml:  general_content += str(config_yaml["ip_prefixes"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Server URL </td><td> """; 
-    if "server_url" in config_yaml:  general_content += str(config_yaml["server_url"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Updates Disabled? </td><td> """; 
-    if "disable_check_updates" in config_yaml:  general_content += str(config_yaml["disable_check_updates"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Ephemeral Node Timeout </td><td> """; 
-    if "ephemeral_node_inactivity_timeout" in config_yaml:  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"]); 
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Node Update Check Interval </td><td> """; 
-    if "node_update_check_interval" in config_yaml:  general_content += str(config_yaml["node_update_check_interval"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-                        </table>
-                    </p>
-                </div>
-            </div>
-        </div>
-    """
+    # General Content variables:
+    ip_prefixes, server_url, disable_check_updates, ephemeral_node_inactivity_timeout, node_update_check_interval = "N/A", "N/A", "N/A", "N/A", "N/A"
+    if "ip_prefixes"                       in config_yaml:  ip_prefixes                       = str(config_yaml["ip_prefixes"])
+    if "server_url"                        in config_yaml:  server_url                        = str(config_yaml["server_url"])
+    if "disable_check_updates"             in config_yaml:  disable_check_updates             = str(config_yaml["disable_check_updates"])
+    if "ephemeral_node_inactivity_timeout" in config_yaml:  ephemeral_node_inactivity_timeout = str(config_yaml["ephemeral_node_inactivity_timeout"])
+    if "node_update_check_interval"        in config_yaml:  node_update_check_interval        = str(config_yaml["node_update_check_interval"])
 
-    #     Whether OIDC is configured
-    oidc_content = ""
+    # OIDC Content variables:
+    issuer, client_id, scope, use_expiry_from_token, expiry = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "oidc" in config_yaml:
-        oidc_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
-                    <div class="card-content">
-                        <span class="card-title">OIDC</span>
-                        <p>
-                            <table>   
-                                <tr><td> Issuer </td><td> """
-        if "issuer" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["issuer"])                
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Client ID </td><td> """
-        if "client_id" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["client_id"])             
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Scope </td><td> """
-        if "scope" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["scope"])                 
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Token Expiry </td><td> """
-        if "use_expiry_from_token" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["use_expiry_from_token"]) 
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Expiry </td><td> """
-        if "expiry" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["expiry"])                
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-                            </table>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        """
+        if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])                
+        if "client_id"             in config_yaml["oidc"] : client_id             = str(config_yaml["oidc"]["client_id"])             
+        if "scope"                 in config_yaml["oidc"] : scope                 = str(config_yaml["oidc"]["scope"])                 
+        if "use_expiry_from_token" in config_yaml["oidc"] : use_expiry_from_token = str(config_yaml["oidc"]["use_expiry_from_token"]) 
+        if "expiry"                in config_yaml["oidc"] : expiry                = str(config_yaml["oidc"]["expiry"])   
 
-    derp_content = ""
+    # Embedded DERP server information.
+    enabled, region_id, region_code, region_name, stun_listen_addr = "N/A", "N/A", "N/A", "N/A", "N/A"
+    if "derp" in config_yaml:
+        if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"] == "True":
+            if "enabled"          in config_yaml["derp"]["server"]: enabled          = str(config_yaml["derp"]["server"]["enabled"])          
+            if "region_id"        in config_yaml["derp"]["server"]: region_id        = str(config_yaml["derp"]["server"]["region_id"])        
+            if "region_code"      in config_yaml["derp"]["server"]: region_code      = str(config_yaml["derp"]["server"]["region_code"])      
+            if "region_name"      in config_yaml["derp"]["server"]: region_name      = str(config_yaml["derp"]["server"]["region_name"])      
+            if "stun_listen_addr" in config_yaml["derp"]["server"]: stun_listen_addr = str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
+    
+    nameservers, magic_dns, domains, base_domain = "N/A", "N/A", "N/A", "N/A"
+    if "dns_config" in config_yaml:
+        if "nameservers" in config_yaml["dns_config"]: nameservers = str(config_yaml["dns_config"]["nameservers"]) 
+        if "magic_dns"   in config_yaml["dns_config"]: magic_dns   = str(config_yaml["dns_config"]["magic_dns"])   
+        if "domains"     in config_yaml["dns_config"]: domains     = str(config_yaml["dns_config"]["domains"])     
+        if "base_domain" in config_yaml["dns_config"]: base_domain = str(config_yaml["dns_config"]["base_domain"]) 
+
+    # Start putting the content together
+    overview_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Server Statistics</h4></li>
+                <li class="collection-item"><div>Machines Added       <div class="secondary-content overview-page">"""+ str(machines_count)                               +"""</div></div></li>
+                <li class="collection-item"><div>Users Added          <div class="secondary-content overview-page">"""+ str(user_count)                                   +"""</div></div></li>
+                <li class="collection-item"><div>Usable Preauth Keys  <div class="secondary-content overview-page">"""+ str(usable_keys_count)                            +"""</div></div></li>
+                <li class="collection-item"><div>Enabled/Total Routes <div class="secondary-content overview-page">"""+ str(enabled_routes) +"""/"""+str(total_routes)    +"""</div></div></li>
+                <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content overview-page">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    general_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>General</h4></li>
+                <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
+                <li class="collection-item"><div>Server URL                        <div class="secondary-content overview-page">"""+ server_url                        +"""</div></div></li>
+                <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content overview-page">"""+ disable_check_updates             +"""</div></div></li>
+                <li class="collection-item"><div>Ephemeral Node Inactivity Timeout <div class="secondary-content overview-page">"""+ ephemeral_node_inactivity_timeout +"""</div></div></li>
+                <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content overview-page">"""+ node_update_check_interval        +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    oidc_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Headscale OIDC</h4></li>
+                <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
+                <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
+                <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
+                <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content overview-page">"""+ use_expiry_from_token +"""</div></div></li>
+                <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    derp_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Embedded DERP</h4></li>
+                <li class="collection-item"><div>Enabled     <div class="secondary-content overview-page">"""+ enabled          +"""</div></div></li>
+                <li class="collection-item"><div>Region ID   <div class="secondary-content overview-page">"""+ region_id        +"""</div></div></li>
+                <li class="collection-item"><div>Region Code <div class="secondary-content overview-page">"""+ region_code      +"""</div></div></li>
+                <li class="collection-item"><div>Region Name <div class="secondary-content overview-page">"""+ region_name      +"""</div></div></li>
+                <li class="collection-item"><div>STUN Address<div class="secondary-content overview-page">"""+ stun_listen_addr +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    dns_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>DNS</h4></li>
+                <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
+                <li class="collection-item"><div>MagicDNS        <div class="secondary-content overview-page">"""+  magic_dns    +"""</div></div></li>
+                <li class="collection-item"><div>Search Domains  <div class="secondary-content overview-page">"""+  domains      +"""</div></div></li>
+                <li class="collection-item"><div>Base Domain     <div class="secondary-content overview-page">"""+  base_domain  +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+
+    # Remove content that isn't needed:
+    # Remove OIDC if it isn't available:
+    if "oidc" not in config_yaml: oidc_content = ""
+    # Remove DERP if it isn't available or isn't enabled
+    if "derp" not in config_yaml: 
+        derp_content = ""
     if "derp" in config_yaml:
         if "server" in config_yaml["derp"]:
-            derp_content  = """
-                <div class="col s12 m6">
-                    <div class="card hoverable">
-                        <div class="card-content">
-                            <span class="card-title">Built-in DERP</span>
-                            <p>
-                                <table>
-                                    <tr><td> Enabled      </td><td> """
-            if "enabled" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> Region ID    </td><td> """
-            if "region_id" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> Region Code  </td><td> """
-            if "region_code" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> Region Name  </td><td> """
-            if "region_name" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> STUN Address </td><td> """
-            if "stun_listen_addr" in config_yaml["derp"]["server"]: derp_content+= str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-                                </table>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            """
+            if str(config_yaml["derp"]["server"]["enabled"]) == "False":
+                derp_content = ""
 
     # TODO:  
     #     Whether there are custom DERP servers
@@ -195,37 +195,7 @@ def render_overview():
     #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
-    if "dns_config" in config_yaml:
-        dns_content  = """
-            <div class="col s12 m6">
-                <div class="card hoverable">
-                    <div class="card-content">
-                        <span class="card-title">DNS</span>
-                        <p>
-                            <table>
-                                <tr><td> Nameservers </td><td> """
-        if "nameservers" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["nameservers"]) 
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> MagicDNS    </td><td> """
-        if "magic_dns" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["magic_dns"])   
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> Domains     </td><td> """
-        if "domains" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["domains"])     
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> Base Domain </td><td> """
-        if "base_domain" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["base_domain"]) 
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-                                <tr><td> </td><td><br></td></tr>
-                            </table>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        """
+
     if config_yaml["derp"]["paths"]: pass
     #   # open the path:
     #   derp_file = 
@@ -237,7 +207,7 @@ def render_overview():
     #     The log level
     #     What kind of Database is being used to drive headscale
 
-    content = "<br><div class='row'>" + overview_content + general_content + derp_content + oidc_content + dns_content + "</div>"
+    content = "<br>" + overview_content + general_content + derp_content + oidc_content + dns_content + ""
     return Markup(content)
 
 def thread_machine_content(machine, machine_content, idx):
@@ -275,7 +245,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # app.logger.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                # LOG.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -315,14 +285,14 @@ def thread_machine_content(machine, machine_content, idx):
                         }) 
                     );
                 }, false
-            ); 
+            )
         </script>
         """
 
     # Get the machine IP's
     machine_ips = "<ul>"
-    for ip in machine["ipAddresses"]:
-        machine_ips = machine_ips+"<li>"+ip+"</li>"
+    for ip_address in machine["ipAddresses"]:
+        machine_ips = machine_ips+"<li>"+ip_address+"</li>"
     machine_ips = machine_ips+"</ul>"
 
     # Format the dates for easy readability
@@ -344,6 +314,20 @@ def thread_machine_content(machine, machine_content, idx):
     created_print     = helper.pretty_print_duration(created_delta)
     created_time      = str(created_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(created_print)+")"
 
+    expiry_parse     = parser.parse(machine["expiry"])
+    expiry_local     = expiry_parse.astimezone(timezone)
+    expiry_delta     = expiry_local - local_time
+    expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
+
+    if str(expiry_local.strftime('%Y')) in ("0001",  "9999", "0000"):
+        expiry_time  = "No expiration date."
+    elif int(expiry_local.strftime('%Y')) > int(expiry_local.strftime('%Y'))+2:
+        expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+    else: 
+        expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+    LOG.error("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+
+    expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
@@ -356,9 +340,9 @@ def thread_machine_content(machine, machine_content, idx):
 
     # Generate the various badges:
     status_badge      = "<i class='material-icons left tooltipped "+text_color+"' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
-    user_badge   = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
+    user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_node else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
-
+    expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
         'machines_card.html', 
@@ -374,14 +358,16 @@ def thread_machine_content(machine, machine_content, idx):
         advertised_routes = Markup(routes),
         exit_node_badge   = Markup(exit_node_badge),
         status_badge      = Markup(status_badge),
-        user_badge   = Markup(user_badge),
+        user_badge        = Markup(user_badge),
         last_update_time  = str(last_update_time),
         last_seen_time    = str(last_seen_time),
         created_time      = str(created_time),
+        expiry_time       = str(expiry_time),
         preauth_key       = str(preauth_key),
+        expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
     )))
-    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    LOG.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -391,18 +377,18 @@ def render_machines_cards():
 
     #########################################
     # Thread this entire thing.  
-    numThreads = len(machines_list["machines"])
+    num_threads = len(machines_list["machines"])
     iterable = []
     machine_content = {}
-    for i in range (0, numThreads):
-        app.logger.debug("Appending iterable:  "+str(i))
+    for i in range (0, num_threads):
+        LOG.error("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    app.logger.warning("Starting futures")
+    LOG.warning("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    app.logger.warning("Finished futures")
+    LOG.warning("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
@@ -413,7 +399,7 @@ def render_machines_cards():
     content = "<div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>"
     # Print the content
 
-    for index in range(0, numThreads):
+    for index in range(0, num_threads):
         content = content+str(sorted_machines[index])
         # content = content+str(sorted_machines[index])
 
@@ -441,8 +427,8 @@ def render_users_cards():
         content = content + render_template(
             'users_card.html', 
             status_badge            = Markup(status_badge),
-            user_name          = user["name"],
-            user_id            = user["id"],
+            user_name               = user["name"],
+            user_id                 = user["id"],
             preauth_keys_collection = Markup(preauth_keys_collection)
         ) 
     content = content+"</div>"
@@ -499,14 +485,14 @@ def build_preauth_key_table(user_name):
         # Class for the javascript function to look for to toggle the hide function
         hide_expired = "expired-row" if not key_usable else ""
 
-        btn_reusable      = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
-        btn_ephemeral     = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
-        btn_used          = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
-        btn_usable        = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
+        btn_reusable  = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
+        btn_ephemeral = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
+        btn_used      = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
+        btn_usable    = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
 
         # Other buttons:
-        btn_delete        = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
-        tooltip_data      = "Expiration:  "+expiration_time
+        btn_delete    = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
+        tooltip_data  = "Expiration:  "+expiration_time
 
         # TR ID will look like "1-albert-tr"
         preauth_keys_collection = preauth_keys_collection+"""
@@ -525,3 +511,37 @@ def build_preauth_key_table(user_name):
         </li>
         """
     return preauth_keys_collection
+
+def oidc_nav_dropdown(user_name, email_address, name):
+    html_payload = """
+        <!-- Dropdown Structure -->
+        <ul id="dropdown1" class="dropdown-content dropdown-oidc">
+            <ul class="collection dropdown-oidc-collection">
+                <li class="collection-item dropdown-oidc-avatar avatar">
+                    <i class="material-icons circle">email</i>
+                    <span class="dropdown-oidc-title title">Email</span>
+                    <p>"""+email_address+"""</p>
+                </li>
+                <li class="collection-item dropdown-oidc-avatar avatar">
+                    <i class="material-icons circle">person_outline</i>
+                    <span class="dropdown-oidc-title title">Username</span>
+                    <p>"""+user_name+"""</p>
+                </li>
+            </ul>
+        <li class="divider"></li>
+            <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
+        </ul>
+        <li>
+            <a class="dropdown-trigger" href="#!" data-target="dropdown1">
+                """+name+""" <i class="material-icons right">account_circle</i>
+            </a>
+        </li>
+    """
+    return Markup(html_payload)
+
+def oidc_nav_mobile(user_name, email_address, name):
+# https://materializecss.github.io/materialize/sidenav.html
+    html_payload = """
+         <li><hr><a href="logout"><i class="material-icons left">exit_to_app</i>Logout</a></li>
+    """
+    return Markup(html_payload)

@@ -4,10 +4,20 @@ services:
     image: ghcr.io/ifargle/headscale-webui:latest
     container_name: headscale-webui
     environment:
-      - TZ=UTC                                 # Timezone
-      - HS_SERVER=localhost                    # Set this to your Headscale server's URL.  It will need to access /api/ on Headscale.
-      - BASE_PATH="/admin"                     # Default, can be anything you want.  Tailscale's Windows app expects "HS_SERVER/admin"
-      - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32"
+      - TZ=Asia/Tokyo
+      - COLOR=red                              # Use the base colors (ie, no darken-3, etc) - 
+      - HS_SERVER=https://headscale.$DOMAIN    # Reachable endpoint for your Headscale server
+      - DOMAIN_NAME=https://headscale.$DOMAIN  # The base domain name for this container.
+      - SCRIPT_NAME=/admin                     # This is your applications base path (wsgi requires the name "SCRIPT_NAME")
+      - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32" - used to encrypt your key on disk.
+      - AUTH_TYPE=oidc                         # AUTH_TYPE is either Basic or OIDC.  Empty for no authentication
+      # ENV for Basic Auth (Used only if AUTH_TYPE is "Basic").  Can be omitted if you aren't using Basic Auth
+      - BASIC_AUTH_USER=user                 # Used for basic auth
+      - BASIC_AUTH_PASS=pass                 # Used for basic auth
+      # ENV for OIDC (Used only if AUTH_TYPE is "OIDC").  Can be omitted if you aren't using OIDC
+      - OIDC_AUTH_URL=https://auth.$DOMAIN/.well-known/openid-configuration # URL for your OIDC issuer's well-known endpoint
+      - OIDC_CLIENT_ID=headscale-webui     # Your OIDC Issuer's Client ID for Headscale-WebUI
+      - OIDC_CLIENT_SECRET=YourSecretHere  # Your OIDC Issuer's Secret Key for Headscale-WebUI
     volumes:
       - ./volume:/data                         # Headscale-WebUI's storage.  Make sure ./volume is readable by UID 1000 (chown 1000:1000 ./volume)
       - ./headscale/config/:/etc/headscale/:ro # Headscale's config storage location.  Used to read your Headscale config.

@@ -1,112 +1,256 @@
-import json, renderer, headscale, helper, pytz, os
-from flask          import Flask, render_template, request, url_for, redirect, Markup
-from dateutil       import parser
-from flask_executor import Executor
+# pylint: disable=wrong-import-order
+
+import headscale, helper, json, os, pytz, renderer, secrets, requests
+from functools                     import wraps
+from datetime                      import datetime
+from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
+from dateutil                      import parser
+from flask_executor                import Executor
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
-COLOR_NAV   = "blue-grey darken-1"
-COLOR_BTN   = "blue-grey darken-3"
-BASE_PATH   = os.environ["BASE_PATH"].replace('"', '')
-BUILD_DATE  = os.environ["BUILD_DATE"]
-APP_VERSION = os.environ["APP_VERSION"]
-GIT_COMMIT  = os.environ["GIT_COMMIT"]
-GIT_BRANCH  = os.environ["GIT_BRANCH"]
-HS_VERSION  = "v0.20.0"
-DEBUG_STATE = False
+COLOR       = os.environ["COLOR"].replace('"', '').lower()
+COLOR_NAV   = COLOR+" darken-1"
+COLOR_BTN   = COLOR+" darken-3"
+DEBUG_STATE = True
+AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
 
-static_url_path = '/static'
-if BASE_PATH != '': static_url_path = BASE_PATH + static_url_path
+# Initiate the Flask application:
+app          = Flask(__name__, static_url_path="/static")
+LOG          = logging.create_logger(app)
+executor     = Executor(app)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
-app = Flask(__name__, static_url_path=static_url_path)
-executor = Executor(app)
+########################################################################################
+# Set Authentication type.  Currently "OIDC" and "BASIC"
+########################################################################################
+if AUTH_TYPE == "oidc":
+    # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/ 
+    #
+    # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
+    # https://www.authelia.com/integration/openid-connect/introduction/ 
+    # https://github.com/steinarvk/flask_oidc_demo 
+    LOG.error("Loading OIDC libraries and configuring app...")
 
-app.logger.warning("Static assets served on:  "+static_url_path)
-app.logger.warning("BASE_PATH:  "+BASE_PATH)
+    DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
+    BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
+    OIDC_SECRET    = os.environ["OIDC_CLIENT_SECRET"]
+    OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]
+    OIDC_AUTH_URL  = os.environ["OIDC_AUTH_URL"]
+
+    # Construct client_secrets.json:
+    response = requests.get(str(OIDC_AUTH_URL))
+    oidc_info = response.json()
+    LOG.debug("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
+
+    client_secrets = """{
+        "web": {
+            "issuer": \""""+oidc_info["issuer"]+"""\",
+            "auth_uri": \""""+oidc_info["authorization_endpoint"]+"""\",
+            "client_id": \""""+OIDC_CLIENT_ID+"""\",
+            "client_secret": \""""+OIDC_SECRET+"""\",
+            "redirect_uris": [
+                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
+            ],
+            "userinfo_uri": \""""+oidc_info["userinfo_endpoint"]+"""\", 
+            "token_uri": \""""+oidc_info["token_endpoint"]+"""\",
+            "token_introspection_uri": \""""+oidc_info["introspection_endpoint"]+"""\"
+        }
+    }
+    """
+
+    with open("/app/instance/secrets.json", "w+") as secrets_json:
+        secrets_json.write(client_secrets)
+    LOG.debug("Client Secrets:  ")
+    with open("/app/instance/secrets.json", "r+") as secrets_json:
+        LOG.debug("/app/instances/secrets.json:")
+        LOG.debug(secrets_json.read())
+    
+    app.config.update({
+        'SECRET_KEY': secrets.token_urlsafe(32),
+        'TESTING': DEBUG_STATE,
+        'DEBUG': DEBUG_STATE,
+        'OIDC_CLIENT_SECRETS': '/app/instance/secrets.json',
+        'OIDC_ID_TOKEN_COOKIE_SECURE': True,
+        'OIDC_REQUIRE_VERIFIED_EMAIL': False,
+        'OIDC_USER_INFO_ENABLED': True,
+        'OIDC_OPENID_REALM': 'Headscale-WebUI',
+        'OIDC_SCOPES': ['openid', 'profile', 'email'],
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+    })
+    from flask_oidc import OpenIDConnect
+    oidc = OpenIDConnect(app)
+
+elif AUTH_TYPE == "basic":
+    # https://flask-basicauth.readthedocs.io/en/latest/
+    LOG.error("Loading basic auth libraries and configuring app...")
+    from flask_basicauth import BasicAuth
+
+    app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
+    app.config['BASIC_AUTH_PASSWORD'] = os.environ["BASIC_AUTH_PASS"]
+    app.config['BASIC_AUTH_FORCE']    = True
+
+    basic_auth = BasicAuth(app)
+    ########################################################################################
+    # Set Authentication type - Dynamically load function decorators
+    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
+    ########################################################################################
+    # Make a fake decorator for oidc.require_login
+    # If anyone knows a better way of doing this, please let me know.
+    class OpenIDConnect():
+        def require_login(self, view_func):
+            @wraps(view_func)
+            def decorated(*args, **kwargs):
+                return view_func(*args, **kwargs)
+            return decorated
+    oidc = OpenIDConnect()
+
+else:
+    ########################################################################################
+    # Set Authentication type - Dynamically load function decorators
+    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi 
+    ########################################################################################
+    # Make a fake decorator for oidc.require_login
+    # If anyone knows a better way of doing this, please let me know.
+    class OpenIDConnect():
+        def require_login(self, view_func):
+            @wraps(view_func)
+            def decorated(*args, **kwargs):
+                return view_func(*args, **kwargs)
+            return decorated
+    oidc = OpenIDConnect()
 
 ########################################################################################
 # / pages - User-facing pages
-########################################################################################
-
+######################################################ddddddddddd##################################
 @app.route('/')
-@app.route(BASE_PATH+'/')
 @app.route('/overview')
-@app.route(BASE_PATH+'/overview')
+@oidc.require_login
 def overview_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": 
-        app.logger.debug("Why does this fail? Return value:  "+helper.startup_checks())
-        return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     return render_template('overview.html',
         render_page = renderer.render_overview(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
-@app.route(BASE_PATH+'/machines', methods=('GET', 'POST'))
 @app.route('/machines', methods=('GET', 'POST'))
+@oidc.require_login
 def machines_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
         cards            = cards,
         headscale_server = headscale.get_url(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
-@app.route(BASE_PATH+'/users', methods=('GET', 'POST'))
 @app.route('/users', methods=('GET', 'POST'))
+@oidc.require_login
 def users_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    # If the API key fails, redirect to the settings page:
-    if not helper.key_test(): return redirect(BASE_PATH+url_for('settings_page'))
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
         cards = cards,
         headscale_server = headscale.get_url(),
         COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN
+        COLOR_BTN   = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
     )
 
-@app.route(BASE_PATH+'/settings', methods=('GET', 'POST'))
 @app.route('/settings', methods=('GET', 'POST'))
+@oidc.require_login
 def settings_page():
-    # General error checks.  See the function for more info:
-    if helper.startup_checks() != "Pass": return redirect(BASE_PATH+url_for('error_page'))
-    url     = headscale.get_url()
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
 
-    return render_template(
-        'settings.html', 
-        url          = url,
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
+
+    GIT_COMMIT_LINK = Markup("<a href='https://github.com/iFargle/headscale-webui/commit/"+os.environ["GIT_COMMIT"]+"'>"+str(os.environ["GIT_COMMIT"])[0:7]+"</a>")
+
+    return render_template('settings.html', 
+        url          = headscale.get_url(),
         COLOR_NAV    = COLOR_NAV,
         COLOR_BTN    = COLOR_BTN,
-        HS_VERSION   = HS_VERSION,
-        APP_VERSION  = APP_VERSION,
-        GIT_COMMIT   = GIT_COMMIT,
-        GIT_BRANCH   = GIT_BRANCH,
-        BUILD_DATE   = BUILD_DATE
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE,
+        BUILD_DATE   = os.environ["BUILD_DATE"],
+        APP_VERSION  = os.environ["APP_VERSION"],
+        GIT_COMMIT   = GIT_COMMIT_LINK,
+        GIT_BRANCH   = os.environ["GIT_BRANCH"],
+        HS_VERSION   = os.environ["HS_VERSION"]
     )
 
-@app.route(BASE_PATH+'/error')
 @app.route('/error')
+@oidc.require_login
 def error_page():
-    if helper.startup_checks() == "Pass": 
+    if helper.access_checks() == "Pass": 
         return redirect(url_for('overview_page'))
 
     return render_template('error.html', 
-        ERROR_MESSAGE = Markup(helper.startup_checks())
+        ERROR_MESSAGE = Markup(helper.access_checks())
     )
 
+@app.route('/logout')
+def logout_page():
+    if AUTH_TYPE == "oidc":
+        oidc.logout()
+    return redirect(url_for('overview_page'))
 ########################################################################################
 # /api pages
 ########################################################################################
@@ -115,8 +259,8 @@ def error_page():
 # Headscale API Key Endpoints
 ########################################################################################
 
-@app.route(BASE_PATH+'/api/test_key', methods=('GET', 'POST'))
 @app.route('/api/test_key', methods=('GET', 'POST'))
+@oidc.require_login
 def test_key_page():
     api_key    = headscale.get_api_key()
     url        = headscale.get_url()
@@ -126,8 +270,9 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.logger.warning("The below statement will be TRUE if the key has been renewed or DOES NOT need renewal.  False in all other cases")
-    app.logger.warning("Renewed:  "+str(renewed))
+    LOG.warning("The below statement will be TRUE if the key has been renewed, ")
+    LOG.warning("or DOES NOT need renewal.  False in all other cases")
+    LOG.warning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 
@@ -135,24 +280,29 @@ def test_key_page():
 
     # Set the current timezone and local time
     timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time = timezone.localize(datetime.now())
 
     # Format the dates for easy readability
-    expiration_parse   = parser.parse(key_info['expiration'])
-    expiration_local   = expiration_parse.astimezone(timezone)
-    expiration_time    = str(expiration_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
+    creation_parse   = parser.parse(key_info['createdAt'])
+    creation_local   = creation_parse.astimezone(timezone)
+    creation_delta   = local_time - creation_local
+    creation_print   = helper.pretty_print_duration(creation_delta)
+    creation_time    = str(creation_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(creation_print)+")"
 
-    creation_parse     = parser.parse(key_info['createdAt'])
-    creation_local     = creation_parse.astimezone(timezone)
-    creation_time      = str(creation_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
-    
+    expiration_parse = parser.parse(key_info['expiration'])
+    expiration_local = expiration_parse.astimezone(timezone)
+    expiration_delta = expiration_local - local_time
+    expiration_print = helper.pretty_print_duration(expiration_delta, "expiry")
+    expiration_time  = str(expiration_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiration_print)+")"
+
     key_info['expiration'] = expiration_time
     key_info['createdAt']  = creation_time
 
     message = json.dumps(key_info)
     return message
 
-@app.route(BASE_PATH+'/api/save_key', methods=['POST'])
 @app.route('/api/save_key', methods=['POST'])
+@oidc.require_login
 def save_key_page():
     json_response = request.get_json()
     api_key       = json_response['api_key']
@@ -176,8 +326,8 @@ def save_key_page():
 ########################################################################################
 # Machine API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/update_route', methods=['POST'])
 @app.route('/api/update_route', methods=['POST'])
+@oidc.require_login
 def update_route_page():
     json_response = request.get_json()
     route_id      = json_response['route_id']
@@ -187,8 +337,8 @@ def update_route_page():
 
     return headscale.update_route(url, api_key, route_id, current_state)
 
-@app.route(BASE_PATH+'/api/machine_information', methods=['POST'])
 @app.route('/api/machine_information', methods=['POST'])
+@oidc.require_login
 def machine_information_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -197,8 +347,8 @@ def machine_information_page():
 
     return headscale.get_machine_info(url, api_key, machine_id)
 
-@app.route(BASE_PATH+'/api/delete_machine', methods=['POST'])
 @app.route('/api/delete_machine', methods=['POST'])
+@oidc.require_login
 def delete_machine_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -207,8 +357,8 @@ def delete_machine_page():
 
     return headscale.delete_machine(url, api_key, machine_id)
 
-@app.route(BASE_PATH+'/api/rename_machine', methods=['POST'])
 @app.route('/api/rename_machine', methods=['POST'])
+@oidc.require_login
 def rename_machine_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -218,19 +368,19 @@ def rename_machine_page():
 
     return headscale.rename_machine(url, api_key, machine_id, new_name)
 
-@app.route(BASE_PATH+'/api/move_user', methods=['POST'])
 @app.route('/api/move_user', methods=['POST'])
+@oidc.require_login
 def move_user_page():
     json_response = request.get_json()
     machine_id    = json_response['id']
-    new_user = json_response['new_user']
+    new_user      = json_response['new_user']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
     return headscale.move_user(url, api_key, machine_id, new_user)
 
-@app.route(BASE_PATH+'/api/set_machine_tags', methods=['POST'])
 @app.route('/api/set_machine_tags', methods=['POST'])
+@oidc.require_login
 def set_machine_tags():
     json_response = request.get_json()
     machine_id    = json_response['id']
@@ -240,12 +390,12 @@ def set_machine_tags():
 
     return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
 
-@app.route(BASE_PATH+'/api/register_machine', methods=['POST'])
 @app.route('/api/register_machine', methods=['POST'])
+@oidc.require_login
 def register_machine():
     json_response = request.get_json()
     machine_key   = json_response['key']
-    user     = json_response['user']
+    user          = json_response['user']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -254,8 +404,8 @@ def register_machine():
 ########################################################################################
 # User API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/rename_user', methods=['POST'])
 @app.route('/api/rename_user', methods=['POST'])
+@oidc.require_login
 def rename_user_page():
     json_response = request.get_json()
     old_name      = json_response['old_name']
@@ -265,8 +415,8 @@ def rename_user_page():
 
     return headscale.rename_user(url, api_key, old_name, new_name)
 
-@app.route(BASE_PATH+'/api/add_user', methods=['POST'])
 @app.route('/api/add_user', methods=['POST'])
+@oidc.require_login
 def add_user():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -274,18 +424,18 @@ def add_user():
 
     return headscale.add_user(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/delete_user', methods=['POST'])
 @app.route('/api/delete_user', methods=['POST'])
+@oidc.require_login
 def delete_user():
     json_response  = request.get_json()
-    user_name = json_response['name']
+    user_name      = json_response['name']
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
     return headscale.delete_user(url, api_key, user_name)
 
-@app.route(BASE_PATH+'/api/get_users', methods=['POST'])
 @app.route('/api/get_users', methods=['POST'])
+@oidc.require_login
 def get_users_page():
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -295,8 +445,8 @@ def get_users_page():
 ########################################################################################
 # Pre-Auth Key API Endpoints
 ########################################################################################
-@app.route(BASE_PATH+'/api/add_preauth_key', methods=['POST'])
 @app.route('/api/add_preauth_key', methods=['POST'])
+@oidc.require_login
 def add_preauth_key():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -304,8 +454,8 @@ def add_preauth_key():
 
     return headscale.add_preauth_key(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/expire_preauth_key', methods=['POST'])
 @app.route('/api/expire_preauth_key', methods=['POST'])
+@oidc.require_login
 def expire_preauth_key():
     json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
@@ -313,8 +463,8 @@ def expire_preauth_key():
 
     return headscale.expire_preauth_key(url, api_key, json_response)
 
-@app.route(BASE_PATH+'/api/build_preauthkey_table', methods=['POST'])
 @app.route('/api/build_preauthkey_table', methods=['POST'])
+@oidc.require_login
 def build_preauth_key_table():
     json_response  = request.get_json()
     user_name = json_response['name']

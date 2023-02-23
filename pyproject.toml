@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "headscale-webui"
-version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+version = "v0.5.0"
+description = "A simple web UI for small-scale Headscale deployments."
+authors = ["Albert Copeland <albert@sysctl.io>"]
 license = "AGPL"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 requests = "^2.28.2"
 Flask = "^2.2.2"
 cryptography = "^39.0.0"
@@ -16,6 +16,8 @@ Flask-Executor = "^1.0.0"
 PyYAML = "^6.0"
 pyuwsgi = "^2.0.21"
 gunicorn = "^20.1.0"
+flask-basicauth = "^0.2.0"
+flask-providers-oidc = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 

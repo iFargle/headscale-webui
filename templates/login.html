@@ -1,7 +1,7 @@
   <!DOCTYPE html>
   <html id="page">
      <head>
-        <title>●::[●●] {% block title %} {% endblock %}</title>
+        <title>●::[●●] Error</title>
 
         <link rel="apple-touch-icon" sizes="57x57" href="static/img/favicon/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="static/img/favicon/apple-icon-60x60.png">
@@ -23,12 +23,8 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <!-- CSS and Icons -->
-        <!--<link href="static/css/materialize.css" type="text/css" rel="stylesheet"/>-->
         <link href="static/css/materialize.min.css" type="text/css" rel="stylesheet"/> 
-        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
         <link href="static/css/overrides.css"   type="text/css" rel="stylesheet"/>
-        <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
-        <!-- <link href="static/css/fonts.css" type="text/css" rel="stylesheet"/> -->
         <style>
          /* fallback */
             @font-face {
@@ -52,50 +48,26 @@
                word-wrap: normal;
                direction: ltr;
                -moz-font-feature-settings: 'liga';
-               -font-feature-settings: 'liga';
                -moz-osx-font-smoothing: grayscale;
             }
         </style>
      </head>
      <body>
-        <nav>
-         <div class="nav-wrapper {{ COLOR_NAV }}">
-           <img class="hide-on-med-and-down" style="padding-left: 10px" src="static/img/headscale3-dots.png" height="64px"></img>
-           <a href="overview" class="brand-logo bold" style="padding-left: 10px">
-						Headscale
-						<div class="right">
-							<span class="left-align thin hide-on-small-only" style="padding-left: 10px">
-								{% block header %}{% endblock %}
-							</span>
-						</div>
-					</a>
-           <a href="#!" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-           <ul class="right hide-on-med-and-down">
-               <li role="menu-item" class="{{ overview_active   }}">
-                  <a href="overview"><i class="material-icons left">map</i>Overview</a>
-               </li>
-               <li role="menu-item" class="{{ machines_active    }}">
-                  <a href="machines"><i class="material-icons left">devices_other</i>Machines</a>
-               </li>
-               <li role="menu-item" class="{{ users_active }}">
-                  <a href="users"><i class="material-icons left">people</i>Users</a>
-               </li>
-               <li role="menu-item" class="{{ settings_active   }}">
-                  <a href="settings"><i class="material-icons left">settings</i>Settings</a>
-               </li>
-               {% block OIDC_NAV_DROPDOWN %}{% endblock %}
-            </ul>
-         </div>
-       </nav>
-       <ul class="sidenav" id="mobile">
-         <li><a href="/"><i class="material-icons left">map</i>Overview</a></li>
-         <li><a href="machines"><i class="material-icons left">devices_other</i>Machines</a></li>
-         <li><a href="users"><i class="material-icons left">people</i>Users</a></li>
-         <li><a href="settings"><i class="material-icons left">settings</i>Settings</a></li>
-         {% block OIDC_NAV_MOBILE %}{% endblock %}
-      </ul>
-      <div class="container">
-         {% block content %} {% endblock %}
+      <div class="container"><br><br><br>
+         <div class="row">
+            <form class="col s12">
+              <div class="row">
+                <div class="input-field col s6">
+                  <input placeholder="Placeholder" id="username" type="text" class="validate">
+                  <label for="username">Username</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="password" type="password" class="validate">
+                  <label for="password">Password</label>
+                </div>
+              </div>
+            </form>
+          </div>
       </div>
    <!-- Modals -->
    <div id="generic_modal" class="modal">
@@ -108,9 +80,6 @@
       </div>
    </div>
    </body>
-   <!-- JavaScript / jQuery -->
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
     <script type="text/javascript" src="static/js/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="static/js/materialize.min.js"></script> 
    <script>M.AutoInit();</script>

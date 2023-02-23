@@ -1,11 +1,14 @@
+# pylint: disable=wrong-import-order
+
 import requests, json, os
-from os.path             import exists
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
+from flask.logging       import create_logger
 
 app = Flask(__name__)
+LOG = create_logger(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
@@ -14,21 +17,31 @@ app = Flask(__name__)
 def get_url():  return os.environ['HS_SERVER']
 
 def set_api_key(api_key):
-    encryption_key = os.environ['KEY']                      # User-set encryption key
-    key_file       = open("/data/key.txt", "wb+")           # Key file on the filesystem for persistent storage
-    fernet         = Fernet(encryption_key)                 # Preparing the Fernet class with the key
-    encrypted_key  = fernet.encrypt(api_key.encode())       # Encrypting the key
-    return True if key_file.write(encrypted_key) else False # Return true if the file wrote correctly
+    # User-set encryption key
+    encryption_key = os.environ['KEY']                      
+    # Key file on the filesystem for persistent storage
+    key_file       = open("/data/key.txt", "wb+")           
+    # Preparing the Fernet class with the key
+    fernet         = Fernet(encryption_key)                 
+    # Encrypting the key
+    encrypted_key  = fernet.encrypt(api_key.encode())       
+    # Return true if the file wrote correctly
+    return True if key_file.write(encrypted_key) else False 
 
 def get_api_key():
-    if not exists("/data/key.txt"): return False
-    encryption_key = os.environ['KEY']                      # User-set encryption key
-    key_file       = open("/data/key.txt", "rb+")           # Key file on the filesystem for persistent storage
-    enc_api_key    = key_file.read()                        # The encrypted key read from the file
+    if not os.path.exists("/data/key.txt"): return False
+    # User-set encryption key
+    encryption_key = os.environ['KEY']                      
+    # Key file on the filesystem for persistent storage
+    key_file       = open("/data/key.txt", "rb+")           
+    # The encrypted key read from the file
+    enc_api_key    = key_file.read()                        
     if enc_api_key == b'': return "NULL"
 
-    fernet         = Fernet(encryption_key)                 # Preparing the Fernet class with the key
-    decrypted_key  = fernet.decrypt(enc_api_key).decode()   # Decrypting the key
+# Preparing the Fernet class with the key
+    fernet         = Fernet(encryption_key)                 
+    # Decrypting the key
+    decrypted_key  = fernet.decrypt(enc_api_key).decode()   
 
     return decrypted_key
 
@@ -44,20 +57,20 @@ def test_api_key(url, api_key):
 
 # Expires an API key
 def expire_key(url, api_key):
-        payload = {'prefix':str(api_key[0:10])}
-        json_payload=json.dumps(payload)
-#       app.logge.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+    payload = {'prefix':str(api_key[0:10])}
+    json_payload=json.dumps(payload)
+#       app.logger.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
-        response = requests.post(
-            str(url)+"/api/v1/apikey/expire",
-            data=json_payload,
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+str(api_key)
-                }
-        )
-        return response.status_code
+    response = requests.post(
+        str(url)+"/api/v1/apikey/expire",
+        data=json_payload,
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+str(api_key)
+            }
+    )
+    return response.status_code
 
 # Checks if the key needs to be renewed
 # If it does, renews the key, then expires the old key
@@ -70,7 +83,7 @@ def renew_api_key(url, api_key):
     expiration_time     = key_info["expiration"]
     today_date          = date.today()
     expire              = parser.parse(expiration_time)
-    expire_fmt          = str(expire.year) + "-" + str(expire.month).zfill(2) + "-" + str(expire.day).zfill(2) # 2023-01-04
+    expire_fmt          = str(expire.year) + "-" + str(expire.month).zfill(2) + "-" + str(expire.day).zfill(2)
     expire_date         = date.fromisoformat(expire_fmt)
     delta               = expire_date - today_date
     tmp                 = today_date + timedelta(days=90) 
@@ -78,10 +91,10 @@ def renew_api_key(url, api_key):
 
     # If the delta is less than 5 days, renew the key:
     if delta < timedelta(days=5):
-#       app.logge.warning("Key is about to expire.  Delta is "+str(delta))
+#       app.logger.warning("Key is about to expire.  Delta is "+str(delta))
         payload = {'expiration':str(new_expiration_date)}
         json_payload=json.dumps(payload)
-#       app.logge.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+#       app.logger.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
         response = requests.post(
             str(url)+"/api/v1/apikey",
@@ -93,17 +106,17 @@ def renew_api_key(url, api_key):
                 }
         )
         new_key = response.json()
-#       app.logge.warning("JSON:  "+json.dumps(new_key))
-#       app.logge.warning("New Key is:  "+new_key["apiKey"])
+#       app.logger.warning("JSON:  "+json.dumps(new_key))
+#       app.logger.warning("New Key is:  "+new_key["apiKey"])
         api_key_test = test_api_key(url, new_key["apiKey"])
-#       app.logge.warning("Testing the key:  "+str(api_key_test))
+#       app.logger.warning("Testing the key:  "+str(api_key_test))
         # Test if the new key works:
         if api_key_test == 200:
-#           app.logge.warning("The new key is valid and we are writing it to the file")
+#           app.logger.warning("The new key is valid and we are writing it to the file")
             if not set_api_key(new_key["apiKey"]):
-#               app.logge.warning("We failed writing the new key!")
+#               app.logger.warning("We failed writing the new key!")
                 return False # Key write failed
-#           app.logge.warning("Key validated and written.  Moving to expire the key.")
+#           app.logger.warning("Key validated and written.  Moving to expire the key.")
             expire_key(url, api_key)
             return True     # Key updated and validated
         else: return False  # The API Key test failed
@@ -167,7 +180,8 @@ def move_user(url, api_key, machine_id, new_user):
     return response.json()
 
 # updates routes for the given machine_id. enable / disable
-# The Headscale API expects a list of routes to enable.  if we want to toggle 1 out of 3 routes
+# The Headscale API expects a list of routes to enable.  
+# if we want to toggle 1 out of 3 routes
 # we need to pass all currently enabled routes and mask it
 # For example, if we have routes:
 #  0.0.0.0/0
@@ -176,7 +190,8 @@ def move_user(url, api_key, machine_id, new_user):
 # available, but only routes 
 #  0.0.0.0/24
 #  192.168.1.0/24 
-# ENABLED, and we want to disable route 192.168.1.0/24, we need to pass ONLY the routes to KEEP enabled.
+# ENABLED, and we want to disable route 192.168.1.0/24, 
+# we need to pass ONLY the routes to KEEP enabled.
 # In this case, 0.0.0/24
 def update_route(url, api_key, route_id, current_state):
     action = ""
@@ -184,10 +199,10 @@ def update_route(url, api_key, route_id, current_state):
     if current_state == "False": action = "enable"
 
     # Debug
-    #app.logger.info("URL:  "+str(url))
-    #app.logger.info("Route ID:  "+str(route_id))
-    #app.logger.info("Current State:  "+str(current_state))
-    #app.logger.info("Action to take:  "+str(action))
+    # LOG.info("URL:  "+str(url))
+    # LOG.info("Route ID:  "+str(route_id))
+    # LOG.info("Current State:  "+str(current_state))
+    # LOG.info("Action to take:  "+str(action))
 
     response = requests.post(
         str(url)+"/api/v1/routes/"+str(route_id)+"/"+str(action),
@@ -204,7 +219,7 @@ def update_route(url, api_key, route_id, current_state):
     # "route" is what we are toggling.  On or off. 
     # Get a list of all currently enabled routes.
     # If route IS currently in enabled routes, remove it
-#    # TODO: REDO THIS FOR THE NEW API
+#    # DONE: REDO THIS FOR THE NEW API
 #    for enabled_route in routes["routes"]["enabledRoutes"]:
 #        if enabled_route == route: is_enabled=True
 #        else: to_enable.append(enabled_route)
@@ -361,7 +376,8 @@ def get_preauth_keys(url, api_key, user_name):
     )
     return response.json()
 
-# Add a preauth key to the user "user_name" given the booleans "ephemeral" and "reusable" with the expiration date "date" contained in the JSON payload "data"
+# Add a preauth key to the user "user_name" given the booleans "ephemeral" 
+# and "reusable" with the expiration date "date" contained in the JSON payload "data"
 def add_preauth_key(url, api_key, data):
     response = requests.post(
         str(url)+"/api/v1/preauthkey",
@@ -387,6 +403,6 @@ def expire_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
-    # app.logger.info("expire_preauth_key - Return:  "+str(response.json()))
-    # app.logger.info("expire_preauth_key - Status:  "+str(status))
+    ## LOG.info("expire_preauth_key - Return:  "+str(response.json()))
+    ## LOG.info("expire_preauth_key - Status:  "+str(status))
     return {"status": status, "body": response.json()}
