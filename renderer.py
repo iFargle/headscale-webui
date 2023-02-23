@@ -64,7 +64,7 @@ def render_overview():
             if not key["reusable"] and not key["used"] and not key_expired: usable_keys_count += 1
 
     # General Content variables:
-    ip_prefixes, server_url, disable_check_updates, ephemeral_node_inactivity_timeout, node_update_check_interval = "N/A"
+    ip_prefixes, server_url, disable_check_updates, ephemeral_node_inactivity_timeout, node_update_check_interval = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "ip_prefixes"                       in config_yaml:  ip_prefixes                       = str(config_yaml["ip_prefixes"])
     if "server_url"                        in config_yaml:  server_url                        = str(config_yaml["server_url"])
     if "disable_check_updates"             in config_yaml:  disable_check_updates             = str(config_yaml["disable_check_updates"])
@@ -72,7 +72,7 @@ def render_overview():
     if "node_update_check_interval"        in config_yaml:  node_update_check_interval        = str(config_yaml["node_update_check_interval"])
 
     # OIDC Content variables:
-    issuer, client_id, scope, use_expiry_from_token, expiry = "N/A"
+    issuer, client_id, scope, use_expiry_from_token, expiry = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "oidc" in config_yaml:
         if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])                
         if "client_id"             in config_yaml["oidc"] : client_id             = str(config_yaml["oidc"]["client_id"])             
@@ -81,6 +81,7 @@ def render_overview():
         if "expiry"                in config_yaml["oidc"] : expiry                = str(config_yaml["oidc"]["expiry"])   
 
     # Embedded DERP server information.
+    enabled, region_id, region_code, region_name, stun_listen_addr = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "derp" in config_yaml:
         if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"] == "True":
             if "enabled"          in config_yaml["derp"]["server"]: enabled          = str(config_yaml["derp"]["server"]["enabled"])          
@@ -88,7 +89,8 @@ def render_overview():
             if "region_code"      in config_yaml["derp"]["server"]: region_code      = str(config_yaml["derp"]["server"]["region_code"])      
             if "region_name"      in config_yaml["derp"]["server"]: region_name      = str(config_yaml["derp"]["server"]["region_name"])      
             if "stun_listen_addr" in config_yaml["derp"]["server"]: stun_listen_addr = str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
-
+    
+    nameservers, magic_dns, domains, base_domain = "N/A", "N/A", "N/A", "N/A"
     if "dns_config" in config_yaml:
         if "nameservers" in config_yaml["dns_config"]: nameservers = str(config_yaml["dns_config"]["nameservers"]) 
         if "magic_dns"   in config_yaml["dns_config"]: magic_dns   = str(config_yaml["dns_config"]["magic_dns"])   
