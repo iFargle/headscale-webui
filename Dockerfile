@@ -33,15 +33,15 @@ COPY --chown=app:app --from=builder ${WORKDIR} .
 # General variables
 ENV TZ="UTC"
 ENV COLOR="blue-grey"
-ENV HS_SERVER="http://localhost/"
+ENV HS_SERVER=http://localhost/
 ENV KEY=""
 ENV SCRIPT_NAME=/
-ENV DOMAIN_NAME=https://localhost
+ENV DOMAIN_NAME=http://localhost
 ENV AUTH_TYPE=""
 
 # BasicAuth variables
-ENV BASIC_AUTH_USER="user"
-ENV BASIC_AUTH_PASS="pass"
+ENV BASIC_AUTH_USER=""
+ENV BASIC_AUTH_PASS=""
 
 # Flask OIDC Variables
 ENV OIDC_AUTH_URL=https://localhost
