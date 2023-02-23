@@ -101,60 +101,50 @@ def render_overview():
     overview_content = """
         <ul class=collection with-header">
             <li class="collection-header"><h4>Server Statistics</h4></li>
-            <li class="collection-item"><div>Machines Added       <div class="secondary-content">"""+ str(machines_count)                               +"""</div></div></li>
-            <li class="collection-item"><div>Users Added          <div class="secondary-content">"""+ str(user_count)                                   +"""</div></div></li>
-            <li class="collection-item"><div>Usable Preauth Keys  <div class="secondary-content">"""+ str(usable_keys_count)                            +"""</div></div></li>
-            <li class="collection-item"><div>Enabled/Total Routes <div class="secondary-content">"""+ str(enabled_routes) +"""/"""+str(total_routes)    +"""</div></div></li>
-            <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
+            <li class="collection-item"><div>Machines Added       <div class="secondary-content overview-page">"""+ str(machines_count)                               +"""</div></div></li>
+            <li class="collection-item"><div>Users Added          <div class="secondary-content overview-page">"""+ str(user_count)                                   +"""</div></div></li>
+            <li class="collection-item"><div>Usable Preauth Keys  <div class="secondary-content overview-page">"""+ str(usable_keys_count)                            +"""</div></div></li>
+            <li class="collection-item"><div>Enabled/Total Routes <div class="secondary-content overview-page">"""+ str(enabled_routes) +"""/"""+str(total_routes)    +"""</div></div></li>
+            <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content overview-page">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
         </ul>
     """
     general_content = """
         <ul class=collection with-header">
             <li class="collection-header"><h4>General Information</h4></li>
-            <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content">"""+ ip_prefixes                       +"""</div></div></li>
-            <li class="collection-item"><div>Server URL                        <div class="secondary-content">"""+ server_url                        +"""</div></div></li>
-            <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content">"""+ disable_check_updates             +"""</div></div></li>
-            <li class="collection-item"><div>Ephemeral Node Inactivity Timeout <div class="secondary-content">"""+ ephemeral_node_inactivity_timeout +"""</div></div></li>
-            <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content">"""+ node_update_check_interval        +"""</div></div></li>
+            <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
+            <li class="collection-item"><div>Server URL                        <div class="secondary-content overview-page">"""+ server_url                        +"""</div></div></li>
+            <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content overview-page">"""+ disable_check_updates             +"""</div></div></li>
+            <li class="collection-item"><div>Ephemeral Node Inactivity Timeout <div class="secondary-content overview-page">"""+ ephemeral_node_inactivity_timeout +"""</div></div></li>
+            <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content overview-page">"""+ node_update_check_interval        +"""</div></div></li>
         </ul>
     """
     oidc_content = """
         <ul class=collection with-header">
             <li class="collection-header"><h4>Headscale OIDC Information</h4></li>
-            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
-            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
-            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
-            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
-            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
+            <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
+            <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
+            <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
+            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content overview-page">"""+ use_expiry_from_token +"""</div></div></li>
+            <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
         </ul>
     """
     derp_content = """
         <ul class=collection with-header">
             <li class="collection-header"><h4>Embedded DERP Information</h4></li>
-            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
-            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
-            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
-            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
-            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
-        </ul>
-    """
-    oidc_content = """
-        <ul class=collection with-header">
-            <li class="collection-header"><h4>Embedded DERP Information</h4></li>
-            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
-            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
-            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
-            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
-            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
+            <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
+            <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
+            <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
+            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content overview-page">"""+ use_expiry_from_token +"""</div></div></li>
+            <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
         </ul>
     """
     dns_content = """
         <ul class=collection with-header">
-            <li class="collection-header"><h4>Embedded DERP Information</h4></li>
-            <li class="collection-item"><div>DNS Nameservers <div class="secondary-content">"""+  nameservers  +"""</div></div></li>
-            <li class="collection-item"><div>MagicDNS        <div class="secondary-content">"""+  magic_dns    +"""</div></div></li>
-            <li class="collection-item"><div>Search Domains  <div class="secondary-content">"""+  domains      +"""</div></div></li>
-            <li class="collection-item"><div>Base Domain     <div class="secondary-content">"""+  base_domain  +"""</div></div></li>
+            <li class="collection-header"><h4>DNS Information</h4></li>
+            <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
+            <li class="collection-item"><div>MagicDNS        <div class="secondary-content overview-page">"""+  magic_dns    +"""</div></div></li>
+            <li class="collection-item"><div>Search Domains  <div class="secondary-content overview-page">"""+  domains      +"""</div></div></li>
+            <li class="collection-item"><div>Base Domain     <div class="secondary-content overview-page">"""+  base_domain  +"""</div></div></li>
         </ul>
     """
 
@@ -186,7 +176,7 @@ def render_overview():
     #     The log level
     #     What kind of Database is being used to drive headscale
 
-    content = "<br><div class='row'>" + overview_content + general_content + derp_content + oidc_content + dns_content + "</div>"
+    content = "<br>" + overview_content + general_content + derp_content + oidc_content + dns_content + ""
     return Markup(content)
 
 def thread_machine_content(machine, machine_content, idx):

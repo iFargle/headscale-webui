@@ -31,3 +31,7 @@ li.dropdown-oidc-collection{
     padding: unset !important;
     color: unset !important;
 }
+
+.overview-page {
+    color: unset !important;
+}
