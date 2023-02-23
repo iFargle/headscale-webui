@@ -100,7 +100,8 @@ def render_overview():
     # Start putting the content together
     overview_content = """
     <div class="row">
-        <div class="col s12">
+        <div class="col s1"></div>
+        <div class="col s10">
             <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Server Statistics</h4></li>
                 <li class="collection-item"><div>Machines Added       <div class="secondary-content overview-page">"""+ str(machines_count)                               +"""</div></div></li>
@@ -110,11 +111,13 @@ def render_overview():
                 <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content overview-page">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
             </ul>
         </div>
+        <div class="col s1"></div>
     </div>
     """
     general_content = """
     <div class="row">
-        <div class="col s12">
+        <div class="col s1"></div>
+        <div class="col s10">
             <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>General</h4></li>
                 <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
@@ -124,11 +127,13 @@ def render_overview():
                 <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content overview-page">"""+ node_update_check_interval        +"""</div></div></li>
             </ul>
         </div>
+        <div class="col s1"></div>
     </div>
     """
     oidc_content = """
     <div class="row">
-        <div class="col s12">
+        <div class="col s1"></div>
+        <div class="col s10">
             <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Headscale OIDC</h4></li>
                 <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
@@ -138,11 +143,13 @@ def render_overview():
                 <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
             </ul>
         </div>
+        <div class="col s1"></div>
     </div>
     """
     derp_content = """
     <div class="row">
-        <div class="col s12">
+        <div class="col s1"></div>
+        <div class="col s10">
             <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>Embedded DERP</h4></li>
                 <li class="collection-item"><div>Enabled     <div class="secondary-content overview-page">"""+ enabled          +"""</div></div></li>
@@ -152,11 +159,13 @@ def render_overview():
                 <li class="collection-item"><div>STUN Address<div class="secondary-content overview-page">"""+ stun_listen_addr +"""</div></div></li>
             </ul>
         </div>
+        <div class="col s1"></div>
     </div>
     """
     dns_content = """
     <div class="row">
-        <div class="col s12">
+        <div class="col s1"></div>
+        <div class="col s10">
             <ul class="collection with-header z-depth-1">
                 <li class="collection-header"><h4>DNS</h4></li>
                 <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
@@ -165,6 +174,7 @@ def render_overview():
                 <li class="collection-item"><div>Base Domain     <div class="secondary-content overview-page">"""+  base_domain  +"""</div></div></li>
             </ul>
         </div>
+        <div class="col s1"></div>
     </div>
     """
 
