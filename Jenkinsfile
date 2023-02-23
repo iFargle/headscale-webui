@@ -75,7 +75,7 @@ pipeline {
                             publicImage.push("latest")
                             publicImage.push(APP_VERSION)
                         }
-                        docker.withRegistry('https://hub.docker.com/', 'dockerhub-ifargle-pat') {
+                        docker.withRegistry('https://registry-1.docker.io/', 'dockerhub-ifargle-pat') {
                             publicImage.push("latest")
                             publicImage.push(APP_VERSION)
                         }
