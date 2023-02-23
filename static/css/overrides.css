@@ -24,7 +24,7 @@
     padding: 10px !important;
 }
 
-.dropdown-oidc-collection.avatar {
+li.dropdown-oidc-collection{
     padding-left: 72px !important;
 }
 
