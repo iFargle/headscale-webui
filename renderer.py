@@ -99,6 +99,7 @@ def render_overview():
 
     # Start putting the content together
     overview_content = """
+    <div class="row">
         <div class="col s12">
             <ul class=collection with-header">
                 <li class="collection-header"><h4>Server Statistics</h4></li>
@@ -109,8 +110,10 @@ def render_overview():
                 <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content overview-page">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
             </ul>
         </div>
+    </div>
     """
     general_content = """
+    <div class="row">
         <div class="col s12">
             <ul class=collection with-header">
                 <li class="collection-header"><h4>General Information</h4></li>
@@ -121,8 +124,10 @@ def render_overview():
                 <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content overview-page">"""+ node_update_check_interval        +"""</div></div></li>
             </ul>
         </div>
+    </div>
     """
     oidc_content = """
+    <div class="row">
         <div class="col s12">
             <ul class=collection with-header">
                 <li class="collection-header"><h4>Headscale OIDC Information</h4></li>
@@ -133,8 +138,10 @@ def render_overview():
                 <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
             </ul>
         </div>
+    </div>
     """
     derp_content = """
+    <div class="row">
         <div class="col s12">
             <ul class=collection with-header">
                 <li class="collection-header"><h4>Embedded DERP Information</h4></li>
@@ -145,8 +152,10 @@ def render_overview():
                 <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
             </ul>
         </div>
+    </div>
     """
     dns_content = """
+    <div class="row">
         <div class="col s12">
             <ul class=collection with-header">
                 <li class="collection-header"><h4>DNS Information</h4></li>
@@ -156,6 +165,7 @@ def render_overview():
                 <li class="collection-item"><div>Base Domain     <div class="secondary-content overview-page">"""+  base_domain  +"""</div></div></li>
             </ul>
         </div>
+    </div>
     """
 
     # Remove content that isn't needed:
