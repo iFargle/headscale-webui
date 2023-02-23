@@ -30,5 +30,5 @@ li.dropdown-oidc-collection{
 
 .dropdown-oidc-collection .title {
     color: unset !important;
-    padding: unset !important;
+    padding-left: 72px !important;
 }
