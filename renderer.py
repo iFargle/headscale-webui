@@ -561,7 +561,7 @@ def oidc_nav_dropdown(user_name, email_address, name):
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
-            <ul class="collection">
+            <ul class="collection dropdown-oidc-collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle">email</i>
                     <span class="title">Email</span>
