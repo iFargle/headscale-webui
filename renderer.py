@@ -548,14 +548,14 @@ def oidc_nav_dropdown(user_name, email_address, name):
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
             <ul class="collection dropdown-oidc-collection">
-                <li class="collection-item dropdown-oidc-collection avatar">
+                <li class="collection-item dropdown-oidc-avatar avatar">
                     <i class="material-icons circle">email</i>
-                    <span class="dropdown-oidc-collection title">Email</span>
+                    <span class="dropdown-oidc-title title">Email</span>
                     <p>"""+email_address+"""</p>
                 </li>
-                <li class="collection-item dropdown-oidc-collection avatar">
+                <li class="collection-item dropdown-oidc-avatar avatar">
                     <i class="material-icons circle">person_outline</i>
-                    <span class="dropdown-oidc-collection title">Username</span>
+                    <span class="dropdown-oidc-title title">Username</span>
                     <p>"""+user_name+"""</p>
                 </li>
             </ul>

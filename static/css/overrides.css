@@ -14,21 +14,19 @@
     cursor: unset !important;
     height: unset !important;
 }
+.dropdown-oidc-avatar {
+    margin-left: 72px !important;
+}
 
 .dropdown-oidc-collection {
     border: unset !important;
     margin: unset !important;
 }
 
-.dropdown-oidc-collection .collection-item {
-    padding: 10px !important;
-}
-
 li.dropdown-oidc-collection{
     padding-left: 72px !important;
 }
 
-.dropdown-oidc-collection .title {
+.dropdown-oidc-title {
     color: unset !important;
-    padding-left: 72px !important;
 }
