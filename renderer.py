@@ -164,7 +164,7 @@ def render_overview():
     # Remove DERP if it isn't available or isn't enabled
     if "derp" not in config_yaml: oidc_content = ""
     if "derp" in config_yaml:
-        if config_file["derp"]["enabled"] == "False":
+        if config_yaml["derp"]["enabled"] == "False":
             oidc_content = ""
 
     # TODO:  
