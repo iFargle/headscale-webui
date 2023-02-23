@@ -165,7 +165,7 @@ def render_overview():
     if "derp" not in config_yaml: 
         oidc_content = ""
     if "derp" in config_yaml:
-        if server in config_yaml["derp"]:
+        if "server" in config_yaml["derp"]:
             if config_yaml["derp"]["server"]["enabled"] == "False":
                 oidc_content = ""
 
