@@ -116,7 +116,7 @@ def render_overview():
     <div class="row">
         <div class="col s12">
             <ul class="collection with-header z-depth-1">
-                <li class="collection-header"><h4>General Information</h4></li>
+                <li class="collection-header"><h4>General</h4></li>
                 <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
                 <li class="collection-item"><div>Server URL                        <div class="secondary-content overview-page">"""+ server_url                        +"""</div></div></li>
                 <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content overview-page">"""+ disable_check_updates             +"""</div></div></li>
@@ -130,7 +130,7 @@ def render_overview():
     <div class="row">
         <div class="col s12">
             <ul class="collection with-header z-depth-1">
-                <li class="collection-header"><h4>Headscale OIDC Information</h4></li>
+                <li class="collection-header"><h4>Headscale OIDC</h4></li>
                 <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
                 <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
                 <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
@@ -144,12 +144,12 @@ def render_overview():
     <div class="row">
         <div class="col s12">
             <ul class="collection with-header z-depth-1">
-                <li class="collection-header"><h4>Embedded DERP Information</h4></li>
-                <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
-                <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
-                <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
-                <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content overview-page">"""+ use_expiry_from_token +"""</div></div></li>
-                <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
+                <li class="collection-header"><h4>Embedded DERP</h4></li>
+                <li class="collection-item"><div>Enabled     <div class="secondary-content overview-page">"""+ enabled          +"""</div></div></li>
+                <li class="collection-item"><div>Region ID   <div class="secondary-content overview-page">"""+ region_id        +"""</div></div></li>
+                <li class="collection-item"><div>Region Code <div class="secondary-content overview-page">"""+ region_code      +"""</div></div></li>
+                <li class="collection-item"><div>Region Name <div class="secondary-content overview-page">"""+ region_name      +"""</div></div></li>
+                <li class="collection-item"><div>STUN Address<div class="secondary-content overview-page">"""+ stun_listen_addr +"""</div></div></li>
             </ul>
         </div>
     </div>
@@ -158,7 +158,7 @@ def render_overview():
     <div class="row">
         <div class="col s12">
             <ul class="collection with-header z-depth-1">
-                <li class="collection-header"><h4>DNS Information</h4></li>
+                <li class="collection-header"><h4>DNS</h4></li>
                 <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
                 <li class="collection-item"><div>MagicDNS        <div class="secondary-content overview-page">"""+  magic_dns    +"""</div></div></li>
                 <li class="collection-item"><div>Search Domains  <div class="secondary-content overview-page">"""+  domains      +"""</div></div></li>
@@ -173,11 +173,11 @@ def render_overview():
     if "oidc" not in config_yaml: oidc_content = ""
     # Remove DERP if it isn't available or isn't enabled
     if "derp" not in config_yaml: 
-        oidc_content = ""
+        derp_content = ""
     if "derp" in config_yaml:
         if "server" in config_yaml["derp"]:
-            if config_yaml["derp"]["server"]["enabled"] == "False":
-                oidc_content = ""
+            if str(config_yaml["derp"]["server"]["enabled"]) == "False":
+                derp_content = ""
 
     # TODO:  
     #     Whether there are custom DERP servers
@@ -185,6 +185,7 @@ def render_overview():
     #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
+
     if config_yaml["derp"]["paths"]: pass
     #   # open the path:
     #   derp_file = 
