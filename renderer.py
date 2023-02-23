@@ -63,132 +63,107 @@ def render_overview():
             if key["reusable"] and not key_expired: usable_keys_count += 1
             if not key["reusable"] and not key["used"] and not key_expired: usable_keys_count += 1
 
-    overview_content  = """
-        <div class="col s12">
-            <div class="card z-depth-1">
-                <div class="card-content">
-                    <span class="card-title">Stats</span>
-                    <p>
-                        <table>
-                            <tr><td> Machines            </td><td> """+ str(machines_count)                                +""" </td></tr>
-                            <tr><td> Users               </td><td> """+ str(user_count)                                    +""" </td></tr>
-                            <tr><td> Usable PreAuth Keys </td><td> """+ str(usable_keys_count)                             +""" </td></tr>
-                            <tr><td> Enabled/Total Routes</td><td> """+ str(enabled_routes) +"""/"""+str(total_routes)     +""" </td></tr>
-                            <tr><td> Enabled/Total Exits</td><td>  """+ str(exits_enabled_count) +"""/"""+str(exits_count) +""" </td></tr>
-                        </table>
-                    </p>
-                </div>
-            </div>
-        </div>
-    """
-    # Overview of general configs from the YAML
-    general_content  = """
-        <div class="col s12">
-            <div class="card z-depth-1">
-                <div class="card-content">
-                    <span class="card-title">General</span>
-                    <p>
-                        <table>
-                            <tr><td> IP Prefixes </td><td> """
-    if "ip_prefixes" in config_yaml:  general_content += str(config_yaml["ip_prefixes"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Server URL </td><td> """
-    if "server_url" in config_yaml:  general_content += str(config_yaml["server_url"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Updates Disabled? </td><td> """ 
-    if "disable_check_updates" in config_yaml:  general_content += str(config_yaml["disable_check_updates"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Ephemeral Node Timeout </td><td> """
-    if "ephemeral_node_inactivity_timeout" in config_yaml:  general_content += str(config_yaml["ephemeral_node_inactivity_timeout"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-    <tr><td> Node Update Check Interval </td><td> """
-    if "node_update_check_interval" in config_yaml:  general_content += str(config_yaml["node_update_check_interval"])
-    else: general_content += "N/A"
-    general_content +=""" </td></tr>
-                        </table>
-                    </p>
-                </div>
-            </div>
-        </div>
-    """
+    # General Content variables:
+    ip_prefixes, server_url, disable_check_updates, ephemeral_node_inactivity_timeout, node_update_check_interval = "N/A"
+    if "ip_prefixes"                       in config_yaml:  ip_prefixes                       = str(config_yaml["ip_prefixes"])
+    if "server_url"                        in config_yaml:  server_url                        = str(config_yaml["server_url"])
+    if "disable_check_updates"             in config_yaml:  disable_check_updates             = str(config_yaml["disable_check_updates"])
+    if "ephemeral_node_inactivity_timeout" in config_yaml:  ephemeral_node_inactivity_timeout = str(config_yaml["ephemeral_node_inactivity_timeout"])
+    if "node_update_check_interval"        in config_yaml:  node_update_check_interval        = str(config_yaml["node_update_check_interval"])
 
-    #     Whether OIDC is configured
-    oidc_content = ""
+    # OIDC Content variables:
+    issuer, client_id, scope, use_expiry_from_token, expiry = "N/A"
     if "oidc" in config_yaml:
-        oidc_content  = """
-            <div class="col s12">
-                <div class="card z-depth-1">
-                    <div class="card-content">
-                        <span class="card-title">Headscale OIDC</span>
-                        <p>
-                            <table>   
-                                <tr><td> Issuer </td><td> """
-        if "issuer" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["issuer"])                
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Client ID </td><td> """
-        if "client_id" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["client_id"])             
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Scope </td><td> """
-        if "scope" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["scope"])                 
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Token Expiry </td><td> """
-        if "use_expiry_from_token" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["use_expiry_from_token"]) 
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-        <tr><td> Expiry </td><td> """
-        if "expiry" in config_yaml["oidc"] : oidc_content += str(config_yaml["oidc"]["expiry"])                
-        else: oidc_content += "N/A"
-        oidc_content += """</td></tr>
-                            </table>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        """
+        if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])                
+        if "client_id"             in config_yaml["oidc"] : client_id             = str(config_yaml["oidc"]["client_id"])             
+        if "scope"                 in config_yaml["oidc"] : scope                 = str(config_yaml["oidc"]["scope"])                 
+        if "use_expiry_from_token" in config_yaml["oidc"] : use_expiry_from_token = str(config_yaml["oidc"]["use_expiry_from_token"]) 
+        if "expiry"                in config_yaml["oidc"] : expiry                = str(config_yaml["oidc"]["expiry"])   
 
-    derp_content = ""
+    # Embedded DERP server information.
     if "derp" in config_yaml:
         if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"] == "True":
-            derp_content  = """
-                <div class="col s12">
-                    <div class="card z-depth-1">
-                        <div class="card-content">
-                            <span class="card-title">Built-in DERP</span>
-                            <p>
-                                <table>
-                                    <tr><td> Enabled      </td><td> """
-            if "enabled" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["enabled"])          
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> Region ID    </td><td> """
-            if "region_id" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_id"])        
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> Region Code  </td><td> """
-            if "region_code" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_code"])      
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>headscale-webui/renderer.py
-            <tr><td> Region Name  </td><td> """
-            if "region_name" in config_yaml["derp"]["server"] : derp_content+= str(config_yaml["derp"]["server"]["region_name"])      
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-            <tr><td> STUN Address </td><td> """
-            if "stun_listen_addr" in config_yaml["derp"]["server"]: derp_content+= str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
-            else: derp_content+= "N/A"
-            derp_content+= """ </td></tr>
-                                </table>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            """
+            if "enabled"          in config_yaml["derp"]["server"]: enabled          = str(config_yaml["derp"]["server"]["enabled"])          
+            if "region_id"        in config_yaml["derp"]["server"]: region_id        = str(config_yaml["derp"]["server"]["region_id"])        
+            if "region_code"      in config_yaml["derp"]["server"]: region_code      = str(config_yaml["derp"]["server"]["region_code"])      
+            if "region_name"      in config_yaml["derp"]["server"]: region_name      = str(config_yaml["derp"]["server"]["region_name"])      
+            if "stun_listen_addr" in config_yaml["derp"]["server"]: stun_listen_addr = str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
+
+    if "dns_config" in config_yaml:
+        if "nameservers" in config_yaml["dns_config"]: nameservers = str(config_yaml["dns_config"]["nameservers"]) 
+        if "magic_dns"   in config_yaml["dns_config"]: magic_dns   = str(config_yaml["dns_config"]["magic_dns"])   
+        if "domains"     in config_yaml["dns_config"]: domains     = str(config_yaml["dns_config"]["domains"])     
+        if "base_domain" in config_yaml["dns_config"]: base_domain = str(config_yaml["dns_config"]["base_domain"]) 
+
+    # Start putting the content together
+    overview_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>Server Statistics</h4></li>
+            <li class="collection-item"><div>Machines Added       <div class="secondary-content">"""+ str(machines_count)                               +"""</div></div></li>
+            <li class="collection-item"><div>Users Added          <div class="secondary-content">"""+ str(user_count)                                   +"""</div></div></li>
+            <li class="collection-item"><div>Usable Preauth Keys  <div class="secondary-content">"""+ str(usable_keys_count)                            +"""</div></div></li>
+            <li class="collection-item"><div>Enabled/Total Routes <div class="secondary-content">"""+ str(enabled_routes) +"""/"""+str(total_routes)    +"""</div></div></li>
+            <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
+        </ul>
+    """
+    general_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>General Information</h4></li>
+            <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content">"""+ ip_prefixes                       +"""</div></div></li>
+            <li class="collection-item"><div>Server URL                        <div class="secondary-content">"""+ server_url                        +"""</div></div></li>
+            <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content">"""+ disable_check_updates             +"""</div></div></li>
+            <li class="collection-item"><div>Ephemeral Node Inactivity Timeout <div class="secondary-content">"""+ ephemeral_node_inactivity_timeout +"""</div></div></li>
+            <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content">"""+ node_update_check_interval        +"""</div></div></li>
+        </ul>
+    """
+    oidc_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>Headscale OIDC Information</h4></li>
+            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
+            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
+            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
+            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
+            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
+        </ul>
+    """
+    derp_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>Embedded DERP Information</h4></li>
+            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
+            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
+            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
+            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
+            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
+        </ul>
+    """
+    oidc_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>Embedded DERP Information</h4></li>
+            <li class="collection-item"><div>Issuer                <div class="secondary-content">"""+ issuer                +"""</div></div></li>
+            <li class="collection-item"><div>Client ID             <div class="secondary-content">"""+ client_id             +"""</div></div></li>
+            <li class="collection-item"><div>Scope                 <div class="secondary-content">"""+ scope                 +"""</div></div></li>
+            <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content">"""+ use_expiry_from_token +"""</div></div></li>
+            <li class="collection-item"><div>Expiry                <div class="secondary-content">"""+ expiry                +"""</div></div></li>
+        </ul>
+    """
+    dns_content = """
+        <ul class=collection with-header">
+            <li class="collection-header"><h4>Embedded DERP Information</h4></li>
+            <li class="collection-item"><div>DNS Nameservers <div class="secondary-content">"""+  nameservers  +"""</div></div></li>
+            <li class="collection-item"><div>MagicDNS        <div class="secondary-content">"""+  magic_dns    +"""</div></div></li>
+            <li class="collection-item"><div>Search Domains  <div class="secondary-content">"""+  domains      +"""</div></div></li>
+            <li class="collection-item"><div>Base Domain     <div class="secondary-content">"""+  base_domain  +"""</div></div></li>
+        </ul>
+    """
+
+    # Remove content that isn't needed:
+    # Remove OIDC if it isn't available:
+    if "oidc" not in config_yaml: oidc_content = ""
+    # Remove DERP if it isn't available or isn't enabled
+    if "derp" not in config_yaml: oidc_content = ""
+    if "derp" in config_yaml:
+        if config_file["derp"]["enabled"] == "False":
+            oidc_content = ""
 
     # TODO:  
     #     Whether there are custom DERP servers
@@ -196,37 +171,6 @@ def render_overview():
     #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
-    if "dns_config" in config_yaml:
-        dns_content  = """
-            <div class="col s12">
-                <div class="card z-depth-1">
-                    <div class="card-content">
-                        <span class="card-title">DNS</span>
-                        <p>
-                            <table>
-                                <tr><td> Nameservers </td><td> """
-        if "nameservers" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["nameservers"]) 
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> MagicDNS    </td><td> """
-        if "magic_dns" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["magic_dns"])   
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> Domains     </td><td> """
-        if "domains" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["domains"])     
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-        <tr><td> Base Domain </td><td> """
-        if "base_domain" in config_yaml["dns_config"]: dns_content += str(config_yaml["dns_config"]["base_domain"]) 
-        else: dns_content += "N/A"
-        dns_content += """ </td></tr>
-                                <tr><td> </td><td><br></td></tr>
-                            </table>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        """
     if config_yaml["derp"]["paths"]: pass
     #   # open the path:
     #   derp_file = 
