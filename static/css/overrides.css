@@ -14,8 +14,8 @@
     cursor: unset !important;
     height: unset !important;
 }
-.dropdown-oidc-avatar {
-    margin-left: 72px !important;
+.dropdown-oidc-content {
+    padding: unset !important;
 }
 
 .dropdown-oidc-collection {
@@ -28,5 +28,6 @@ li.dropdown-oidc-collection{
 }
 
 .dropdown-oidc-title {
+    padding: unset !important;
     color: unset !important;
 }
