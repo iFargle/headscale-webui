@@ -15,6 +15,7 @@ Allows you to do the following:
     * Last seen by the control server
     * Last update with the control server
     * Creation date
+    * Expiration date (will also display a badge when nearing expiration)
     * PreAuth key associated with the machine
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
