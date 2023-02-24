@@ -106,6 +106,7 @@ https://example.com {
 
 ### KeyCloak
 1.  In your Keycloak settings, add the following:
+    *  The keycloak endpoint can be found on the realm settings page as the "OpenID Endpoint Configuration" link.
 ```
 Client ID = headscale-webui
 Callback URI = https://[DOMAIN]/[SCRIPT_NAME]/oidc_callback
