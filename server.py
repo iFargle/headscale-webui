@@ -209,7 +209,8 @@ def users_page():
 def settings_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+    if pass_checks != "Pass": and pass_checks != "settings_page": 
+        return redirect(url_for(pass_checks))
 
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
