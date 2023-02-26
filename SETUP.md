@@ -22,7 +22,7 @@
   * `AUTH_TYPE` can be set to `Basic` or `OIDC`.  See the [Authentication](#Authentication) section below for more information.
 ---
 # Reverse Proxies
-** If your reverse proxy isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on. **
+* If your reverse proxy isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on. *
 
 ## Traefik with SSL
 1.  Use the following labels for your container.  You may need to adjust slightly to fit your setup.
@@ -76,7 +76,7 @@ https://example.com {
 
 --- 
 # Authentication
-** If your OIDC provider isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on. **
+* If your OIDC provider isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on. *
 
 ## No Authentication
 1.  If you use your reverse proxy for authentication, simply remove `AUTH_TYPE` from your environment variables.
