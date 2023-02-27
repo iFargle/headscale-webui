@@ -4,10 +4,10 @@ import requests, json, os
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
-from flask               import Flask, current_app
+from flask               import Flask, logging
 
 app = Flask(__name__)
-LOG = current_app.logger
+LOG = logging.create_logger(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS

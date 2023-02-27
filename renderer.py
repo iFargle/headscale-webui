@@ -1,14 +1,14 @@
 # pylint: disable=line-too-long, wrong-import-order
 
 import headscale, helper, pytz, os, yaml
-from flask              import Markup, render_template, Flask, current_app
+from flask              import Markup, render_template, Flask, logging
 from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
 app = Flask(__name__)
-LOG = current_app.logger
+LOG = logging.create_logger(app)
 executor = Executor(app)
 
 def render_overview():
