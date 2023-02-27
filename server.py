@@ -3,7 +3,7 @@
 import headscale, helper, json, os, pytz, renderer, secrets, requests
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for
+from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -36,6 +36,7 @@ dictConfig({
 })
 
 app          = Flask(__name__, static_url_path="/static")
+app.logger   = logging.create_logger(app)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
