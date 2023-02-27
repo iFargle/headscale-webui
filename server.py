@@ -3,7 +3,7 @@
 import headscale, helper, json, os, pytz, renderer, secrets, requests
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
+from flask                         import Flask, Markup, redirect, render_templaterequest, url_for, logging, current_app
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
