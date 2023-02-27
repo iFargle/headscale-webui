@@ -1,10 +1,10 @@
 # pylint: disable=wrong-import-order
 
 import os, headscale, requests, logging
-from flask          import Flask
+from flask import Flask
 
 app = Flask(__name__)
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger("app")
 
 def pretty_print_duration(duration, delta_type=""):
     """ Prints a duration in human-readable formats """

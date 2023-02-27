@@ -35,9 +35,8 @@ dictConfig({
     }
 })
 
-app          = Flask(__name__, static_url_path="/static")
+app          = Flask("app", static_url_path="/static")
 LOG          = logging.create_logger(app)
-LOG.setLevel(LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
