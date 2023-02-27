@@ -1,14 +1,13 @@
 # pylint: disable=wrong-import-order
 
-import requests, json, os
+import requests, json, os, logging
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
-from flask.logging       import create_logger
 
-app          = Flask(__name__)
-LOG          = create_logger(app)
+app = Flask(__name__)
+LOG = logging.getLogger(app)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
