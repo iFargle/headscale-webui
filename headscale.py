@@ -1,12 +1,12 @@
 # pylint: disable=wrong-import-order
 
 import requests, json, os
+from server              import app
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
-from flask               import Flask, logging
+from flask               import logging
 
-app = Flask(__name__)
 LOG = logging.create_logger(app)
 
 ##################################################################

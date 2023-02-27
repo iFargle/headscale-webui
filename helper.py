@@ -1,9 +1,9 @@
 # pylint: disable=wrong-import-order
 
 import os, headscale, requests
-from flask import Flask, logging
+from server import app
+from flask  import logging
 
-app = Flask(__name__)
 LOG = logging.create_logger(app)
 
 def pretty_print_duration(duration, delta_type=""):
