@@ -13,14 +13,14 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 COLOR       = os.environ["COLOR"].replace('"', '').lower()
 COLOR_NAV   = COLOR+" darken-1"
 COLOR_BTN   = COLOR+" darken-3"
-DEBUG_STATE = True
+DEBUG_STATE = False
 AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
 LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 
 # Initiate the Flask application and logging:
 app          = Flask(__name__, static_url_path="/static")
-logging.basicConfig(level=logging.LOG_LEVEL)
 LOG          = logging.create_logger(app)
+LOG.setLevel(logging.LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
