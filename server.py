@@ -7,6 +7,7 @@ from flask                         import Flask, Markup, redirect, render_templa
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
+from logging.config                import dictConfig
 
 # Global vars
 # Colors:  https://materializecss.com/color.html
@@ -18,9 +19,25 @@ AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
 LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 
 # Initiate the Flask application and logging:
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://flask.logging.wsgi_errors_stream',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': LOG_LEVEL,
+        'handlers': ['wsgi']
+    }
+})
+
 app          = Flask(__name__, static_url_path="/static")
 LOG          = logging.create_logger(app)
-LOG.setLevel(logging.LOG_LEVEL)
+LOG.setLevel(LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
