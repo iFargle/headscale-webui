@@ -11,6 +11,7 @@ services:
       - SCRIPT_NAME=/admin                     # This is your applications base path (wsgi requires the name "SCRIPT_NAME")
       - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32" - used to encrypt your key on disk.
       - AUTH_TYPE=oidc                         # AUTH_TYPE is either Basic or OIDC.  Empty for no authentication
+      - LOG_LEVEL=info                         # Log level.  "DEBUG", "ERROR", "WARNING", or "INFO".  Default "INFO"
       # ENV for Basic Auth (Used only if AUTH_TYPE is "Basic").  Can be omitted if you aren't using Basic Auth
       - BASIC_AUTH_USER=user                 # Used for basic auth
       - BASIC_AUTH_PASS=pass                 # Used for basic auth

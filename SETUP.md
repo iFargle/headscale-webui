@@ -20,6 +20,7 @@
   * `SCRIPT_NAME` is your "Base Path" for hosting.  For example, if you want to host on http://localhost/admin, set this to `/admin`
   * `KEY` is your encryption key.  Set this to a random value generated from `openssl rand -base64 32`
   * `AUTH_TYPE` can be set to `Basic` or `OIDC`.  See the [Authentication](#Authentication) section below for more information.
+  * `LOG_LEVEL` can be one of `Debug`, `Info`, `Warning`, or `Error` for decreasing verbosity.
 ---
 # Reverse Proxies
 *If your reverse proxy isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on.*
