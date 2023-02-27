@@ -4,7 +4,7 @@ import requests, json, os
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
-from flask               import Flask, logging
+from flask               import Flask
 
 app = Flask(__name__, static_url_path="/static")
 

@@ -1,7 +1,7 @@
 # pylint: disable=wrong-import-order
 
 import os, headscale, requests
-from flask import Flask, logging
+from flask import Flask
 
 app = Flask(__name__, static_url_path="/static")
 

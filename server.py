@@ -3,7 +3,7 @@
 import headscale, helper, json, os, pytz, renderer, secrets, requests
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
+from flask                         import Flask, Markup, redirect, render_template, request, url_for
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -48,7 +48,7 @@ if AUTH_TYPE == "oidc":
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     # https://github.com/steinarvk/flask_oidc_demo 
-    app.loggerinfo("Loading OIDC libraries and configuring app...")
+    app.logger.info("Loading OIDC libraries and configuring app...")
 
     DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
     BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
@@ -101,7 +101,7 @@ if AUTH_TYPE == "oidc":
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
-    app.loggerinfo("Loading basic auth libraries and configuring app...")
+    app.logger.info("Loading basic auth libraries and configuring app...")
     from flask_basicauth import BasicAuth
 
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
