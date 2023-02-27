@@ -7,7 +7,7 @@ from dateutil            import parser
 from flask               import Flask
 
 app = Flask(__name__)
-LOG = logging.getLogger(app)
+LOG = logging.getLogger(__name__)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS

@@ -4,7 +4,7 @@ import os, headscale, requests, logging
 from flask          import Flask
 
 app = Flask(__name__)
-LOG = logging.getLogger(app)
+LOG = logging.getLogger(__name__)
 
 def pretty_print_duration(duration, delta_type=""):
     """ Prints a duration in human-readable formats """
