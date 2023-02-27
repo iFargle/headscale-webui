@@ -19,8 +19,8 @@ LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 
 # Initiate the Flask application and logging:
 app          = Flask(__name__, static_url_path="/static")
+logging.basicConfig(level=logging.LOG_LEVEL)
 LOG          = logging.create_logger(app)
-getattr(logging, LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
