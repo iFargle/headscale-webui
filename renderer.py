@@ -1,7 +1,7 @@
 # pylint: disable=line-too-long, wrong-import-order
 
 import headscale, helper, pytz, os, yaml, logging
-from flask              import Markup, render_template, Flask, logging
+from flask              import Markup, render_template, Flask
 from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import ALL_COMPLETED, wait
