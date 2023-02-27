@@ -1,9 +1,9 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets, requests, logger
+import headscale, helper, json, os, pytz, renderer, secrets, requests
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for
+from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -36,7 +36,6 @@ dictConfig({
 })
 
 app          = Flask(__name__, static_url_path="/static")
-LOG          = app.logger()
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
@@ -49,7 +48,7 @@ if AUTH_TYPE == "oidc":
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     # https://github.com/steinarvk/flask_oidc_demo 
-    LOG.info("Loading OIDC libraries and configuring app...")
+    app.loggerinfo("Loading OIDC libraries and configuring app...")
 
     DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
     BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
@@ -60,7 +59,7 @@ if AUTH_TYPE == "oidc":
     # Construct client_secrets.json:
     response = requests.get(str(OIDC_AUTH_URL))
     oidc_info = response.json()
-    LOG.debug("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
+    app.logger.debug("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
 
     client_secrets = """{
         "web": {
@@ -80,10 +79,10 @@ if AUTH_TYPE == "oidc":
 
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
-    LOG.debug("Client Secrets:  ")
+    app.logger.debug("Client Secrets:  ")
     with open("/app/instance/secrets.json", "r+") as secrets_json:
-        LOG.debug("/app/instances/secrets.json:")
-        LOG.debug(secrets_json.read())
+        app.logger.debug("/app/instances/secrets.json:")
+        app.logger.debug(secrets_json.read())
     
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
@@ -102,7 +101,7 @@ if AUTH_TYPE == "oidc":
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
-    LOG.info("Loading basic auth libraries and configuring app...")
+    app.loggerinfo("Loading basic auth libraries and configuring app...")
     from flask_basicauth import BasicAuth
 
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')
@@ -289,9 +288,9 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    LOG.warning("The below statement will be TRUE if the key has been renewed, ")
-    LOG.warning("or DOES NOT need renewal.  False in all other cases")
-    LOG.warning("Renewed:  "+str(renewed))
+    app.loggerwarning("The below statement will be TRUE if the key has been renewed, ")
+    app.loggerwarning("or DOES NOT need renewal.  False in all other cases")
+    app.loggerwarning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 

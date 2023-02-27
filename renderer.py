@@ -1,14 +1,13 @@
 # pylint: disable=line-too-long, wrong-import-order
 
-import headscale, helper, pytz, os, yaml, logger
-from flask              import Flask, Markup, render_template
+import headscale, helper, pytz, os, yaml
+from flask              import Flask, Markup, render_template, logging
 from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
 app = Flask(__name__, static_url_path="/static")
-LOG = app.logger()
 executor = Executor(app)
 
 def render_overview():
@@ -245,7 +244,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # LOG.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -325,7 +324,7 @@ def thread_machine_content(machine, machine_content, idx):
         expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
     else: 
         expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    LOG.error("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+    app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
 
     expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
     # Get the first 10 characters of the PreAuth Key:
@@ -367,7 +366,7 @@ def thread_machine_content(machine, machine_content, idx):
         expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
     )))
-    LOG.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -381,14 +380,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, num_threads):
-        LOG.error("Appending iterable:  "+str(i))
+        app.logger.error("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    LOG.warning("Starting futures")
+    app.logger.warning("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    LOG.warning("Finished futures")
+    app.logger.warning("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
