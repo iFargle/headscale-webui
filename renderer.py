@@ -366,7 +366,7 @@ def thread_machine_content(machine, machine_content, idx):
         expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
     )))
-    app.logger.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    app.logger.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
@@ -380,14 +380,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, num_threads):
-        app.logger.error("Appending iterable:  "+str(i))
+        app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    app.logger.warning("Starting futures")
+    app.logger.info("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    app.logger.warning("Finished futures")
+    app.logger.info("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)

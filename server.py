@@ -288,9 +288,9 @@ def test_key_page():
     if status != 200: return "Unauthenticated"
 
     renewed = headscale.renew_api_key(url, api_key)
-    app.loggerwarning("The below statement will be TRUE if the key has been renewed, ")
-    app.loggerwarning("or DOES NOT need renewal.  False in all other cases")
-    app.loggerwarning("Renewed:  "+str(renewed))
+    app.logger.warning("The below statement will be TRUE if the key has been renewed, ")
+    app.logger.warning("or DOES NOT need renewal.  False in all other cases")
+    app.logger.warning("Renewed:  "+str(renewed))
     # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
     if renewed: api_key = headscale.get_api_key()
 

@@ -266,7 +266,7 @@ def rename_machine(url, api_key, machine_id, new_name):
 
 # Gets routes for the passed machine_id
 def get_machine_routes(url, api_key, machine_id):
-    app.logger.info("Renaming machine %s", str(machine_id))
+    app.logger.info("Getting routes for machine %s", str(machine_id))
     response = requests.get(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/routes",
         headers={
