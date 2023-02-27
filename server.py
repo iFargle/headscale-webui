@@ -15,10 +15,12 @@ COLOR_NAV   = COLOR+" darken-1"
 COLOR_BTN   = COLOR+" darken-3"
 DEBUG_STATE = True
 AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
+LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 
-# Initiate the Flask application:
+# Initiate the Flask application and logging:
 app          = Flask(__name__, static_url_path="/static")
 LOG          = logging.create_logger(app)
+getattr(logging, LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
@@ -31,7 +33,7 @@ if AUTH_TYPE == "oidc":
     # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/ 
     # https://www.authelia.com/integration/openid-connect/introduction/ 
     # https://github.com/steinarvk/flask_oidc_demo 
-    LOG.error("Loading OIDC libraries and configuring app...")
+    LOG.info("Loading OIDC libraries and configuring app...")
 
     DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
     BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
@@ -84,7 +86,7 @@ if AUTH_TYPE == "oidc":
 
 elif AUTH_TYPE == "basic":
     # https://flask-basicauth.readthedocs.io/en/latest/
-    LOG.error("Loading basic auth libraries and configuring app...")
+    LOG.info("Loading basic auth libraries and configuring app...")
     from flask_basicauth import BasicAuth
 
     app.config['BASIC_AUTH_USERNAME'] = os.environ["BASIC_AUTH_USER"].replace('"', '')

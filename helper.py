@@ -4,8 +4,8 @@ import os, headscale, requests
 from flask          import Flask
 from flask.logging  import create_logger
 
-app = Flask(__name__)
-LOG = create_logger(app)
+app          = Flask(__name__)
+LOG          = create_logger(app)
 
 def pretty_print_duration(duration, delta_type=""):
     """ Prints a duration in human-readable formats """
@@ -26,6 +26,7 @@ def pretty_print_duration(duration, delta_type=""):
     if hours > 0  : return str(hours) + " hours ago"    if hours >  1 else str(hours) + " hour ago"
     if mins  > 0  : return str(mins ) + " minutes ago"  if mins  >  1 else str(mins ) + " minute ago"
     return str(secs ) + " seconds ago"     if secs  >= 1 or secs == 0 else str(secs ) + " second ago"
+
 def text_color_duration(duration):
     """ Prints a color based on duratioin (imported as seconds) """
 
@@ -52,9 +53,13 @@ def key_check():
 
     # Test the API key.  If the test fails, return a failure. 
     # AKA, if headscale returns Unauthorized, fail:
+    LOG.info("Testing API key validity.")
     status = headscale.test_api_key(url, api_key)
-    if status != 200: return False
+    if status != 200: 
+        LOG.info("Got a non-200 response from Headscale.  Test failed (Response:  %i)", status)
+        return False
     else:
+        LOG.info("Key check passed.")
         # Check if the key needs to be renewed
         headscale.renew_api_key(url, api_key)
         return True
