@@ -1,9 +1,9 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets, requests
+import headscale, helper, json, os, pytz, renderer, secrets, requests, logger
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for, logging
+from flask                         import Flask, Markup, redirect, render_template, request, url_for
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -30,13 +30,13 @@ dictConfig({
         'formatter': 'default'
     }},
     'root': {
-        'level': 'INFO',
+        'level': LOG_LEVEL,
         'handlers': ['wsgi']
     }
 })
 
-app          = Flask("app", static_url_path="/static")
-LOG          = logging.create_logger(app)
+app          = Flask(__name__, static_url_path="/static")
+LOG          = app.logger()
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
