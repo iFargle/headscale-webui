@@ -1,6 +1,6 @@
 # pylint: disable=line-too-long, wrong-import-order
 
-import headscale, helper, pytz, os, yaml
+import headscale, helper, pytz, os, yaml, logging
 from flask              import Flask, Markup, render_template
 from datetime           import datetime
 from dateutil           import parser

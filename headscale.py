@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import requests, json, os
+import requests, json, os, logging
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser

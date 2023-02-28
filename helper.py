@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import os, headscale, requests
+import os, headscale, requests, logging
 from flask import Flask
 
 LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
