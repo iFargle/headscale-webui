@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headscale-webui"
-version = "v0.5.1"
+version = "v0.5.2"
 description = "A simple web UI for small-scale Headscale deployments."
 authors = ["Albert Copeland <albert@sysctl.io>"]
 license = "AGPL"

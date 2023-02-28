@@ -527,11 +527,6 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def oidc_nav_dropdown(user_name, email_address, name):
-    # TODO:  Test this with a super long email address / name
-    # DEBUG:  REMOVE WHEN DONE TESTING
-    email_address = "somesuperlongemailaddress@thisisridiculousitshouldneverbethislong.com"
-    user_name = "whyWouldYOuEverSETyourusernamehtisLONGImjusttestingtheauto-width"
-    # DEBUG:  REMOVE WHEN DONE TESTING
     app.logger.info("OIDC is enabled.  Building the OIDC nav dropdown")
     html_payload = """
         <!-- Dropdown Structure -->
