@@ -8,7 +8,6 @@ from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
 app = Flask(__name__, static_url_path="/static")
-app.logger = logging.create_logger(app)
 executor = Executor(app)
 
 def render_overview():
