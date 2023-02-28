@@ -12,6 +12,7 @@ app.logger = logging.create_logger(app)
 executor = Executor(app)
 
 def render_overview():
+    app.logger.info("Rendering the Overview page")
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -21,8 +22,12 @@ def render_overview():
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
     config_file = ""
-    try:    config_file = open("/etc/headscale/config.yml",  "r")
-    except: config_file = open("/etc/headscale/config.yaml", "r")
+    try:    
+        config_file = open("/etc/headscale/config.yml",  "r")
+        app.logger.info("Opening /etc/headscale/config.yml")
+    except: 
+        config_file = open("/etc/headscale/config.yaml", "r")
+        app.logger.info("Opening /etc/headscale/config.yaml")
     config_yaml = yaml.safe_load(config_file)
 
     # Get and display the following information:
@@ -371,6 +376,7 @@ def thread_machine_content(machine, machine_content, idx):
 
 # Render the cards for the machines page:
 def render_machines_cards():
+    app.logger.info("Rendering machine cards")
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
     machines_list = headscale.get_machines(url, api_key)
@@ -401,7 +407,6 @@ def render_machines_cards():
 
     for index in range(0, num_threads):
         content = content+str(sorted_machines[index])
-        # content = content+str(sorted_machines[index])
 
     content = content+"</div>"
 
@@ -409,6 +414,7 @@ def render_machines_cards():
 
 # Render the cards for the Users page:
 def render_users_cards():
+    app.logger.info("Rendering Users cards")
     url       = headscale.get_url()
     api_key   = headscale.get_api_key()
     user_list = headscale.get_users(url, api_key)
@@ -436,6 +442,7 @@ def render_users_cards():
 
 # Builds the preauth key table for the User page
 def build_preauth_key_table(user_name):
+    app.logger.info("Building the PreAuth key table for User:  %s", str(user_name))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
@@ -513,6 +520,7 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def oidc_nav_dropdown(user_name, email_address, name):
+    app.logger.info("OIDC is enabled.  Building the OIDC nav dropdown")
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
