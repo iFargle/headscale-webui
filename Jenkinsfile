@@ -81,7 +81,6 @@ pipeline {
                         }
                     } else {
                         docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                            privateImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                             privateImage.push("${env.BRANCH_NAME}")
                             privateImage.push("testing")
                         }
