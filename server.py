@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import headscale, helper, json, os, pytz, renderer, secrets, requests
+import headscale, helper, json, os, pytz, renderer, secrets, requests, logging
 from functools                     import wraps
 from datetime                      import datetime
 from flask                         import Flask, Markup, redirect, render_template, request, url_for
