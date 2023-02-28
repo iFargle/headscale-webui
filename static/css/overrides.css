@@ -36,6 +36,6 @@ li.dropdown-oidc-collection{
     color: unset !important;
 }
 
-.user-preauthkey-datepicker {
+.datepicker-modal {
     width: max-content !important;
 }
