@@ -18,7 +18,7 @@ def set_api_key(api_key):
     # User-set encryption key
     encryption_key = os.environ['KEY']                      
     # Key file on the filesystem for persistent storage
-    key_file       = open("/data/key.txt", "wb+")           
+    key_file       = open("/data/key.txt", "wb+")
     # Preparing the Fernet class with the key
     fernet         = Fernet(encryption_key)                 
     # Encrypting the key
