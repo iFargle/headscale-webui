@@ -8,7 +8,7 @@
 
 .dropdown-oidc {
     top: 64px !important;
-    width: 200px !important;
+    width: max-content !important;
     left: unset !important;
     right: 10px !important;
     cursor: unset !important;
@@ -34,4 +34,8 @@ li.dropdown-oidc-collection{
 
 .overview-page {
     color: unset !important;
+}
+
+.user-preauthkey-datepicker {
+    width: max-content !important;
 }

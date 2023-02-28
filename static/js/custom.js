@@ -298,7 +298,7 @@ function load_modal_add_preauth_key(user_name) {
         </ul>
         <h4>PreAuth Key Information</h4>
         <br>
-        <input type="text" class="datepicker" id="preauth_key_expiration_date">
+        <input type="text" class="datepicker user-preauthkey-datepicker" id="preauth_key_expiration_date">
         <p>
             <label>
                 <input type="checkbox" class="filled-in" id="checkbox-reusable"/>
