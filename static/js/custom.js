@@ -41,17 +41,12 @@ function get_color(id) {
     return colors[index]
 }
 
-function get_base_path() {
-
-}
-
 // Generic modal used for alerts / problems
 function load_modal_generic(type, title, message) {
     console.log("Loading the generic modal")
     element         = document.getElementById('generic_modal')
     content_element = document.getElementById('generic_modal_content')
     title_element   = document.getElementById('generic_modal_title')
-
 
     content_element.innerHTML = loading()
     title_element.innerHTML = "Loading..."
@@ -311,7 +306,6 @@ function load_modal_add_preauth_key(user_name) {
                 <span>Ephemeral</span>
             </label>
         </p>
-
     `
 
     modal_body.innerHTML = body_html
@@ -617,7 +611,7 @@ function add_chip(machine_id, chipsData) {
 }
 
 function add_machine() {
-    var key       = document.getElementById('add_machine_key_field').value
+    var key  = document.getElementById('add_machine_key_field').value
     var user = document.getElementById('add_machine_user_select').value
     var data = {"key": key, "user": user}
 
