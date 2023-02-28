@@ -17,11 +17,15 @@ AUTH_TYPE   = os.environ["AUTH_TYPE"].replace('"', '').lower()
 LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 # If LOG_LEVEL is DEBUG, enable Flask debugging:
 DEBUG_STATE = True if LOG_LEVEL == "DEBUG" else False
-LOG_LEVEL = "logging."+LOG_LEVEL
+match LOG_LEVEL:
+    case "DEBUG":       app.logger(logging.DEBUG)
+    case "INFO":        app.logger(logging.INFO)
+    case "WARNING":     app.logger(logging.WARNING)
+    case "ERROR":       app.logger(logging.ERROR)
+    case "CRITICAL":    app.logger(logging.CRITICAL)
 
 # Initiate the Flask application and logging:
 app          = Flask(__name__, static_url_path="/static")
-app.logger.setLevel(LOG_LEVEL)
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.logger.info("LOG LEVEL SET TO %s", str(LOG_LEVEL))
