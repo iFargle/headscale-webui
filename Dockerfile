@@ -38,6 +38,7 @@ ENV KEY=""
 ENV SCRIPT_NAME=/
 ENV DOMAIN_NAME=http://localhost
 ENV AUTH_TYPE=""
+ENV LOG_LEVEL="Info"
 
 # BasicAuth variables
 ENV BASIC_AUTH_USER=""

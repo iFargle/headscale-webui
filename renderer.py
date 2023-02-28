@@ -1,17 +1,25 @@
 # pylint: disable=line-too-long, wrong-import-order
 
-import headscale, helper, pytz, os, yaml
-from flask              import Markup, render_template, Flask, logging
+import headscale, helper, pytz, os, yaml, logging
+from flask              import Flask, Markup, render_template
 from datetime           import datetime
 from dateutil           import parser
 from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
-app = Flask(__name__)
-LOG = logging.create_logger(app)
+LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+# Initiate the Flask application and logging:
+app = Flask(__name__, static_url_path="/static")
+match LOG_LEVEL:
+    case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
+    case "INFO"    : app.logger.setLevel(logging.INFO)
+    case "WARNING" : app.logger.setLevel(logging.WARNING)
+    case "ERROR"   : app.logger.setLevel(logging.ERROR)
+    case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 executor = Executor(app)
 
 def render_overview():
+    app.logger.info("Rendering the Overview page")
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -21,8 +29,12 @@ def render_overview():
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
     config_file = ""
-    try:    config_file = open("/etc/headscale/config.yml",  "r")
-    except: config_file = open("/etc/headscale/config.yaml", "r")
+    try:    
+        config_file = open("/etc/headscale/config.yml",  "r")
+        app.logger.info("Opening /etc/headscale/config.yml")
+    except: 
+        config_file = open("/etc/headscale/config.yaml", "r")
+        app.logger.info("Opening /etc/headscale/config.yaml")
     config_yaml = yaml.safe_load(config_file)
 
     # Get and display the following information:
@@ -245,7 +257,7 @@ def thread_machine_content(machine, machine_content, idx):
                     <p><div>
             """
             for route in pulled_routes["routes"]:
-                # LOG.warning("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -325,7 +337,7 @@ def thread_machine_content(machine, machine_content, idx):
         expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
     else: 
         expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    LOG.error("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+    app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
 
     expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
     # Get the first 10 characters of the PreAuth Key:
@@ -367,10 +379,11 @@ def thread_machine_content(machine, machine_content, idx):
         expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
     )))
-    LOG.warning("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
+    app.logger.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
 # Render the cards for the machines page:
 def render_machines_cards():
+    app.logger.info("Rendering machine cards")
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
     machines_list = headscale.get_machines(url, api_key)
@@ -381,14 +394,14 @@ def render_machines_cards():
     iterable = []
     machine_content = {}
     for i in range (0, num_threads):
-        LOG.error("Appending iterable:  "+str(i))
+        app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    LOG.warning("Starting futures")
+    app.logger.info("Starting futures")
     futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
     # Wait for the executor to finish all jobs:
     wait(futures, return_when=ALL_COMPLETED)
-    LOG.warning("Finished futures")
+    app.logger.info("Finished futures")
 
     # DEBUG:  Do in a forloop:
     # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
@@ -401,7 +414,6 @@ def render_machines_cards():
 
     for index in range(0, num_threads):
         content = content+str(sorted_machines[index])
-        # content = content+str(sorted_machines[index])
 
     content = content+"</div>"
 
@@ -409,6 +421,7 @@ def render_machines_cards():
 
 # Render the cards for the Users page:
 def render_users_cards():
+    app.logger.info("Rendering Users cards")
     url       = headscale.get_url()
     api_key   = headscale.get_api_key()
     user_list = headscale.get_users(url, api_key)
@@ -436,6 +449,7 @@ def render_users_cards():
 
 # Builds the preauth key table for the User page
 def build_preauth_key_table(user_name):
+    app.logger.info("Building the PreAuth key table for User:  %s", str(user_name))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
@@ -513,6 +527,7 @@ def build_preauth_key_table(user_name):
     return preauth_keys_collection
 
 def oidc_nav_dropdown(user_name, email_address, name):
+    app.logger.info("OIDC is enabled.  Building the OIDC nav dropdown")
     html_payload = """
         <!-- Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">

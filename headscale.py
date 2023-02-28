@@ -1,14 +1,20 @@
 # pylint: disable=wrong-import-order
 
-import requests, json, os
+import requests, json, os, logging
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
-from flask.logging       import create_logger
 
-app = Flask(__name__)
-LOG = create_logger(app)
+LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+# Initiate the Flask application and logging:
+app = Flask(__name__, static_url_path="/static")
+match LOG_LEVEL:
+    case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
+    case "INFO"    : app.logger.setLevel(logging.INFO)
+    case "WARNING" : app.logger.setLevel(logging.WARNING)
+    case "ERROR"   : app.logger.setLevel(logging.ERROR)
+    case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
@@ -20,7 +26,7 @@ def set_api_key(api_key):
     # User-set encryption key
     encryption_key = os.environ['KEY']                      
     # Key file on the filesystem for persistent storage
-    key_file       = open("/data/key.txt", "wb+")           
+    key_file       = open("/data/key.txt", "wb+")
     # Preparing the Fernet class with the key
     fernet         = Fernet(encryption_key)                 
     # Encrypting the key
@@ -38,7 +44,7 @@ def get_api_key():
     enc_api_key    = key_file.read()                        
     if enc_api_key == b'': return "NULL"
 
-# Preparing the Fernet class with the key
+    # Preparing the Fernet class with the key
     fernet         = Fernet(encryption_key)                 
     # Decrypting the key
     decrypted_key  = fernet.decrypt(enc_api_key).decode()   
@@ -59,7 +65,7 @@ def test_api_key(url, api_key):
 def expire_key(url, api_key):
     payload = {'prefix':str(api_key[0:10])}
     json_payload=json.dumps(payload)
-#       app.logger.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+    app.logger.debug("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
     response = requests.post(
         str(url)+"/api/v1/apikey/expire",
@@ -78,8 +84,7 @@ def renew_api_key(url, api_key):
     # 0 = Key has been updated or key is not in need of an update
     # 1 = Key has failed validity check or has failed to write the API key 
     # Check when the key expires and compare it to todays date:
-    key_info                = get_api_key_info(url, api_key)
-
+    key_info            = get_api_key_info(url, api_key)
     expiration_time     = key_info["expiration"]
     today_date          = date.today()
     expire              = parser.parse(expiration_time)
@@ -91,10 +96,10 @@ def renew_api_key(url, api_key):
 
     # If the delta is less than 5 days, renew the key:
     if delta < timedelta(days=5):
-#       app.logger.warning("Key is about to expire.  Delta is "+str(delta))
+        app.logger.warning("Key is about to expire.  Delta is "+str(delta))
         payload = {'expiration':str(new_expiration_date)}
         json_payload=json.dumps(payload)
-#       app.logger.warning("Sending the payload '"+str(json_payload)+"' to the headscale server")
+        app.logger.debug("Sending the payload '"+str(json_payload)+"' to the headscale server")
 
         response = requests.post(
             str(url)+"/api/v1/apikey",
@@ -106,24 +111,27 @@ def renew_api_key(url, api_key):
                 }
         )
         new_key = response.json()
-#       app.logger.warning("JSON:  "+json.dumps(new_key))
-#       app.logger.warning("New Key is:  "+new_key["apiKey"])
+        app.logger.debug("JSON:  "+json.dumps(new_key))
+        app.logger.debug("New Key is:  "+new_key["apiKey"])
         api_key_test = test_api_key(url, new_key["apiKey"])
-#       app.logger.warning("Testing the key:  "+str(api_key_test))
+        app.logger.debug("Testing the key:  "+str(api_key_test))
         # Test if the new key works:
         if api_key_test == 200:
-#           app.logger.warning("The new key is valid and we are writing it to the file")
+            app.logger.info("The new key is valid and we are writing it to the file")
             if not set_api_key(new_key["apiKey"]):
-#               app.logger.warning("We failed writing the new key!")
+                app.logger.error("We failed writing the new key!")
                 return False # Key write failed
-#           app.logger.warning("Key validated and written.  Moving to expire the key.")
+            app.logger.info("Key validated and written.  Moving to expire the key.")
             expire_key(url, api_key)
             return True     # Key updated and validated
-        else: return False  # The API Key test failed
-    else: return True       #No work is required
+        else: 
+            app.logger.error("Testing the API key failed.")
+            return False  # The API Key test failed
+    else: return True       # No work is required
 
 # Gets information about the current API key
 def get_api_key_info(url, api_key):
+    app.logger.info("Getting API key information")
     response = requests.get(
         str(url)+"/api/v1/apikey",
         headers={
@@ -134,9 +142,12 @@ def get_api_key_info(url, api_key):
     json_response = response.json()
     # Find the current key in the array:  
     key_prefix = str(api_key[0:10])
+    app.logger.info("Looking for valid API Key...")
     for key in json_response["apiKeys"]:
         if key_prefix == key["prefix"]:
+            app.logger.info("Key found.")
             return key
+    app.logger.error("Could not find a valid key in Headscale.  Need a new API key.")
     return "Key not found"
 
 ##################################################################
@@ -145,6 +156,7 @@ def get_api_key_info(url, api_key):
 
 # register a new machine
 def register_machine(url, api_key, machine_key, user):
+    app.logger.info("Registering machine %s to user %s", str(machine_key), str(user))
     response = requests.post(
         str(url)+"/api/v1/machine/register?user="+str(user)+"&key="+str(machine_key),
         headers={
@@ -157,6 +169,7 @@ def register_machine(url, api_key, machine_key, user):
 
 # Sets the machines tags
 def set_machine_tags(url, api_key, machine_id, tags_list):
+    app.logger.info("Setting machine_id %s tag %s", str(machine_id), str(tags_list))
     response = requests.post(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/tags",
         data=tags_list,
@@ -170,6 +183,7 @@ def set_machine_tags(url, api_key, machine_id, tags_list):
 
 # Moves machine_id to user "new_user"
 def move_user(url, api_key, machine_id, new_user):
+    app.logger.info("Moving machine_id %s to user %s", str(machine_id), str(new_user))
     response = requests.post(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/user?user="+str(new_user),
         headers={
@@ -179,30 +193,17 @@ def move_user(url, api_key, machine_id, new_user):
     )
     return response.json()
 
-# updates routes for the given machine_id. enable / disable
-# The Headscale API expects a list of routes to enable.  
-# if we want to toggle 1 out of 3 routes
-# we need to pass all currently enabled routes and mask it
-# For example, if we have routes:
-#  0.0.0.0/0
-#  ::/0
-#  192.168.1.0/24
-# available, but only routes 
-#  0.0.0.0/24
-#  192.168.1.0/24 
-# ENABLED, and we want to disable route 192.168.1.0/24, 
-# we need to pass ONLY the routes to KEEP enabled.
-# In this case, 0.0.0/24
 def update_route(url, api_key, route_id, current_state):
     action = ""
     if current_state == "True":  action = "disable"
     if current_state == "False": action = "enable"
+    app.logger.info("Updating Route %s:  Action: %s", str(route_id), str(action))
 
     # Debug
-    # LOG.info("URL:  "+str(url))
-    # LOG.info("Route ID:  "+str(route_id))
-    # LOG.info("Current State:  "+str(current_state))
-    # LOG.info("Action to take:  "+str(action))
+    app.logger.debug("URL:  "+str(url))
+    app.logger.debug("Route ID:  "+str(route_id))
+    app.logger.debug("Current State:  "+str(current_state))
+    app.logger.debug("Action to take:  "+str(action))
 
     response = requests.post(
         str(url)+"/api/v1/routes/"+str(route_id)+"/"+str(action),
@@ -212,37 +213,10 @@ def update_route(url, api_key, route_id, current_state):
         }
     )
     return response.json()
-    # First, get all route info:
-#    routes = get_machine_routes(url, api_key, machine_id)
-#    to_enable = []
-#    is_enabled = False
-    # "route" is what we are toggling.  On or off. 
-    # Get a list of all currently enabled routes.
-    # If route IS currently in enabled routes, remove it
-#    # DONE: REDO THIS FOR THE NEW API
-#    for enabled_route in routes["routes"]["enabledRoutes"]:
-#        if enabled_route == route: is_enabled=True
-#        else: to_enable.append(enabled_route)
-#    if not is_enabled: to_enable.append(route)
-#
-#    query = ""
-#    count = 0
-#    for route in to_enable:
-#        count = count+1
-#        if count == 1:  query = query+"routes="+route
-#        else: query = query+"&routes="+route
-#
-#    response = requests.post(
-#        str(url)+"/api/v1/machine/"+str(machine_id)+"/routes?"+query,
-#        headers={
-#            'Accept': 'application/json',
-#            'Authorization': 'Bearer '+str(api_key)
-#        }
-#    )
-#    return response.json()
 
 # Get all machines on the Headscale network
 def get_machines(url, api_key):
+    app.logger.info("Getting machine information")
     response = requests.get(
         str(url)+"/api/v1/machine",
         headers={
@@ -254,6 +228,7 @@ def get_machines(url, api_key):
 
 # Get machine with "machine_id" on the Headscale network
 def get_machine_info(url, api_key, machine_id):
+    app.logger.info("Getting information for machine ID %s", str(machine_id))
     response = requests.get(
         str(url)+"/api/v1/machine/"+str(machine_id),
         headers={
@@ -265,6 +240,7 @@ def get_machine_info(url, api_key, machine_id):
 
 # Delete a machine from Headscale
 def delete_machine(url, api_key, machine_id):
+    app.logger.info("Deleting machine %s", str(machine_id))
     response = requests.delete(
         str(url)+"/api/v1/machine/"+str(machine_id),
         headers={
@@ -273,10 +249,15 @@ def delete_machine(url, api_key, machine_id):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("Machine deleted.")
+    else:
+        app.logger.error("Deleting machine failed!  %s", str(response.json()))
     return {"status": status, "body": response.json()}
 
 # Rename "machine_id" with name "new_name"
 def rename_machine(url, api_key, machine_id, new_name):
+    app.logger.info("Renaming machine %s", str(machine_id))
     response = requests.post(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/rename/"+str(new_name),
         headers={
@@ -285,10 +266,15 @@ def rename_machine(url, api_key, machine_id, new_name):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("Machine renamed")
+    else:
+        app.logger.error("Machine rename failed!  %s", str(response.json()))
     return {"status": status, "body": response.json()}
 
 # Gets routes for the passed machine_id
 def get_machine_routes(url, api_key, machine_id):
+    app.logger.info("Getting routes for machine %s", str(machine_id))
     response = requests.get(
         str(url)+"/api/v1/machine/"+str(machine_id)+"/routes",
         headers={
@@ -296,9 +282,15 @@ def get_machine_routes(url, api_key, machine_id):
             'Authorization': 'Bearer '+str(api_key)
         }
     )
+    if response.status_code == 200:
+        app.logger.info("Routes obtained")
+    else:
+        app.logger.error("Failed to get routes:  %s", str(response.json()))
     return response.json()
+
 # Gets routes for the entire tailnet
 def get_routes(url, api_key):
+    app.logger.info("Getting routes")
     response = requests.get(
         str(url)+"/api/v1/routes",
         headers={
@@ -314,6 +306,7 @@ def get_routes(url, api_key):
 
 # Get all users in use
 def get_users(url, api_key):
+    app.logger.info("Getting Users")
     response = requests.get(
         str(url)+"/api/v1/user",
         headers={
@@ -325,6 +318,7 @@ def get_users(url, api_key):
 
 # Rename "old_name" with name "new_name"
 def rename_user(url, api_key, old_name, new_name):
+    app.logger.info("Renaming user %s to %s.", str(old_name), str(new_name))
     response = requests.post(
         str(url)+"/api/v1/user/"+str(old_name)+"/rename/"+str(new_name),
         headers={
@@ -333,10 +327,15 @@ def rename_user(url, api_key, old_name, new_name):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("User renamed.")
+    else:
+        app.logger.error("Renaming User failed!")
     return {"status": status, "body": response.json()}
 
 # Delete a user from Headscale
 def delete_user(url, api_key, user_name):
+    app.logger.info("Deleting a User:  %s", str(user_name))
     response = requests.delete(
         str(url)+"/api/v1/user/"+str(user_name),
         headers={
@@ -345,10 +344,15 @@ def delete_user(url, api_key, user_name):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("User deleted.")
+    else:
+        app.logger.error("Deleting User failed!")
     return {"status": status, "body": response.json()}
 
 # Add a user from Headscale
 def add_user(url, api_key, data):
+    app.logger.info("Adding user:  %s", str(data))
     response = requests.post(
         str(url)+"/api/v1/user",
         data=data,
@@ -359,6 +363,10 @@ def add_user(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("User added.")
+    else:
+        app.logger.error("Adding User failed!")
     return {"status": status, "body": response.json()}
 
 ##################################################################
@@ -367,6 +375,7 @@ def add_user(url, api_key, data):
 
 # Get all PreAuth keys associated with a user "user_name"
 def get_preauth_keys(url, api_key, user_name):
+    app.logger.info("Getting PreAuth Keys in User %s", str(user_name))
     response = requests.get(
         str(url)+"/api/v1/preauthkey?user="+str(user_name),
         headers={
@@ -379,6 +388,7 @@ def get_preauth_keys(url, api_key, user_name):
 # Add a preauth key to the user "user_name" given the booleans "ephemeral" 
 # and "reusable" with the expiration date "date" contained in the JSON payload "data"
 def add_preauth_key(url, api_key, data):
+    app.logger.info("Adding PreAuth Key:  %s", str(data))
     response = requests.post(
         str(url)+"/api/v1/preauthkey",
         data=data,
@@ -389,10 +399,15 @@ def add_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
+    if response.status_code == 200:
+        app.logger.info("PreAuth Key added.")
+    else:
+        app.logger.error("Adding PreAuth Key failed!")
     return {"status": status, "body": response.json()}
 
 # Expire a pre-auth key.  data is {"user": "string", "key": "string"}
 def expire_preauth_key(url, api_key, data):
+    app.logger.info("Expiring PreAuth Key...")
     response = requests.post(
         str(url)+"/api/v1/preauthkey/expire",
         data=data,
@@ -403,6 +418,6 @@ def expire_preauth_key(url, api_key, data):
         }
     )
     status = "True" if response.status_code == 200 else "False"
-    ## LOG.info("expire_preauth_key - Return:  "+str(response.json()))
-    ## LOG.info("expire_preauth_key - Status:  "+str(status))
+    app.logger.debug("expire_preauth_key - Return:  "+str(response.json()))
+    app.logger.debug("expire_preauth_key - Status:  "+str(status))
     return {"status": status, "body": response.json()}
