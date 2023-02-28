@@ -7,7 +7,15 @@ from dateutil           import parser
 from concurrent.futures import ALL_COMPLETED, wait
 from flask_executor     import Executor
 
+LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+# Initiate the Flask application and logging:
 app = Flask(__name__, static_url_path="/static")
+match LOG_LEVEL:
+    case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
+    case "INFO"    : app.logger.setLevel(logging.INFO)
+    case "WARNING" : app.logger.setLevel(logging.WARNING)
+    case "ERROR"   : app.logger.setLevel(logging.ERROR)
+    case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 executor = Executor(app)
 
 def render_overview():

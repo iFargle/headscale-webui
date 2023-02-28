@@ -6,7 +6,15 @@ from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
 
+LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+# Initiate the Flask application and logging:
 app = Flask(__name__, static_url_path="/static")
+match LOG_LEVEL:
+    case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
+    case "INFO"    : app.logger.setLevel(logging.INFO)
+    case "WARNING" : app.logger.setLevel(logging.WARNING)
+    case "ERROR"   : app.logger.setLevel(logging.ERROR)
+    case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
