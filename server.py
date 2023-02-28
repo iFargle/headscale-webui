@@ -21,16 +21,11 @@ DEBUG_STATE = True if LOG_LEVEL == "DEBUG" else False
 # Initiate the Flask application and logging:
 app          = Flask(__name__, static_url_path="/static")
 match LOG_LEVEL:
-    case "DEBUG":       
-        app.logger(logging.DEBUG)
-    case "INFO":        
-        app.logger(logging.INFO)
-    case "WARNING":     
-        app.logger(logging.WARNING)
-    case "ERROR":       
-        app.logger(logging.ERROR)
-    case "CRITICAL":    
-        app.logger(logging.CRITICAL)
+    case "DEBUG":       app.logger.setLevel(logging.DEBUG)
+    case "INFO":        app.logger.setLevel(logging.INFO)
+    case "WARNING":     app.logger.setLevel(logging.WARNING)
+    case "ERROR":       app.logger.setLevel(logging.ERROR)
+    case "CRITICAL":    app.logger.setLevel(logging.CRITICAL)
 
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
