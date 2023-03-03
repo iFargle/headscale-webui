@@ -1,0 +1,17 @@
+name: Remove old package versions
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'The name of the package to delete'     
+        required: true
+
+jobs:
+  remove-package-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: purge packages
+        uses: dylanratcliffe/delete-untagged-containers@main
+        with:
+          package_name: ${{ github.event.inputs.package_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
