@@ -1,4 +1,6 @@
 name: Remove old package versions
+on:
+  [push]
 
 jobs:
   remove-package-versions:
