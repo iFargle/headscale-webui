@@ -50,6 +50,8 @@ def render_overview():
 
     # Get all routes:
     routes = headscale.get_routes(url,api_key)
+
+    total_routes = 0
     for route in routes["routes"]:
         if int(route['machine']['id']) != 0: 
             total_routes += 1
