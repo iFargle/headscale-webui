@@ -51,16 +51,20 @@ def render_overview():
     # Get all routes:
     routes = headscale.get_routes(url,api_key)
     total_routes = len(routes["routes"])
+    for route in routes["routes"]:
+        if int(route['machine']['id']) != 0: 
+            total_routes += 1
+
     enabled_routes = 0
     for route in routes["routes"]:
-        if route["enabled"] and route['advertised'] and route['machine']['id'] != 0: 
+        if route["enabled"] and route['advertised'] and int(route['machine']['id']) != 0: 
             enabled_routes += 1
 
     # Get a count of all enabled exit routes
     exits_count = 0
     exits_enabled_count = 0
     for route in routes["routes"]:
-        if route['advertised'] and route['machine']['id'] != 0:
+        if route['advertised'] and int(route['machine']['id']) != 0:
             if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                 exits_count +=1
                 if route["enabled"]:
