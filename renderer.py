@@ -44,26 +44,30 @@ def render_overview():
     machines = headscale.get_machines(url, api_key)
     machines_count = len(machines["machines"])
 
+    # Need to check if routes are attached to an active machine:
+    # ISSUE:  https://github.com/iFargle/headscale-webui/issues/36 
+    # ISSUE:  https://github.com/juanfont/headscale/issues/1228 
+
     # Get all routes:
     routes = headscale.get_routes(url,api_key)
     total_routes = len(routes["routes"])
     enabled_routes = 0
     for route in routes["routes"]:
-        if route["enabled"] and route['advertised']: 
+        if route["enabled"] and route['advertised'] and route['machine']['id'] != 0: 
             enabled_routes += 1
 
     # Get a count of all enabled exit routes
     exits_count = 0
     exits_enabled_count = 0
     for route in routes["routes"]:
-        if route['advertised']:
+        if route['advertised'] and route['machine']['id'] != 0:
             if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                 exits_count +=1
                 if route["enabled"]:
                     exits_enabled_count += 1
 
     # Get User and PreAuth Key counts
-    user_count   = 0
+    user_count        = 0
     usable_keys_count = 0
     users = headscale.get_users(url, api_key)
     for user in users["users"]:
@@ -462,7 +466,7 @@ def build_preauth_key_table(user_name):
             <span 
                 href="#card_modal" 
                 class='badge grey lighten-2 btn-small modal-trigger' 
-                onclick="load_modal_add_preauth_key('"""+user_name+"""')"
+                onclick="('"""+user_name+"""')"
             >Add PreAuth Key</span>
             <i class="material-icons circle">vpn_key</i>
             <span class="title">PreAuth Keys</span>
