@@ -9,5 +9,5 @@ jobs:
       - name: purge packages
         uses: dylanratcliffe/delete-untagged-containers@main
         with:
-          package_name: ifargle/headscale-webui
+          package_name: iFargle/headscale-webui
           token: ${{ secrets.GITHUB_TOKEN }}
