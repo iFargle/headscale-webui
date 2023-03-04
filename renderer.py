@@ -471,7 +471,7 @@ def build_preauth_key_table(user_name):
             <span 
                 href="#card_modal" 
                 class='badge grey lighten-2 btn-small modal-trigger' 
-                onclick="('"""+user_name+"""')"
+                onclick="load_modal_add_preauth_key('"""+user_name+"""')"
             >Add PreAuth Key</span>
             <i class="material-icons circle">vpn_key</i>
             <span class="title">PreAuth Keys</span>
