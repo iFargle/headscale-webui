@@ -9,8 +9,10 @@ ARG WORKDIR
 ENV PYTHONUNBUFFERED=1
 # Don't create `.pyc` files:
 ENV PYTHONDONTWRITEBYTECODE=1
+# https://github.com/rust-lang/cargo/issues/2808 
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-# For building CFFI:
+# For building CFFI / Crypgotraphy:
 RUN apk add gcc make musl-dev libffi-dev rust cargo
 
 RUN pip install poetry
