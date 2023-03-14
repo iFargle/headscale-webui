@@ -13,7 +13,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 # For building CFFI / Crypgotraphy:
-RUN apk add gcc make musl-dev libffi-dev rust cargo git
+RUN apk add gcc make musl-dev libffi-dev rust cargo git openssl-dev
 
 RUN pip install poetry
 RUN poetry config virtualenvs.in-project true 
