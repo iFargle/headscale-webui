@@ -10,7 +10,9 @@ ENV PYTHONUNBUFFERED=1
 # Don't create `.pyc` files:
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN apk add gcc make musl-dev
+# For building CFFI:
+RUN apk add gcc make musl-dev libffi-dev
+
 RUN pip install poetry
 RUN poetry config virtualenvs.in-project true 
 
