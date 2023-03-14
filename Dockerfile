@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # For building CFFI:
-RUN apk add gcc make musl-dev libffi-dev
+RUN apk add gcc make musl-dev libffi-dev rust
 
 RUN pip install poetry
 RUN poetry config virtualenvs.in-project true 
