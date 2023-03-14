@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1
 # Don't create `.pyc` files:
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN apk add gcc make
+RUN apk add gcc make musl-dev
 RUN pip install poetry
 RUN poetry config virtualenvs.in-project true 
 
