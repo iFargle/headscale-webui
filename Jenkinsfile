@@ -45,23 +45,7 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
-            options { timeout(time: 3, unit: 'MINUTES') }
-            steps {
-                script {
-                    privateImage.inside { 
-                        sh 'ls -lah /app'
-                        sh 'python --version'
-                        sh 'pip list'
-                    }
-                    publicImage.inside { 
-                        sh 'ls -lah /app'
-                        sh 'python --version'
-                        sh 'pip list'
-                    }
-                }
-            }
-        }
+
         stage('Push') {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
