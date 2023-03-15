@@ -32,14 +32,9 @@ pipeline {
         }
         stage('Registry Logins') {
             steps {
-                sh """
-                    echo 'Logging into Docker Hub...'
-                    docker login -u $DOCKERHUB_CRED_USR -p $DOCKERHUB_CRED_PSW $DOCKERHUB_URL
-                    echo 'Logging into Github Container Registry...
-                    docker login -u $GHCR_CRED_USR -p $GHCR_CRED_PSW $GHCR_URL
-                    echo 'Logging into git.sysctl.io...
-                    docker login -u $SYSCTL_CRED_USR -p $SYSCTL_CRED_PSW $SYSCTL_URL
-                """
+                sh 'docker login -u %DOCKERHUB_CRED_USR% -p %DOCKERHUB_CRED_PSW% $DOCKERHUB_URL'
+                sh 'docker login -u %GHCR_CRED_USR%      -p %GHCR_CRED_PSW%      $GHCR_URL'
+                sh 'docker login -u %SYSCTL_CRED_USR%    -p %SYSCTL_CRED_PSW%    $SYSCTL_URL'
             }
         }
         stage('Create Buildx ENV') {
@@ -68,8 +63,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:latest"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:${APP_VERSION}"
+                            + " -t ${SYSCTL_URL}/albert/headscale-webui:latest"
+                            + " -t ${SYSCTL_URL}/albert/headscale-webui:${APP_VERSION}"
                         )
                     } else {
                         privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
@@ -81,8 +76,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:testing"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:${env.BRANCH_NAME}"
+                            + " -t ${SYSCTL_URL}/albert/headscale-webui:testing"
+                            + " -t ${SYSCTL_URL}/albert/headscale-webui:${env.BRANCH_NAME}"
                         )
                     }
                 }
@@ -102,37 +97,11 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${GHCR_URL}/${GHCR_CRED_USR}/headscale-webui:latest"
-                            + " -t ${GHCR_URL}/${GHCR_CRED_USR}/headscale-webui:${APP_VERSION}"
-                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_CRED_USR}/headscale-webui:latest"
-                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_CRED_USR}/headscale-webui:${APP_VERSION}"
+                            + " -t ${GHCR_URL}/ifargle/headscale-webui:latest"
+                            + " -t ${GHCR_URL}/ifargle/headscale-webui:${APP_VERSION}"
+                            + " -t ${DOCKERHUB_URL}/ifargle/headscale-webui:latest"
+                            + " -t ${DOCKERHUB_URL}/ifargle/headscale-webui:${APP_VERSION}"
                         )
-                    }
-                }
-            }
-        }
-        stage('Push') {
-            options { timeout(time: 5, unit: 'MINUTES') }
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        docker.withRegistry('', 'gitea-jenkins-pat') {
-                            privateImage.push("latest")
-                            privateImage.push(APP_VERSION)
-                        }
-                        docker.withRegistry('', 'github-ifargle-pat') {
-                            publicImage.push("latest")
-                            publicImage.push(APP_VERSION)
-                        }
-                        docker.withRegistry('', 'dockerhub-ifargle-pat') {
-                            publicImage.push("latest")
-                            publicImage.push(APP_VERSION)
-                        }
-                    } else {
-                        docker.withRegistry('https://git.sysctl.io/', 'gitea-jenkins-pat') {
-                            privateImage.push("${env.BRANCH_NAME}")
-                            privateImage.push("testing")
-                        }
                     }
                 }
             }
