@@ -32,9 +32,9 @@ pipeline {
         }
         stage('Registry Logins') {
             steps {
-                sh 'docker login -u %DOCKERHUB_CRED_USR% -p %DOCKERHUB_CRED_PSW% $DOCKERHUB_URL'
-                sh 'docker login -u %GHCR_CRED_USR%      -p %GHCR_CRED_PSW%      $GHCR_URL'
-                sh 'docker login -u %SYSCTL_CRED_USR%    -p %SYSCTL_CRED_PSW%    $SYSCTL_URL'
+                sh 'docker login -u ${DOCKERHUB_CRED_USR} -p ${DOCKERHUB_CRED_PSW} $DOCKERHUB_URL'
+                sh 'docker login -u ${GHCR_CRED_USR}      -p ${GHCR_CRED_PSW}      $GHCR_URL'
+                sh 'docker login -u ${SYSCTL_CRED_USR}    -p ${SYSCTL_CRED_PSW}    $SYSCTL_URL'
             }
         }
         stage('Create Buildx ENV') {
