@@ -14,7 +14,7 @@ pipeline {
         DOCKERHUB_CRED = credentials('dockerhub-ifargle-pat')
 
         GHCR_URL       = "https://ghcr.io/"
-        GHCR_CRED      =https://stackoverflow.com/questions/37463489/how-do-i-assure-that-a-jenkins-pipeline-stage-is-always-executed-even-if-a-prev credentials('github-ifargle-pat')
+        GHCR_CRED      = credentials('github-ifargle-pat')
 
         SYSCTL_URL     = "https://git.sysctl.io/"
         SYSCTL_CRED    = credentials('gitea-jenkins-pat')
