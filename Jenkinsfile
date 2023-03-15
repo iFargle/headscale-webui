@@ -68,8 +68,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_USER}/headscale-webui:latest"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_USER}/headscale-webui:${APP_VERSION}"
+                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:latest"
+                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:${APP_VERSION}"
                         )
                     } else {
                         privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
@@ -81,8 +81,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_USER}/headscale-webui:testing"
-                            + " -t ${SYSCTL_URL}/${SYSCTL_USER}/headscale-webui:${env.BRANCH_NAME}"
+                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:testing"
+                            + " -t ${SYSCTL_URL}/${SYSCTL_CRED_USR}/headscale-webui:${env.BRANCH_NAME}"
                         )
                     }
                 }
@@ -102,10 +102,10 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${GHCR_URL}/${GHCR_USER}/headscale-webui:latest"
-                            + " -t ${GHCR_URL}/${GHCR_USER}/headscale-webui:${APP_VERSION}"
-                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_USER}/headscale-webui:latest"
-                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_USER}/headscale-webui:${APP_VERSION}"
+                            + " -t ${GHCR_URL}/${GHCR_CRED_USR}/headscale-webui:latest"
+                            + " -t ${GHCR_URL}/${GHCR_CRED_USR}/headscale-webui:${APP_VERSION}"
+                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_CRED_USR}/headscale-webui:latest"
+                            + " -t ${DOCKERHUB_URL}/${DOCKERHUB_CRED_USR}/headscale-webui:${APP_VERSION}"
                         )
                     }
                 }
