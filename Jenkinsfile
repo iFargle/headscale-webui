@@ -42,7 +42,7 @@ pipeline {
                 sh """
                     # Create the builder:
                     docker buildx create --name $BUILDER_NAME
-                    docker buildx user $BUILDER_NAME
+                    docker buildx use $BUILDER_NAME
                     docker buildx inspect --bootstrap
 
                     docker buildx ls
