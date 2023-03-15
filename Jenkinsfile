@@ -50,7 +50,7 @@ pipeline {
             }
         }
         stage('Build Private') {
-            options { timeout(time: 30, unit: 'MINUTES') }
+            options { timeout(time: 2, unit: 'HOURS') }
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
@@ -85,7 +85,7 @@ pipeline {
             }
         }
         stage('Build Public') {
-            options { timeout(time: 30, unit: 'MINUTES') }
+            options { timeout(time: 2, unit: 'HOURS') }
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
