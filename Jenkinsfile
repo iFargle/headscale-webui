@@ -63,8 +63,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/albert/headscale-webui:latest"
-                            + " -t ${SYSCTL_URL}/albert/headscale-webui:${APP_VERSION}"
+                            + " -t albert/headscale-webui:latest"
+                            + " -t albert/headscale-webui:${APP_VERSION}"
                         )
                     } else {
                         privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
@@ -76,8 +76,9 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${SYSCTL_URL}/albert/headscale-webui:testing"
-                            + " -t ${SYSCTL_URL}/albert/headscale-webui:${env.BRANCH_NAME}"
+                            + " -t git.sysctl.io/albert/headscale-webui:testing"
+                            + " -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}"
+                            + " --push"
                         )
                     }
                 }
@@ -97,10 +98,11 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t ${GHCR_URL}/ifargle/headscale-webui:latest"
-                            + " -t ${GHCR_URL}/ifargle/headscale-webui:${APP_VERSION}"
-                            + " -t ${DOCKERHUB_URL}/ifargle/headscale-webui:latest"
-                            + " -t ${DOCKERHUB_URL}/ifargle/headscale-webui:${APP_VERSION}"
+                            + " -t docker.io/ifargle/headscale-webui:latest"
+                            + " -t docker.io/ifargle/headscale-webui:${APP_VERSION}"
+                            + " -t ghcr.io/ifargle/headscale-webui:latest"
+                            + " -t ghcr.io/ifargle/headscale-webui:${APP_VERSION}"
+                            + " --push"
                         )
                     }
                 }
