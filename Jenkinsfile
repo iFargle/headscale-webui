@@ -17,7 +17,7 @@ pipeline {
         GHCR_CRED      = credentials('github-ifargle-pat')
 
         SYSCTL_URL     = "https://git.sysctl.io/"
-        SYSCTL_CRED    = credentials('gitea-jenkins-pat')
+        SYSCTL_CRED    = credentials('forgejo-jenkins-pat')
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
@@ -63,8 +63,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t albert/headscale-webui:latest"
-                            + " -t albert/headscale-webui:${APP_VERSION}"
+                            + " -t git.sysctl.io/albert/headscale-webui:latest"
+                            + " -t git.sysctl.io/albert/headscale-webui:${APP_VERSION}"
                         )
                     } else {
                         privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
