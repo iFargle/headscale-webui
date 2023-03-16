@@ -51,12 +51,12 @@ pipeline {
                     if (env.BRANCH_NAME == 'main') {
                         sh """
                             docker build . \
-                                -t git.sysctl.io/albert/headscale-webui:latest \
-                                -t git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
-                                -t ifargle/headscale-webui:latest \
-                                -t ifargle/headscale-webui:${APP_VERSION} \
-                                -t ghcr.io/ifargle/headscale-webui:latest \
-                                -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
+                                -t git.sysctl.io/albert/headscale-webui:latest \         
+                                -t git.sysctl.io/albert/headscale-webui:${APP_VERSION} \ 
+                                -t ifargle/headscale-webui:latest \                      
+                                -t ifargle/headscale-webui:${APP_VERSION} \              
+                                -t ghcr.io/ifargle/headscale-webui:latest \              
+                                -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \      
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
                                 --build-arg APP_VERSION_ARG=${APP_VERSION} \
@@ -71,8 +71,8 @@ pipeline {
                             docker build . \
                                 -t git.sysctl.io/albert/headscale-webui:testing \
                                 -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
-                                -t ghcr.io/ifargle/headscale-webui:latest \
-                                -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
+                                -t ghcr.io/ifargle/headscale-webui:testing \
+                                -t ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
                                 --build-arg APP_VERSION_ARG=${APP_VERSION} \
