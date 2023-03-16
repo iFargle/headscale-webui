@@ -406,14 +406,15 @@ def render_machines_cards():
         app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
-    app.logger.info("Starting futures")
-    futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
-    # Wait for the executor to finish all jobs:
-    wait(futures, return_when=ALL_COMPLETED)
-    app.logger.info("Finished futures")
-
-    # DEBUG:  Do in a forloop:
-    # for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
+    if LOG_LEVEL == "DEBUG":
+        # DEBUG:  Do in a forloop:
+        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
+    else:
+        app.logger.info("Starting futures")
+        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
+        # Wait for the executor to finish all jobs:
+        wait(futures, return_when=ALL_COMPLETED)
+        app.logger.info("Finished futures")
 
     # Sort the content by machine_id:
     sorted_machines = {key: val for key, val in sorted(machine_content.items(), key = lambda ele: ele[0])}
