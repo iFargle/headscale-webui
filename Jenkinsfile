@@ -66,7 +66,7 @@ pipeline {
                         sh """
                             docker build . \
                                 -t git.sysctl.io/albert/headscale-webui:testing \
-                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \                            docker build . \
+                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
                                 -t ghcr.io/ifargle/headscale-webui:latest \
                                 -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
