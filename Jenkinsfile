@@ -45,7 +45,7 @@ pipeline {
             }
         }
         stage('Build') {
-            options { timeout(time: 2, unit: 'HOURS') }
+            options { timeout(time: 8, unit: 'HOURS') }
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
