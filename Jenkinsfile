@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                        privateImage = docker.build("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                             "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                             + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                             + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
@@ -63,11 +63,11 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t git.sysctl.io/albert/headscale-webui:latest"
-                            + " -t git.sysctl.io/albert/headscale-webui:${APP_VERSION}"
+                            + " -t latest"
+                            + " -t ${APP_VERSION}"
                         )
                     } else { // IF I'm just testing, I don't need to build for ARM
-                        privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
+                        privateImage = docker.build("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                             "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                             + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
                             + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
@@ -76,8 +76,8 @@ pipeline {
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
                             + " --platform linux/amd64"
-                            + " -t git.sysctl.io/albert/headscale-webui:testing"
-                            + " -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}"
+                            + " -t testing"
+                            + " -t ${env.BRANCH_NAME}"
                             + " --push"
                         )
                     }
