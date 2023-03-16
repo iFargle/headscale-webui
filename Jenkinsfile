@@ -1,5 +1,3 @@
-def privateImage // My personal git / container registry
-def publicImage  // GitHub Container Registry and Docker Hub
 pipeline {
     agent {
         label 'linux-x64'
@@ -24,20 +22,13 @@ pipeline {
         timestamps()
     }
     stages {
-        stage ('ENV') {
+        stage ('Jenkins ENV') {
             steps {
                 sh 'printenv'
                 script { BUILD_DATE = java.time.LocalDate.now() }
             }
         }
-        stage('Registry Logins') {
-            steps {
-                sh 'docker login -u ${DOCKERHUB_CRED_USR} -p ${DOCKERHUB_CRED_PSW} $DOCKERHUB_URL'
-                sh 'docker login -u ${GHCR_CRED_USR}      -p ${GHCR_CRED_PSW}      $GHCR_URL'
-                sh 'docker login -u ${SYSCTL_CRED_USR}    -p ${SYSCTL_CRED_PSW}    $SYSCTL_URL'
-            }
-        }
-        stage('Create Buildx ENV') {
+        stage('Create Build ENV') {
             steps {
                 sh """
                     # Create the builder:
@@ -47,39 +38,44 @@ pipeline {
 
                     docker buildx ls
                 """
+
+                sh 'docker login -u ${DOCKERHUB_CRED_USR} -p ${DOCKERHUB_CRED_PSW} $DOCKERHUB_URL'
+                sh 'docker login -u ${GHCR_CRED_USR}      -p ${GHCR_CRED_PSW}      $GHCR_URL'
+                sh 'docker login -u ${SYSCTL_CRED_USR}    -p ${SYSCTL_CRED_PSW}    $SYSCTL_URL'
             }
         }
-        stage('Build Private') {
+        stage('Build') {
             options { timeout(time: 2, unit: 'HOURS') }
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        privateImage = docker.build("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                            "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
-                            + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
-                            + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
-                            + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
-                            + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
-                            + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
-                            + " ."
-                            + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t latest"
-                            + " -t ${APP_VERSION}"
-                        )
+                        sh """
+                            docker build . \
+                                -t git.sysctl.io/albert/headscale-webui:latest" \
+                                -t git.sysctl.io/albert/headscale-webui:${APP_VERSION}" \
+                                --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
+                                --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
+                                --build-arg APP_VERSION_ARG=${APP_VERSION} \
+                                --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
+                                --build-arg HS_VERSION_ARG=${HS_VERSION} \
+                                --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
+                                --platform inux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+                                --push"
+                        """
                     } else { // IF I'm just testing, I don't need to build for ARM
-                        privateImage = docker.build("git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                            "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
-                            + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
-                            + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
-                            + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
-                            + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
-                            + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
-                            + " ."
-                            + " --platform linux/amd64"
-                            + " -t testing"
-                            + " -t ${env.BRANCH_NAME}"
-                            + " --push"
-                        )
+                        sh """
+                            docker build . \
+                                -t git.sysctl.io/albert/headscale-webui:testing" \
+                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}" \
+                                --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
+                                --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
+                                --build-arg APP_VERSION_ARG=${APP_VERSION} \
+                                --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
+                                --build-arg HS_VERSION_ARG=${HS_VERSION} \
+                                --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
+                                --platform linux/amd64 \
+                                --push"
+                        """
                     }
                 }
             }
@@ -89,21 +85,21 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        publicImage = docker.build("ifargle/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
-                            "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
-                            + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
-                            + " --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} "
-                            + " --build-arg APP_VERSION_ARG=${APP_VERSION} "
-                            + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
-                            + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
-                            + " ."
-                            + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
-                            + " -t docker.io/ifargle/headscale-webui:latest"
-                            + " -t docker.io/ifargle/headscale-webui:${APP_VERSION}"
-                            + " -t ghcr.io/ifargle/headscale-webui:latest"
-                            + " -t ghcr.io/ifargle/headscale-webui:${APP_VERSION}"
-                            + " --push"
-                        )
+                        sh """
+                            docker build . \
+                                -t docker.io/ifargle/headscale-webui:latest \
+                                -t docker.io/ifargle/headscale-webui:${APP_VERSION} \
+                                -t ghcr.io/ifargle/headscale-webui:latest \
+                                -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
+                                --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
+                                --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
+                                --build-arg APP_VERSION_ARG=${APP_VERSION} \
+                                --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
+                                --build-arg HS_VERSION_ARG=${HS_VERSION} \
+                                --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
+                                --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+                                --push"
+                        """
                     }
                 }
             }
