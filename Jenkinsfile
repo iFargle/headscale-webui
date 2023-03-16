@@ -32,7 +32,7 @@ pipeline {
             steps {
                 sh """
                     # Create the builder:
-                    docker buildx create --name $BUILDER_NAME
+                    docker buildx create --name $BUILDER_NAME --driver-opt=image=moby/buildkit
                     docker buildx use $BUILDER_NAME
                     docker buildx inspect --bootstrap
 
@@ -53,6 +53,8 @@ pipeline {
                             docker build . \
                                 -t git.sysctl.io/albert/headscale-webui:latest \
                                 -t git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
+                                -t docker.io/ifargle/headscale-webui:latest \
+                                -t docker.io/ifargle/headscale-webui:${APP_VERSION} \
                                 -t ghcr.io/ifargle/headscale-webui:latest \
                                 -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
@@ -64,10 +66,7 @@ pipeline {
                                 --platform linux/amd64 \
                                 --push
                         """
-// 
-//                                -t docker.io/ifargle/headscale-webui:latest \
-//                                -t docker.io/ifargle/headscale-webui:${APP_VERSION} \
-//                                --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+//                              --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
 
                     } else { // IF I'm just testing, I don't need to build for ARM
                         sh """
