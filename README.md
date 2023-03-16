@@ -55,11 +55,11 @@ Settings Page showing an API Key Test:
 
 ---
 # Tech used:
-* Python - ![Link](https://www.python.org/)
-* Poetry - ![Link](https://python-poetry.org/)
-* MaterializeCSS - ![Link](https://github.com/Dogfalo/materialize)
-* jQuery - ![Link](https://jquery.com/)
+* Python - [Link](https://www.python.org/)
+* Poetry - [Link](https://python-poetry.org/)
+* MaterializeCSS - [Link](https://github.com/Dogfalo/materialize)
+* jQuery - [Link](https://jquery.com/)
 
-For Python libraries, see ![pyproject.toml](pyproject.toml)
+For Python libraries, see [pyproject.toml](pyproject.toml)
 
 If you use this project, please reach out!  It keeps me motivated!  Thank you!
