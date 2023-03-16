@@ -66,7 +66,7 @@ pipeline {
                             + " -t git.sysctl.io/albert/headscale-webui:latest"
                             + " -t git.sysctl.io/albert/headscale-webui:${APP_VERSION}"
                         )
-                    } else {
+                    } else { // IF I'm just testing, I don't need to build for ARM
                         privateImage = docker.build("albert/headscale-webui:${env.BRANCH_NAME}-${env.BUILD_ID}",
                             "--label \"GIT_COMMIT=${env.GIT_COMMIT}\" "
                             + " --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} "
@@ -75,7 +75,7 @@ pipeline {
                             + " --build-arg BUILD_DATE_ARG=${BUILD_DATE} "
                             + " --build-arg HS_VERSION_ARG=${HS_VERSION} "
                             + " ."
-                            + " --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
+                            + " --platform linux/amd64"
                             + " -t git.sysctl.io/albert/headscale-webui:testing"
                             + " -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}"
                             + " --push"
