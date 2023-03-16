@@ -17,7 +17,7 @@ pipeline {
         GHCR_CRED      = credentials('github-ifargle-pat')
 
         SYSCTL_URL     = "https://git.sysctl.io/"
-        SYSCTL_CRED    = credentials('forgejo-jenkins-pat')
+        SYSCTL_CRED    = credentials('gitea-jenkins-pat')
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '100', artifactNumToKeepStr: '20'))
