@@ -63,9 +63,9 @@ pipeline {
                                 --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
-                                --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+                                --platform linux/amd64 \
                                 --push
-                        """
+                        """ // ,linux/arm64,linux/arm/v7,linux/arm/v6
                     } else { // If I'm just testing, I don't need to build for ARM
                         sh """
                             docker buildx build . \
