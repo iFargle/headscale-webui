@@ -66,7 +66,9 @@ pipeline {
                         sh """
                             docker build . \
                                 -t git.sysctl.io/albert/headscale-webui:testing \
-                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
+                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \                            docker build . \
+                                -t ghcr.io/ifargle/headscale-webui:latest \
+                                -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
                                 --build-arg APP_VERSION_ARG=${APP_VERSION} \
@@ -87,8 +89,8 @@ pipeline {
                     if (env.BRANCH_NAME == 'main') {
                         sh """
                             docker build . \
-                                -t docker.io/ifargle/headscale-webui:latest \
-                                -t docker.io/ifargle/headscale-webui:${APP_VERSION} \
+                                -t registry-1.docker.io/ifargle/headscale-webui:latest \
+                                -t registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION} \
                                 -t ghcr.io/ifargle/headscale-webui:latest \
                                 -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
