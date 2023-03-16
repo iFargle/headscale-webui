@@ -51,22 +51,22 @@ pipeline {
                     if (env.BRANCH_NAME == 'main') {
                         sh """
                             docker build . \
-                                -t git.sysctl.io/albert/headscale-webui:latest" \
-                                -t git.sysctl.io/albert/headscale-webui:${APP_VERSION}" \
+                                -t git.sysctl.io/albert/headscale-webui:latest \
+                                -t git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
                                 --build-arg APP_VERSION_ARG=${APP_VERSION} \
                                 --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
-                                --platform inux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
-                                --push"
+                                --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+                                --push
                         """
                     } else { // IF I'm just testing, I don't need to build for ARM
                         sh """
                             docker build . \
-                                -t git.sysctl.io/albert/headscale-webui:testing" \
-                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}" \
+                                -t git.sysctl.io/albert/headscale-webui:testing \
+                                -t git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
                                 --build-arg APP_VERSION_ARG=${APP_VERSION} \
@@ -74,7 +74,7 @@ pipeline {
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
                                 --platform linux/amd64 \
-                                --push"
+                                --push
                         """
                     }
                 }
@@ -98,7 +98,7 @@ pipeline {
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
                                 --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
-                                --push"
+                                --push
                         """
                     }
                 }
