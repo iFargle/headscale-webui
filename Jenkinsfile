@@ -89,8 +89,8 @@ pipeline {
                     if (env.BRANCH_NAME == 'main') {
                         sh """
                             docker build . \
-                                -t registry-1.docker.io/ifargle/headscale-webui:latest \
-                                -t registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION} \
+                                -t ifargle/headscale-webui:latest \
+                                -t ifargle/headscale-webui:${APP_VERSION} \
                                 -t ghcr.io/ifargle/headscale-webui:latest \
                                 -t ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
