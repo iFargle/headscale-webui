@@ -3,7 +3,7 @@
 import headscale, helper, json, os, pytz, renderer, secrets, requests, logging
 from functools                     import wraps
 from datetime                      import datetime
-from flask                         import Flask, Markup, redirect, render_template, request, url_for
+from flask                         import Flask, escape, Markup, redirect, render_template, request, url_for
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -341,7 +341,7 @@ def save_key_page():
 @oidc.require_login
 def update_route_page():
     json_response = request.get_json()
-    route_id      = json_response['route_id']
+    route_id      = escape(json_response['route_id'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
     current_state = json_response['current_state']
@@ -352,7 +352,7 @@ def update_route_page():
 @oidc.require_login
 def machine_information_page():
     json_response = request.get_json()
-    machine_id    = json_response['id']
+    machine_id    = escape(json_response['id'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -362,7 +362,7 @@ def machine_information_page():
 @oidc.require_login
 def delete_machine_page():
     json_response = request.get_json()
-    machine_id    = json_response['id']
+    machine_id    = escape(json_response['id'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -372,7 +372,7 @@ def delete_machine_page():
 @oidc.require_login
 def rename_machine_page():
     json_response = request.get_json()
-    machine_id    = json_response['id']
+    machine_id    = escape(json_response['id'])
     new_name      = json_response['new_name']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -383,8 +383,8 @@ def rename_machine_page():
 @oidc.require_login
 def move_user_page():
     json_response = request.get_json()
-    machine_id    = json_response['id']
-    new_user      = json_response['new_user']
+    machine_id    = escape(json_response['id'])
+    new_user      = escape(json_response['new_user'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -394,8 +394,8 @@ def move_user_page():
 @oidc.require_login
 def set_machine_tags():
     json_response = request.get_json()
-    machine_id    = json_response['id']
-    machine_tags  = json_response['tags_list']
+    machine_id    = escape(json_response['id'])
+    machine_tags  = escape(json_response['tags_list'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -405,8 +405,8 @@ def set_machine_tags():
 @oidc.require_login
 def register_machine():
     json_response = request.get_json()
-    machine_key   = json_response['key']
-    user          = json_response['user']
+    machine_key   = escape(json_response['key'])
+    user          = escape(json_response['user'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -419,8 +419,8 @@ def register_machine():
 @oidc.require_login
 def rename_user_page():
     json_response = request.get_json()
-    old_name      = json_response['old_name']
-    new_name      = json_response['new_name']
+    old_name      = escape(json_response['old_name'])
+    new_name      = escape(json_response['new_name'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -429,17 +429,19 @@ def rename_user_page():
 @app.route('/api/add_user', methods=['POST'])
 @oidc.require_login
 def add_user():
-    json_response  = json.dumps(request.get_json())
+    json_response  = request.get_json()
+    user_name      = str(escape(json_response['name']))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
+    json_string    = '{"name": "'+user_name+'"}'
 
-    return headscale.add_user(url, api_key, json_response)
+    return headscale.add_user(url, api_key, json_string)
 
 @app.route('/api/delete_user', methods=['POST'])
 @oidc.require_login
 def delete_user():
     json_response  = request.get_json()
-    user_name      = json_response['name']
+    user_name      = str(escape(json_response['name']))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
@@ -478,7 +480,7 @@ def expire_preauth_key():
 @oidc.require_login
 def build_preauth_key_table():
     json_response  = request.get_json()
-    user_name = json_response['name']
+    user_name      = str(escape(json_response['name']))
 
     return renderer.build_preauth_key_table(user_name)
 
