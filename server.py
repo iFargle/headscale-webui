@@ -434,11 +434,10 @@ def add_user():
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
     json_string    = '{"name": "'+user_name+'"}'
-    parsed_json    = json.loads(json_string)
 
-    app.logger.debug("Parsed JSON:  "+str(parsed_json))
+    app.logger.debug("Parsed JSON:  "+str(json_string))
 
-    return headscale.add_user(url, api_key, parsed_json)
+    return headscale.add_user(url, api_key, json_string)
 
 @app.route('/api/delete_user', methods=['POST'])
 @oidc.require_login
