@@ -429,8 +429,8 @@ def rename_user_page():
 @app.route('/api/add_user', methods=['POST'])
 @oidc.require_login
 def add_user():
-    json_response  = json.dumps(request.get_json())
-    user_name      = escape(json_response["name"])
+    json_response  = request.get_json()
+    user_name      = escape(json_response('name')
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
     json_data      = json.loads("{'name': "+user_name+"}")
