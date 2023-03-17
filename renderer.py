@@ -235,12 +235,15 @@ def thread_machine_content(machine, machine_content, idx):
     # machine      = passed in machine information
     # content      = place to write the content
 
+    app.logger.debug("Machine Information")
+    app.logger.debug(str(machine))
+
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
     # Set the current timezone and local time
-    timezone = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
-    local_time      = timezone.localize(datetime.now())
+    timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time = timezone.localize(datetime.now())
 
     # Get the machines routes
     pulled_routes = headscale.get_machine_routes(url, api_key, machine["id"])
@@ -335,20 +338,27 @@ def thread_machine_content(machine, machine_content, idx):
     created_print     = helper.pretty_print_duration(created_delta)
     created_time      = str(created_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(created_print)+")"
 
-    expiry_parse     = parser.parse(machine["expiry"])
-    expiry_local     = expiry_parse.astimezone(timezone)
-    expiry_delta     = expiry_local - local_time
-    expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
+    # If there is no expiration date, we don't need to do any calculations:
+    if machine["expiry"] != "0001-01-01T00:00:00Z":
+        expiry_parse     = parser.parse(machine["expiry"])
+        expiry_local     = expiry_parse.astimezone(timezone)
+        expiry_delta     = expiry_local - local_time
+        expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
+        if str(expiry_local.strftime('%Y')) in ("0001",  "9999", "0000"):
+            expiry_time  = "No expiration date."
+        elif int(expiry_local.strftime('%Y')) > int(expiry_local.strftime('%Y'))+2:
+            expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+        else: 
+            expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
 
-    if str(expiry_local.strftime('%Y')) in ("0001",  "9999", "0000"):
+        expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
+        app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+    else:
         expiry_time  = "No expiration date."
-    elif int(expiry_local.strftime('%Y')) > int(expiry_local.strftime('%Y'))+2:
-        expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    else: 
-        expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
-    app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
+        expiring_soon = False
+        app.logger.debug("Machine:  "+machine["name"]+" has no expiration date")
 
-    expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
+
     # Get the first 10 characters of the PreAuth Key:
     if machine["preAuthKey"]:
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]

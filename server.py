@@ -29,6 +29,7 @@ match LOG_LEVEL:
 
 executor     = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+app.logger.info("Headscale-WebUI Version:  "+os.environ["APP_VERSION"]+" / "+os.environ["GIT_BRANCH"])
 app.logger.info("LOG LEVEL SET TO %s", str(LOG_LEVEL))
 app.logger.info("DEBUG STATE:  %s", str(DEBUG_STATE))
 
