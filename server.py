@@ -433,7 +433,7 @@ def add_user():
     user_name      = escape(json_response['name'])
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
-    json_string    = f'{{"name": "'+user_name+'"}}'
+    json_string    = '\{"name": "'+user_name+'"\}'
     parsed_json    = json.loads(json_string)
 
     return headscale.add_user(url, api_key, parsed_json)
