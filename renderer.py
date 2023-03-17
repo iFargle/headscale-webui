@@ -235,12 +235,15 @@ def thread_machine_content(machine, machine_content, idx):
     # machine      = passed in machine information
     # content      = place to write the content
 
+    app.logger.debug("Machine Information")
+    app.logger.debug(str(machine))
+
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
     # Set the current timezone and local time
-    timezone = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
-    local_time      = timezone.localize(datetime.now())
+    timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time = timezone.localize(datetime.now())
 
     # Get the machines routes
     pulled_routes = headscale.get_machine_routes(url, api_key, machine["id"])
