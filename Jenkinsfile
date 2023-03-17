@@ -53,7 +53,7 @@ pipeline {
                                 --tag git.sysctl.io/albert/headscale-webui:latest \
                                 --tag git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
                                 --tag registry-1.docker.io/ifargle/headscale-webui:latest \
-                                --tag docker.io/ifargle/headscale-webui:${APP_VERSION} \
+                                --tag registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --tag ghcr.io/ifargle/headscale-webui:latest \
                                 --tag ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
