@@ -435,8 +435,6 @@ def add_user():
     api_key        = headscale.get_api_key()
     json_string    = '{"name": "'+user_name+'"}'
 
-    app.logger.debug("Parsed JSON:  "+str(json_string))
-
     return headscale.add_user(url, api_key, json_string)
 
 @app.route('/api/delete_user', methods=['POST'])
@@ -463,7 +461,7 @@ def get_users_page():
 @app.route('/api/add_preauth_key', methods=['POST'])
 @oidc.require_login
 def add_preauth_key():
-    json_response  = escape(json.dumps(request.get_json()))
+    json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
@@ -472,7 +470,7 @@ def add_preauth_key():
 @app.route('/api/expire_preauth_key', methods=['POST'])
 @oidc.require_login
 def expire_preauth_key():
-    json_response  = escape(json.dumps(request.get_json()))
+    json_response  = json.dumps(request.get_json())
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
