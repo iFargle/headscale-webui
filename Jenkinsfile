@@ -8,7 +8,6 @@ pipeline {
         BUILD_DATE     = ''
         BUILDER_NAME   = "multiarch"
 
-        DOCKERHUB_URL  = "https://registry-1.docker.io/"
         DOCKERHUB_CRED = credentials('dockerhub-ifargle-pat')
 
         GHCR_URL       = "https://ghcr.io/"
@@ -39,7 +38,7 @@ pipeline {
                     docker buildx ls
                 """
 
-                sh 'docker login -u ${DOCKERHUB_CRED_USR} -p ${DOCKERHUB_CRED_PSW} $DOCKERHUB_URL'
+                sh 'docker login -u ${DOCKERHUB_CRED_USR} -p ${DOCKERHUB_CRED_PSW}'
                 sh 'docker login -u ${GHCR_CRED_USR}      -p ${GHCR_CRED_PSW}      $GHCR_URL'
                 sh 'docker login -u ${SYSCTL_CRED_USR}    -p ${SYSCTL_CRED_PSW}    $SYSCTL_URL'
             }
