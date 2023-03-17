@@ -355,6 +355,7 @@ def thread_machine_content(machine, machine_content, idx):
         app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
     else:
         expiry_time  = "No expiration date."
+        expiring_soon = False
         app.logger.debug("Machine:  "+machine["name"]+" has no expiration date")
 
 
