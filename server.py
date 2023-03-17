@@ -373,7 +373,7 @@ def delete_machine_page():
 def rename_machine_page():
     json_response = request.get_json()
     machine_id    = escape(json_response['id'])
-    new_name      = json_response['new_name']
+    new_name      = escape(json_response['new_name'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
