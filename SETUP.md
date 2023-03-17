@@ -22,6 +22,23 @@
   * `AUTH_TYPE` can be set to `Basic` or `OIDC`.  See the [Authentication](#Authentication) section below for more information.
   * `LOG_LEVEL` can be one of `Debug`, `Info`, `Warning`, `Error`, or `Critical` for decreasing verbosity.  Default is `Info` if removed from your Environment.
 ---
+# Podman rootless container
+
+A rootless container can be a good choice when running headscale-webui with Podman.
+
+To achieve this, the option `allow_host_loopback` for the slirp4netns network driver must be explicitly set. This will allow the container to contact sockets listening on the host (specifically, headscale).
+
+By default, slirp4netns will present the host on the IP address `10.0.2.2` (adjust accordingly if you specify different addressing options), so this IP will be the address to set in the HS_SERVER environment variable (along with the port number) when spinning the container.
+For the rest of the enviroment settings, the considerations done for the Docker example above still hold.
+
+* Example:
+```
+podman run -d --network slirp4netns:allow_host_loopback=true -v /etc/headscale:/etc/headscale:ro \
+           -p 5000:5000 --name headscale-webui -e HS_SERVER=http://10.0.2.2:8080 -e KEY=YOUR_ENC_KEY \
+           -e DOMAIN_NAME=http://headscale-webui:5000 -e SCRIPT_NAME=/admin ifargle/headscale-webui:latest
+```
+
+---
 # Reverse Proxies
 *If your reverse proxy isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on.*
 
