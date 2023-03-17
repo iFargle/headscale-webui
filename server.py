@@ -429,11 +429,13 @@ def rename_user_page():
 @app.route('/api/add_user', methods=['POST'])
 @oidc.require_login
 def add_user():
-    json_response  = escape(json.dumps(request.get_json()))
+    json_response  = json.dumps(request.get_json())
+    user_name      = escape(json_response["name"])
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
+    json           = json.loads("{'name': "+user_name+"}")
 
-    return headscale.add_user(url, api_key, json_response)
+    return headscale.add_user(url, api_key, json)
 
 @app.route('/api/delete_user', methods=['POST'])
 @oidc.require_login
