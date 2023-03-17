@@ -430,12 +430,12 @@ def rename_user_page():
 @oidc.require_login
 def add_user():
     json_response  = request.get_json()
-    user_name      = escape(json_response['name'])
+    user_name      = str(escape(json_response['name']))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
     json_string    = '\{"name": "'+user_name+'"\}'
     parsed_json    = json.loads(json_string)
-    
+
     app.logger.debug("Parsed JSON:  "+parsed_json)
 
     return headscale.add_user(url, api_key, parsed_json)
@@ -444,7 +444,7 @@ def add_user():
 @oidc.require_login
 def delete_user():
     json_response  = request.get_json()
-    user_name      = escape(json_response['name'])
+    user_name      = str(escape(json_response['name']))
     url            = headscale.get_url()
     api_key        = headscale.get_api_key()
 
@@ -483,7 +483,7 @@ def expire_preauth_key():
 @oidc.require_login
 def build_preauth_key_table():
     json_response  = request.get_json()
-    user_name      = escape(json_response['name'])
+    user_name      = str(escape(json_response['name']))
 
     return renderer.build_preauth_key_table(user_name)
 
