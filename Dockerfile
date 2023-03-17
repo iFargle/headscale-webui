@@ -12,7 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # https://github.com/rust-lang/cargo/issues/2808 
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-# For building CFFI / Crypgotraphy:
+# For building CFFI / Crypgotraphy (needed on ARM builds):
 RUN apk add gcc make musl-dev libffi-dev rust cargo git openssl-dev
 
 RUN pip install poetry
@@ -22,6 +22,7 @@ WORKDIR ${WORKDIR}
 
 COPY --chown=1000:1000 . .
 RUN poetry install --only main
+# END Builder
 
 FROM python:3.11-alpine
 

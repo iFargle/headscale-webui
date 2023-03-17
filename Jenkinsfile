@@ -3,7 +3,7 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION    = 'v0.5.4'
+        APP_VERSION    = 'v0.5.5'
         HS_VERSION     = "v0.20.0" // Version of Headscale this is compatible with
         BUILD_DATE     = ''
         BUILDER_NAME   = "multiarch"
