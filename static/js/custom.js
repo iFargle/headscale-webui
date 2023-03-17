@@ -105,6 +105,13 @@ function load_modal_generic(type, title, message) {
     instance.open()
 }
 
+// https://stackoverflow.com/questions/3043775/how-to-escape-html#22706073
+function escapeHTML(str){
+    var p = document.createElement("p");
+    p.appendChild(document.createTextNode(str));
+    return p.innerHTML;
+}
+
 // Enables the Floating Action Button (FAB) for the Machines and Users page
 document.addEventListener('DOMContentLoaded', function() {
     var elems = document.querySelectorAll('.fixed-action-btn');
@@ -661,8 +668,8 @@ function rename_machine(machine_id) {
                 modal_element = document.getElementById('card_modal')
                 M.Modal.getInstance(modal_element).close()
 
-                document.getElementById(machine_id+'-name-container').innerHTML = machine_id+". "+new_name
-                M.toast({html: 'Machine '+machine_id+' renamed to '+new_name});
+                document.getElementById(machine_id+'-name-container').innerHTML = machine_id+". "+ escapeHTML(new_name)
+                M.toast({html: 'Machine '+machine_id+' renamed to '+ escapeHTML(new_name)});
             } else { 
                 load_modal_generic("error", "Error setting the machine name", "Headscale response:  "+JSON.stringify(response.body.message))
             }
@@ -790,7 +797,7 @@ function rename_user(user_id, old_name) {
                 M.Modal.getInstance(modal_element).close()
                 
                 // Rename the user on the page:
-                document.getElementById(user_id+'-name-span').innerHTML = new_name
+                document.getElementById(user_id+'-name-span').innerHTML = escapeHTML(new_name)
 
                 // Set the button to use the NEW name as the OLD name for both buttons
                 var rename_button_sm = document.getElementById(user_id+'-rename-user-sm')
