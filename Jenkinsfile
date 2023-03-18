@@ -51,10 +51,10 @@ pipeline {
                         sh """
                             docker buildx build . \
                                 --tag git.sysctl.io/albert/headscale-webui:latest \
-                                --tag git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
                                 --tag registry-1.docker.io/ifargle/headscale-webui:latest \
-                                --tag registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --tag ghcr.io/ifargle/headscale-webui:latest \
+                                --tag git.sysctl.io/albert/headscale-webui:${APP_VERSION} \
+                                --tag registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --tag ghcr.io/ifargle/headscale-webui:${APP_VERSION} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
@@ -62,15 +62,15 @@ pipeline {
                                 --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
-                                --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
+                                --platform amd64,arm64,arm/v7,arm/v6 \
                                 --push
                         """ 
                     } else { // If I'm just testing, I don't need to build for ARM
                         sh """
                             docker buildx build . \
                                 --tag git.sysctl.io/albert/headscale-webui:testing \
-                                --tag git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
                                 --tag ghcr.io/ifargle/headscale-webui:testing \
+                                --tag git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} \
                                 --tag ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} \
                                 --build-arg GIT_COMMIT_ARG=${env.GIT_COMMIT} \
                                 --build-arg GIT_BRANCH_ARG=${env.BRANCH_NAME} \
@@ -78,7 +78,7 @@ pipeline {
                                 --build-arg BUILD_DATE_ARG=${BUILD_DATE} \
                                 --build-arg HS_VERSION_ARG=${HS_VERSION} \
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
-                                --platform linux/amd64 \
+                                --platform amd64 \
                                 --push
                         """
                     }
