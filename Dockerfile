@@ -20,8 +20,9 @@ RUN poetry config virtualenvs.in-project true
 
 WORKDIR ${WORKDIR}
 
-COPY --chown=1000:1000 . .
+COPY --chown=1000:1000 pyproject.toml .
 RUN poetry install --only main
+COPY --chown=1000:1000 . .
 # END Builder
 
 FROM python:3.11-alpine
@@ -74,7 +75,7 @@ VOLUME /etc/headscale
 VOLUME /data
 
 EXPOSE 5000/tcp
-ENTRYPOINT ["/app/entrypoint.sh"]z
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Temporarily reduce to 1 worker
 CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app

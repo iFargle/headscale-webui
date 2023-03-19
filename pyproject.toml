@@ -21,5 +21,9 @@ flask-providers-oidc = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 
+[tool.poetry.group.dev.dependencies]
+pylint = "^2.17.0"
+autopep8 = "^2.0.2"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
