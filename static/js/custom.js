@@ -3,11 +3,12 @@
 //-----------------------------------------------------------
 function show_search() {
     $('#nav-search').removeClass('hide');
+    $('#nav-content').addClass('hide');
 
 }
 function hide_search() {
     $('#nav-search').addClass('hide');
-
+    $('#nav-content').removeClass('hide');
 }
 
 //-----------------------------------------------------------
