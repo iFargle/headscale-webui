@@ -7,7 +7,6 @@ $(document).ready(function() {
     $("#search").addClass('searchbarfix');
       //animate searchbar width increase to  +150%
       $('#search').click(function(e) {
-           //handle other nav elements visibility here to avoid push down 
         $('.search-hide').addClass('hide');
        if (trig == 1){
           $('#navfix2').animate({
@@ -29,7 +28,16 @@ $(document).ready(function() {
             $('.search-hide').removeClass('hide');
       });
     });
-    
+
+function show_search() {
+    $('.').removeClass('hide');
+
+}
+function hide_search() {
+    $('.').addClass('hide');
+
+}
+
 //-----------------------------------------------------------
 // General Helpers
 //-----------------------------------------------------------

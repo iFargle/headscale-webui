@@ -583,20 +583,8 @@ def oidc_nav_mobile(user_name, email_address, name):
 
 def render_search():
     html_payload = """
-        <li class="hide-on-medium-and-down">
-        <a href="#">
-            <form id="navbarsearch">
-                <div class="navfix">
-                    <div id="navfix2">
-                        <div class="input-field">
-                            <input id="search" type="search" required>
-                            <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                            <i class="material-icons">close</i>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </a>
-        </li>
+    <li role="menu-item" class="tooltipped" data-position="bottom" data-tooltip="Search" onclick="show_search()">
+        <a href="#"><i class="material-icons">search</i></a>
+    </li>
     """
     return Markup(html_payload)
