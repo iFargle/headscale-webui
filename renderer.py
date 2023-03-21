@@ -583,7 +583,7 @@ def oidc_nav_mobile(user_name, email_address, name):
 
 def render_search():
     html_payload = """
-        <li>    
+        <li class="hide-on-medium-and-down">    
             <form id="navbarsearch">
                 <div class="navfix">
                     <div id="navfix2">
