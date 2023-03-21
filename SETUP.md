@@ -124,7 +124,7 @@ https://example.com {
 2.  Set `AUTH_TYPE` environment variable in your docker-compose.yml to `oidc` and set the following:
     * `OIDC_AUTH_URL` should be set to your providers well-known endpoint.  For example, Authelia is `https://[YourAuthDomain]/.well-known/openid-configuration`.
     * `OIDC_CLIENT_ID` is the `id` in your Authelia configuration.yaml.  In this case, it would be `headscale-webui`.
-    * `OIDC_SECRET` is your client secret, in this case `[SECRET]`.  You can generate a secret using `openssl rand -hex 64`.
+    * `OIDC_CLIENT_SECRET` is your client secret, in this case `[SECRET]`.  You can generate a secret using `openssl rand -hex 64`.
 
 ### KeyCloak
 1.  In your Keycloak settings, add the following:
@@ -138,6 +138,6 @@ Client Secret = [SECRET]
 2.  Set `AUTH_TYPE` environment variable in your docker-compose.yml to `oidc` and set the following:
     * `OIDC_AUTH_URL` should be set to your providers well-known endpoint.  For example, Keycloak is `https://[DOMAIN]/realms/[REALM]/.well-known/openid-configuration`.
     * `OIDC_CLIENT_ID` is the `id` in your Authelia configuration.yaml.  In this case, it would be `headscale-webui`.
-    * `OIDC_SECRET` is your client secret, in this case `[SECRET]`.  You can generate a secret using `openssl rand -hex 64`.
+    * `OIDC_CLIENT_SECRET` is your client secret, in this case `[SECRET]`.  You can generate a secret using `openssl rand -hex 64`.
 
 ---
