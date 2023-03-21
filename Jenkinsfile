@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
         APP_VERSION    = 'v0.6.0'
-        HS_VERSION     = "v0.20.0" // Version of Headscale this is compatible with
+        HS_VERSION     = "v0.21.0" // Version of Headscale this is compatible with
         BUILD_DATE     = ''
         BUILDER_NAME   = "multiarch-${env.BUILD_TAG}"
 
