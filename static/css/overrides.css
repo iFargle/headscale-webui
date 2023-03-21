@@ -64,7 +64,7 @@ display: none !important
     position: absolute; 
     width: 100%;
 }
-.nav-search.hidden, .nav-cintent.hidden {
+.nav-search.hidden, .nav-content.hidden {
     z-index: -1000;
     visibility: hidden;
 }
