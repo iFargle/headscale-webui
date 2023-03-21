@@ -2,16 +2,10 @@
 // Expandable Search on Users and Machines pages
 //-----------------------------------------------------------
     function show_search() {
-        $('#nav-search').removeClass('hide-out');
-        $('#nav-search').addClass('hide-in');
-        $('#nav-content').removeClass('hide-in');
-        $('#nav-content').addClass('hide-out');
+        $('#nav-search').removeClass('hidden');
     }
     function hide_search() {
-        $('#nav-content').removeClass('hide-out');
-        $('#nav-content').addClass('hide-in');
-        $('#nav-search').removeClass('hide-in');
-        $('#nav-search').addClass('hide-out');
+        $('#nav-content').addClass('hidden');
     }
 
 //-----------------------------------------------------------

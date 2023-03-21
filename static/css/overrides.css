@@ -47,13 +47,6 @@ li.dropdown-oidc-collection{
 .datepicker-modal {
     width: max-content !important;
 }
-
-.hide-transition {
-    -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
-    transition: -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
-    transition: transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
-    transition: transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63), -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
-  }
   
   .hide-transition.hide-out {
     -webkit-transform: hide(0);
@@ -65,8 +58,13 @@ li.dropdown-oidc-collection{
     display: none !important
   }
   
-  .hide-transition.hide-in {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-    display: unset !important
+  .nav-search {
+    z-index: 1000;
+    visibility: unset;
+    position: absolute; 
+    width: 100%;
+  }
+  .nav-search.hidden {
+    z-index: -1000;
+    visibility: hidden;
   }
