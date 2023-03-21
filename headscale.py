@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import requests, json, os, logging
+import requests, json, os, logging, yaml
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
@@ -19,8 +19,21 @@ match LOG_LEVEL:
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
 ##################################################################
-
-def get_url():  return os.environ['HS_SERVER']
+def get_url(inpage=False):  
+    if not inpage: 
+        return os.environ['HS_SERVER']
+    config_file = ""
+    try:
+        config_file = open("/etc/headscale/config.yml",  "r")
+        app.logger.info("Opening /etc/headscale/config.yml")
+    except: 
+        config_file = open("/etc/headscale/config.yaml", "r")
+        app.logger.info("Opening /etc/headscale/config.yaml")
+    config_yaml = yaml.safe_load(config_file)
+    if "server_url" in config_yaml: 
+        return str(config_yaml["server_url"])
+    app.logge.warning("Failed to find server_url in the config. Falling back to ENV variable")
+    return os.environ['HS_SERVER']
 
 def set_api_key(api_key):
     # User-set encryption key

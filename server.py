@@ -19,7 +19,7 @@ LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 DEBUG_STATE = True if LOG_LEVEL == "DEBUG" else False
 
 # Initiate the Flask application and logging:
-app          = Flask(__name__, static_url_path="/static")
+app = Flask(__name__, static_url_path="/static")
 match LOG_LEVEL:
     case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
     case "INFO"    : app.logger.setLevel(logging.INFO)
@@ -27,7 +27,7 @@ match LOG_LEVEL:
     case "ERROR"   : app.logger.setLevel(logging.ERROR)
     case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 
-executor     = Executor(app)
+executor = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.logger.info("Headscale-WebUI Version:  "+os.environ["APP_VERSION"]+" / "+os.environ["GIT_BRANCH"])
 app.logger.info("LOG LEVEL SET TO %s", str(LOG_LEVEL))
@@ -134,7 +134,7 @@ else:
 
 ########################################################################################
 # / pages - User-facing pages
-######################################################ddddddddddd##################################
+########################################################################################
 @app.route('/')
 @app.route('/overview')
 @oidc.require_login
@@ -182,7 +182,7 @@ def machines_page():
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
         cards             = cards,
-        headscale_server  = headscale.get_url(),
+        headscale_server  = headscale.get_url(True),
         COLOR_NAV         = COLOR_NAV,
         COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
@@ -211,7 +211,6 @@ def users_page():
     cards = renderer.render_users_cards()
     return render_template('users.html',
         cards             = cards,
-        headscale_server  = headscale.get_url(),
         COLOR_NAV         = COLOR_NAV,
         COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,

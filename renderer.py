@@ -582,7 +582,7 @@ def oidc_nav_mobile(user_name, email_address, name):
     return Markup(html_payload)
 
 def render_search(page):
-    if page != "users" or page != "machines": return Markup("")
+    if page != "users" and page != "machines": return Markup("")
     html_payload = """
         <form>
             <div class="input-field">
