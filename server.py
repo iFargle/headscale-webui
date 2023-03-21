@@ -200,7 +200,7 @@ def users_page():
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
-    INPAGE_SEARCH = Markup(renderer.render_search()
+    INPAGE_SEARCH = Markup(renderer.render_search())
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
