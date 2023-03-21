@@ -583,15 +583,15 @@ def oidc_nav_mobile(user_name, email_address, name):
 
 def render_search(page):
     app.logger.info("Rendering search for %s page", page)
-    if page != "users":    return Markup("")
-    if page != "machines": return Markup("")
-    html_payload = """
-        <form>
-            <div class="input-field">
-                <input id="search" type="search" required>
-                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                <i class="material-icons">close</i>
-            </div>
-        </form>
-    """
-    return Markup(html_payload)
+    if page == "users" or page == "machines":
+        html_payload = """
+            <form>
+                <div class="input-field">
+                    <input id="search" type="search" required>
+                    <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                    <i class="material-icons">close</i>
+                </div>
+            </form>
+        """
+        return Markup(html_payload)
+    return Markup("")
