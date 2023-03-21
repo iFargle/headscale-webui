@@ -2,11 +2,11 @@
 // Expandable Search on Users and Machines pages
 //-----------------------------------------------------------
 function show_search() {
-    $('.').removeClass('hide');
+    $('#nav-search').removeClass('hide');
 
 }
 function hide_search() {
-    $('.').addClass('hide');
+    $('#nav-search').addClass('hide');
 
 }
 
