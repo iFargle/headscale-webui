@@ -429,7 +429,7 @@ def render_machines_cards():
     # Sort the content by machine_id:
     sorted_machines = {key: val for key, val in sorted(machine_content.items(), key = lambda ele: ele[0])}
 
-    content = "<ul class='collapsible popout expandable'>"
+    content = "<ul class='collapsible expandable'>"
     # Print the content
 
     for index in range(0, num_threads):
@@ -446,7 +446,7 @@ def render_users_cards():
     api_key   = headscale.get_api_key()
     user_list = headscale.get_users(url, api_key)
 
-    content = "<ul class='collapsible popout expandable'>"
+    content = "<ul class='collapsible expandable'>"
     for user in user_list["users"]:
         # Get all preAuth Keys in the user, only display if one exists:
         preauth_keys_collection = build_preauth_key_table(user["name"])
