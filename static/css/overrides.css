@@ -6,7 +6,7 @@
     margin-left: 5px;
 }
 
-.dropdown-oidc {
+.dropdown-oidc .dropdown-search {
     top: 64px !important;
     width: max-content !important;
     left: unset !important;

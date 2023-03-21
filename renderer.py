@@ -549,7 +549,7 @@ def build_preauth_key_table(user_name):
 def oidc_nav_dropdown(user_name, email_address, name):
     app.logger.info("OIDC is enabled.  Building the OIDC nav dropdown")
     html_payload = """
-        <!-- Dropdown Structure -->
+        <!-- OIDC Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
             <ul class="collection dropdown-oidc-collection">
                 <li class="collection-item dropdown-oidc-avatar avatar">
@@ -583,6 +583,8 @@ def oidc_nav_mobile(user_name, email_address, name):
 
 def render_search():
     html_payload = """
+        <!-- Search Dropdown Structure -->
+        <ul id="dropdown-search" class="dropdown-content dropdown-search">
         <form>
             <div class="input-field">
                 <input id="search" type="search" required>
@@ -590,5 +592,13 @@ def render_search():
                 <i class="material-icons">close</i>
             </div>
         </form>
+        <li class="divider"></li>
+            <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
+        </ul>
+        <li>
+            <a class="dropdown-trigger" href="#!" data-target="dropdown-search">
+                <i class="material-icons right">search</i>
+            </a>
+        </li>
     """
     return Markup(html_payload)
