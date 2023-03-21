@@ -583,22 +583,17 @@ def oidc_nav_mobile(user_name, email_address, name):
 
 def render_search():
     html_payload = """
-        <!-- Search Dropdown Structure -->
-        <ul id="dropdown-search" class="dropdown-content dropdown-search">
-        <form>
-            <div class="input-field">
-                <input id="search" type="search" required>
-                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                <i class="material-icons">close</i>
-            </div>
-        </form>
-        <li class="divider"></li>
-            <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
-        </ul>
-        <li>
-            <a class="dropdown-trigger" href="#!" data-target="dropdown-search">
-                <i class="material-icons right">search</i>
-            </a>
-        </li>
+        <li>    
+            <div class="center row">
+                <div class="col s12 " >
+                <div class="row" id="topbarsearch">
+                    <div class="input-field col s6 s12 red-text">
+                    <i class="red-text material-icons prefix">search</i>
+                    <input type="text" placeholder="search" id="autocomplete-input" class="autocomplete red-text" >
+                    </div>
+                    </div>
+                </div>
+                </div>          
+            </li>  
     """
     return Markup(html_payload)
