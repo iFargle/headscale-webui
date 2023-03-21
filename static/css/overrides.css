@@ -47,3 +47,27 @@ li.dropdown-oidc-collection{
 .datepicker-modal {
     width: max-content !important;
 }
+
+/* Search bar */
+@media only screen and (max-width: 600px) {
+    .searchbarfix{
+        height: 56px !important;
+        
+        
+    }
+  }
+  @media only screen and (min-width: 601px) {
+    .searchbarfix{
+        height: 64px !important;
+              
+    }
+  }
+  .navfix {
+    position:relative;
+    margin-right: 0;
+  }
+  
+  .navfix2 {
+    position:absolute;
+    
+  }
