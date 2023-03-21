@@ -429,13 +429,13 @@ def render_machines_cards():
     # Sort the content by machine_id:
     sorted_machines = {key: val for key, val in sorted(machine_content.items(), key = lambda ele: ele[0])}
 
-    content = "<div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>"
+    content = "<ul class="collapsible popout">"
     # Print the content
 
     for index in range(0, num_threads):
         content = content+str(sorted_machines[index])
 
-    content = content+"</div>"
+    content = content+"</ul>"
 
     return Markup(content)
 
