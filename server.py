@@ -171,6 +171,7 @@ def machines_page():
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search("machines"))
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
@@ -180,12 +181,13 @@ def machines_page():
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
-        cards            = cards,
-        headscale_server = headscale.get_url(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        cards             = cards,
+        headscale_server  = headscale.get_url(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE,
+        INPAGE_SEARCH     = INPAGE_SEARCH
     )
 
 @app.route('/users', methods=('GET', 'POST'))
@@ -198,6 +200,7 @@ def users_page():
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search("users"))
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
@@ -207,12 +210,13 @@ def users_page():
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
-        cards = cards,
-        headscale_server = headscale.get_url(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        cards             = cards,
+        headscale_server  = headscale.get_url(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE,
+        INPAGE_SEARCH     = INPAGE_SEARCH
     )
 
 @app.route('/settings', methods=('GET', 'POST'))

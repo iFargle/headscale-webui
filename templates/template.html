@@ -62,13 +62,13 @@
          <div class="nav-wrapper {{ COLOR_NAV }}">
            <img class="hide-on-med-and-down" style="padding-left: 10px" src="static/img/headscale3-dots.png" height="64px"></img>
            <a href="overview" class="brand-logo bold" style="padding-left: 10px">
-						Headscale
-						<div class="right">
-							<span class="left-align thin hide-on-small-only" style="padding-left: 10px">
-								{% block header %}{% endblock %}
-							</span>
-						</div>
-					</a>
+               ●::[●●] Headscale
+               <div class="right">
+                  <span class="left-align thin hide-on-small-only" style="padding-left: 10px">
+                     {% block header %}{% endblock %}
+                  </span>
+               </div>
+            </a>
            <a href="#!" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
            <ul class="right hide-on-med-and-down">
                <li role="menu-item" class="tooltipped {{ overview_active   }}" data-position="bottom" data-tooltip="Overview">
@@ -84,6 +84,7 @@
                   <a href="settings"><i class="material-icons">settings</i></a>
                </li>
                {% block OIDC_NAV_DROPDOWN %}{% endblock %}
+               {% block INPAGE_SEARCH %}{% endblock %}
             </ul>
          </div>
        </nav>
