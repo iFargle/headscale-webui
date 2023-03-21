@@ -48,9 +48,25 @@ li.dropdown-oidc-collection{
     width: max-content !important;
 }
 
-.hide {
-    -webkit-transition: all 0.5s ease;
-    -moz-transition: all 0.5s ease;
-    -o-transition: all 0.5s ease;
-    transition: all 0.5s ease;
-}
+.hide-transition {
+    -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
+    transition: -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
+    transition: transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
+    transition: transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63), -webkit-transform 0.3s cubic-bezier(0.53, 0.01, 0.36, 1.63) !important;
+  }
+  
+  .hide-transition.hide-out {
+    -webkit-transform: hide(0);
+            transform: scale(0);
+    -webkit-transition: -webkit-transform .2s !important;
+    transition: -webkit-transform .2s !important;
+    transition: transform .2s !important; 
+    transition: transform .2s, -webkit-transform .2s !important;
+    display: none !important
+  }
+  
+  .hide-transition.hide-in {
+    -webkit-transform: scale(1);
+            transform: scale(1);
+    display: unset !important
+  }
