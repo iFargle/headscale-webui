@@ -13,7 +13,6 @@
         $('#nav-search').removeClass('scale-in');
         $('#nav-search').addClass('scale-out');
     }
-    
 
 //-----------------------------------------------------------
 // General Helpers
