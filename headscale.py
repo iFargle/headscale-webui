@@ -19,7 +19,7 @@ match LOG_LEVEL:
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
 ##################################################################
-def get_url(inpage=False):  
+def get_url(inpage=False):
     if not inpage: 
         return os.environ['HS_SERVER']
     config_file = ""
