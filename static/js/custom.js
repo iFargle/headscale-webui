@@ -11,7 +11,7 @@ $(document).ready(function() {
         $('.search-hide').addClass('hide');
        if (trig == 1){
           $('#navfix2').animate({
-            width: '+=210',
+            width: '100%',
             marginRight: 0
           }, 200);
           
@@ -22,7 +22,7 @@ $(document).ready(function() {
       // if user leaves the form the width will go back to original state
       $("#search").focusout(function() {
           $('#navfix2').animate({
-          width: '-=210'
+          width: '64'
         }, 200);
        trig = trig - 1;
         //handle other nav elements visibility first to avoid push down
