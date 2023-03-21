@@ -1,15 +1,44 @@
 //-----------------------------------------------------------
 // Expandable Search on Users and Machines pages
 //-----------------------------------------------------------
-function show_search() {
-    $('#nav-search').removeClass('hide');
-    $('#nav-content').addClass('hide');
+$(document).ready(function() {
+    var trig = 1;
+    //fix for chrome
+    $("#search").addClass('searchbarfix');
+      //animate searchbar width increase to  +150%
+      $('#search').click(function(e) {
+        $('.search-hide').addClass('hide');
+       if (trig == 1){
+          $('#navfix2').animate({
+            width: '100%',
+            marginRight: 0
+          }, 200);
+          
+         trig ++; 
+         }
+      });
+    
+      // if user leaves the form the width will go back to original state
+      $("#search").focusout(function() {
+          $('#navfix2').animate({
+          width: '64'
+        }, 200);
+       trig = trig - 1;
+        //handle other nav elements visibility first to avoid push down
+            $('.search-hide').removeClass('hide');
+      });
+    });
 
-}
-function hide_search() {
-    $('#nav-search').addClass('hide');
-    $('#nav-content').removeClass('hide');
-}
+    function show_search() {
+        $('#nav-search').removeClass('hide', 500);
+        $('#nav-content').addClass('hide', 500);
+    
+    }
+    function hide_search() {
+        $('#nav-search').addClass('hide', 500);
+        $('#nav-content').removeClass('hide', 500);
+    }
+    
 
 //-----------------------------------------------------------
 // General Helpers
