@@ -64,7 +64,6 @@ li.dropdown-oidc-collection{
   }
   .navfix {
     position:relative;
-    margin-right: 0;
   }
   
   .navfix2 {
@@ -73,5 +72,5 @@ li.dropdown-oidc-collection{
   }
 
   nav form {
-    width: 64px;
+    width: 54px;
   }
