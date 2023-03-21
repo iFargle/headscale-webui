@@ -399,7 +399,7 @@ def move_user_page():
 def set_machine_tags():
     json_response = request.get_json()
     machine_id    = escape(json_response['id'])
-    machine_tags  = escape(json_response['tags_list'])
+    machine_tags  = (json_response['tags_list']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 

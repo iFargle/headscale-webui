@@ -48,7 +48,7 @@ li.dropdown-oidc-collection{
     width: max-content !important;
 }
 
-nav-search {
+.hide {
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
