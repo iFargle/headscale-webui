@@ -1,78 +1,78 @@
-        <li id="{{ machine_id }}-main-collapsible">
-            <div class="collapsible-header ">
-                <div class="col s8 m6">
-                    {{ status_badge }}
-                    <span class="truncate hover-container" id="{{ machine_id }}-name-container">
-                        {{ machine_id }}. {{ given_name }}
-                    </span>
-                </div>
-                    </span>
-                <div class="col s4 m6 activator">
-                    {{ user_badge       }}
-                    {{ exit_node_badge  }}
-                    {{ expiration_badge }}
-                </div>
-            </div>
-            <div class="collapsible-body">
-                <ul class="collection">
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle">settings</i>
-                        <span class="title">Machine Actions</span>
-                        <p class="hide-on-small-only">
-                            <a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a>
-                            <a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a>
-                            <a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a>
-                        </p>
-                        <p class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
-                            <ul class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
-                                <li><a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a></li>
-                                <li><a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a></li>
-                                <li><a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a></li>
-                            </ul>
-                        </p>
-                    </li>
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle">domain</i>
-                        <span class="title">Hostname</span>
-                        <p> {{ hostname }} </p>
-                    </li>
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle">language</i>
-                        <span class="title">User</span>
-                        <p id="{{ machine_id }}-user-container">{{ ns_name }}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">network_wifi</i>
-                      <span class="title">IP Addresses</span>
-                        <p>{{ machine_ips}}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">access_time</i>
-                      <span class="title">Last Seen</span>
-                        <p>{{ last_seen_time}}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">update</i>
-                      <span class="title">Last Update</span>
-                        <p>{{ last_update_time }}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">history</i>
-                      <span class="title">Created At</span>
-                        <p>{{ created_time }}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">hourglass_empty</i>
-                      <span class="title">Expiration</span>
-                        <p>{{ expiry_time }}</p>
-                    </li>
-                    <li class="collection-item avatar">
-                      <i class="material-icons circle">key</i>
-                      <span class="title">PreAuth Key Prefix</span>
-                        <p>{{ preauth_key }}</p>
-                    </li>
-                    {{ advertised_routes }}
-                    {{ machine_tags }}
-                </ul>
-            </div>
-        </li>
+<li id="{{ machine_id }}-main-collapsible">
+    <div class="collapsible-header ">
+        <div class="col s8 m6">
+            {{ status_badge }}
+            <span class="truncate hover-container" id="{{ machine_id }}-name-container">
+                {{ machine_id }}. {{ given_name }}
+            </span>
+        </div>
+            </span>
+        <div class="col s4 m6 activator">
+            {{ user_badge       }}
+            {{ exit_node_badge  }}
+            {{ expiration_badge }}
+        </div>
+    </div>
+    <div class="collapsible-body">
+        <ul class="collection">
+            <li class="collection-item avatar">
+                <i class="material-icons circle">settings</i>
+                <span class="title">Machine Actions</span>
+                <p class="hide-on-small-only">
+                    <a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a>
+                    <a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a>
+                    <a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a>
+                </p>
+                <p class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
+                    <ul class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
+                        <li><a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a></li>
+                        <li><a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a></li>
+                        <li><a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a></li>
+                    </ul>
+                </p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">domain</i>
+                <span class="title">Hostname</span>
+                <p> {{ hostname }} </p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">language</i>
+                <span class="title">User</span>
+                <p id="{{ machine_id }}-user-container">{{ ns_name }}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">network_wifi</i>
+                <span class="title">IP Addresses</span>
+                <p>{{ machine_ips}}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">access_time</i>
+                <span class="title">Last Seen</span>
+                <p>{{ last_seen_time}}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">update</i>
+                <span class="title">Last Update</span>
+                <p>{{ last_update_time }}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">history</i>
+                <span class="title">Created At</span>
+                <p>{{ created_time }}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">hourglass_empty</i>
+                <span class="title">Expiration</span>
+                <p>{{ expiry_time }}</p>
+            </li>
+            <li class="collection-item avatar">
+                <i class="material-icons circle">key</i>
+                <span class="title">PreAuth Key Prefix</span>
+                <p>{{ preauth_key }}</p>
+            </li>
+            {{ advertised_routes }}
+            {{ machine_tags }}
+        </ul>
+    </div>
+</li>

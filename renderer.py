@@ -446,7 +446,7 @@ def render_users_cards():
     api_key   = headscale.get_api_key()
     user_list = headscale.get_users(url, api_key)
 
-    content = "<div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>"
+    content = "<ul class='collapsible popout'>"
     for user in user_list["users"]:
         # Get all preAuth Keys in the user, only display if one exists:
         preauth_keys_collection = build_preauth_key_table(user["name"])
@@ -464,7 +464,7 @@ def render_users_cards():
             user_id                 = user["id"],
             preauth_keys_collection = Markup(preauth_keys_collection)
         ) 
-    content = content+"</div>"
+    content = content+"</ul>"
     return Markup(content)
 
 # Builds the preauth key table for the User page
