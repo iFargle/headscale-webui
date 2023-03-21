@@ -72,3 +72,7 @@ display: none !important
     z-index: 1000;
     visibility: visible;
 }
+
+.add_machine_selector_class {
+    position: absolute;
+}

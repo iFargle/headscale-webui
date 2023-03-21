@@ -578,7 +578,7 @@ function load_modal_add_machine() {
 
             modal_body.innerHTML = select_html
             // Initialize the form and the machine tabs
-            M.FormSelect.init(document.querySelectorAll('select'))
+            M.FormSelect.init(document.querySelectorAll('select'){classes='add_machine_selector_class'})
             M.Tabs.init(document.getElementById('new_machine_tabs'));
         }
     })
