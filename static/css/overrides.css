@@ -60,7 +60,7 @@ li.dropdown-oidc-collection{
   
   .nav-search {
     z-index: 1000;
-    visibility: unset;
+    visibility: visible;
     position: absolute; 
     width: 100%;
   }
@@ -68,3 +68,8 @@ li.dropdown-oidc-collection{
     z-index: -1000;
     visibility: hidden;
   }
+  .nav-search.show{
+    z-index: 1000;
+    visibility: visible;
+  }
+  
