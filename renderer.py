@@ -104,7 +104,7 @@ def render_overview():
     # Embedded DERP server information.
     enabled, region_id, region_code, region_name, stun_listen_addr = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "derp" in config_yaml:
-        if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"] == "True":
+        if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"]:
             if "enabled"          in config_yaml["derp"]["server"]: enabled          = str(config_yaml["derp"]["server"]["enabled"])          
             if "region_id"        in config_yaml["derp"]["server"]: region_id        = str(config_yaml["derp"]["server"]["region_id"])        
             if "region_code"      in config_yaml["derp"]["server"]: region_code      = str(config_yaml["derp"]["server"]["region_code"])      
