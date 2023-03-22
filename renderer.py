@@ -250,13 +250,12 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     routes = ""
 
     # Test if the machine is an exit node:
-    exit_node = False
+    exit_enabled = False
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
         advertised_and_enabled = False
         advertised_route       = False
         failover_route         = False
-        exit_enabled           = False
 
         # First, check if there are any routes that are both enabled and advertised
         for route in pulled_routes["routes"]:
