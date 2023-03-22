@@ -254,8 +254,9 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     # If the LENGTH of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
         advertised_and_enabled = False
-        advertised_route = False
-        failover_route = False
+        advertised_route       = False
+        failover_route         = False
+        exit_enabled           = False
 
         # First, check if there are any routes that are both enabled and advertised
         for route in pulled_routes["routes"]:
@@ -277,7 +278,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_routes  = []
             exit_enabled_color = "red"
             exit_tooltip = "enable"
-            exit_enabled = False
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -402,7 +402,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     user_color = helper.get_color(int(machine["user"]["id"]))
 
     # Generate the various badges:
-    status_badge      = "<i class='material-icons left tooltipped "+text_color+"' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
+    status_badge      = "<i class='material-icons left tooltipped " + text_color + "' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_enabled  else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
     expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
