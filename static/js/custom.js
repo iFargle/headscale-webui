@@ -13,6 +13,9 @@ function hide_search() {
     $('#nav-content').addClass('show');
     $('#nav-search').removeClass('show');
     $('#nav-search').addClass('hidden');
+
+    // Also remove the contents of the searchbox:
+    document.getElementById("search").value = ""
 }
 
 function liveSearch() {
