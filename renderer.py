@@ -203,8 +203,7 @@ def render_overview():
     # Remove OIDC if it isn't available:
     if "oidc" not in config_yaml: oidc_content = ""
     # Remove DERP if it isn't available or isn't enabled
-    if "derp" not in config_yaml: 
-        derp_content = ""
+    if "derp" not in config_yaml:  derp_content = ""
     if "derp" in config_yaml:
         if "server" in config_yaml["derp"]:
             if str(config_yaml["derp"]["server"]["enabled"]) == "False":
@@ -250,28 +249,25 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     routes = ""
 
     # Test if the machine is an exit node:
-    exit_enabled = False
+    exit_route_found = False
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
-        advertised_and_enabled = False
-        advertised_route       = False
-        failover_route         = False
+        advertised_routes = False
 
         # First, check if there are any routes that are both enabled and advertised
+        # If that is true, we will output the collection-item for routes.  Otherwise, it will not be displayed.
         for route in pulled_routes["routes"]:
-            if route ["advertised"] and route["enabled"]: 
-                advertised_and_enabled = True
-            if route["advertised"]:
-                advertised_route = True
-        if advertised_and_enabled or advertised_route:
+            if route["advertised"]: 
+                advertised_routes = True
+        if advertised_routes:
             routes = """
                 <li class="collection-item avatar">
                     <i class="material-icons circle">directions</i>
                     <span class="title">Routes</span>
                     <p><div>
             """
-            app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
-            app.logger.debug("All    Routes Dump:  "+str(all_routes))
+            # app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
+            # app.logger.debug("All    Routes Dump:  "+str(all_routes))
 
             # Find all exits and put their ID's into the exit_routes array
             exit_routes  = []
@@ -281,24 +277,24 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                     exit_routes.append(route["id"])
-                    exit_node = True
-                    app.logger.debug("Exit route ID's:  "+str(exit_routes))
+                    app.logger.debug("Found exit route ID's:  "+str(exit_routes))
+                    exit_route_found = True
                     # Test if it is enabled:
                     if route["enabled"]:
                         exit_enabled_color = "green"
                         exit_tooltip       = 'disable'
-                        exit_enabled       = True
 
             # Print the button for the Exit routes:
-            routes = routes+"""
-            <p 
-                class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
-                data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
-                id='"""+machine["id"]+"""-exit'
-                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_enabled)+"""')">
-                Exit Route
-            </p>
-            """
+            if exit_route_found:
+                routes = routes+"""
+                <p 
+                    class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
+                    data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
+                    id='"""+machine["id"]+"""-exit'
+                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_found)+"""')">
+                    Exit Route
+                </p>
+                """
 
             # Get the remaining routes
             for route in pulled_routes["routes"]:
@@ -403,8 +399,8 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     # Generate the various badges:
     status_badge      = "<i class='material-icons left tooltipped " + text_color + "' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
-    exit_node_badge   = "" if not exit_enabled  else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
-    expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
+    exit_node_badge   = "" if not exit_route_found else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
+    expiration_badge  = "" if not expiring_soon    else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
         'machines_card.html', 
