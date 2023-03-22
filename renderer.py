@@ -316,6 +316,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
                     route_tooltip = 'enable'
+                    color_index   = failover_pair_prefixes.index(str(route["prefix"]))
                     route_enabled_color = helper.get_color(color_index, "failover")
                     if route["enabled"]:
                         color_index   = failover_pair_prefixes.index(str(route["prefix"]))
