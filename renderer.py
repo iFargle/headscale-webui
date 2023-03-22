@@ -260,6 +260,7 @@ def thread_machine_content(machine, machine_content, idx):
 
         # First, check if there are any routes that are both enabled and advertised
         for route in pulled_routes["routes"]:
+            failover_route = route["isPrimary"]
             if route ["advertised"] and route["enabled"]: 
                 advertised_and_enabled = True
             if route["advertised"]:
