@@ -586,10 +586,7 @@ function load_modal_add_machine() {
             </div>`
             for (let i=0; i < response.users.length; i++) {
                 var name = response["users"][i]["name"]
-                select_html = select_html+`<p><br></p>`
             }
-            select_html = select_html+`<p><br></p>`
-            select_html = select_html+`<p><br></p>`
 
             modal_body.innerHTML = select_html
             // Initialize the form and the machine tabs

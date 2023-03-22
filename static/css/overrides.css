@@ -73,6 +73,6 @@ display: none !important
     visibility: visible;
 }
 
-.add_machine_selector_class {
+.add_machine_selector_class.ul {
     position: absolute;
 }
