@@ -255,6 +255,8 @@ def thread_machine_content(machine, machine_content, idx):
     if len(pulled_routes["routes"]) > 0:
         advertised_and_enabled = False
         advertised_route = False
+        failover_route = False
+
         # First, check if there are any routes that are both enabled and advertised
         for route in pulled_routes["routes"]:
             if route ["advertised"] and route["enabled"]: 
@@ -270,6 +272,7 @@ def thread_machine_content(machine, machine_content, idx):
             """
             for route in pulled_routes["routes"]:
                 app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                app.logger.debug("Route Dump:  "+str(route))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
@@ -375,6 +378,7 @@ def thread_machine_content(machine, machine_content, idx):
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_node else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
     expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
+    failover_badge    = "" if not failover_route else "<span class='badge green white-text text-lighten-3 tooltipped' data-position='left' data-tooltip='This machine has HA failover routes enabled'>HA Route</span>"
 
     machine_content[idx] = (str(render_template(
         'machines_card.html', 
@@ -391,6 +395,7 @@ def thread_machine_content(machine, machine_content, idx):
         exit_node_badge   = Markup(exit_node_badge),
         status_badge      = Markup(status_badge),
         user_badge        = Markup(user_badge),
+        failover_badge    = Markup(failover_badge),
         last_update_time  = str(last_update_time),
         last_seen_time    = str(last_seen_time),
         created_time      = str(created_time),
