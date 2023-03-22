@@ -272,6 +272,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_routes  = []
             exit_enabled_color = "red"
             exit_tooltip = "enable"
+            exit_route_enabled = False
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -282,6 +283,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     if route["enabled"]:
                         exit_enabled_color = "green"
                         exit_tooltip       = 'disable'
+                        exit_route_enabled = True
 
             # Print the button for the Exit routes:
             if exit_route_found:
@@ -289,7 +291,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                     data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
                     id='"""+machine["id"]+"""-exit'
-                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_found)+"""')">
+                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""')">
                     Exit Route
                 </p>
                 """
