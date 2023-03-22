@@ -309,7 +309,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
                         if route_info["id"] != route["id"]:
                             ha_enabled = False
-                            ha_routes = True
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
                             failover_pair_prefixes = str(route["prefix"])
                             if route["enabled"]:
@@ -325,7 +324,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
                         data-position='top' data-tooltip='Click to """+route_tooltip+""" (Failover Pair)'
                         id='"""+route['id']+"""'
-                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route_enabled)+"""')">
+                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route['enabled'])+"""')">
                         """+route['prefix']+"""
                     </p>
                     """
