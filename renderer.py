@@ -303,7 +303,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             # Check if the route has another enabled identical route.  
             for route in pulled_routes["routes"]:
                 for route_info in all_routes["routes"]:
-                    if str(route_info["prefix"]) == str(route["prefix"]) and route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0":
+                    if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
                         if route_info["id"] != route["id"]:
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
                             failover_pair_prefixes = str(route["prefix"])
