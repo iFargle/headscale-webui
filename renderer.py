@@ -275,7 +275,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_routes = []
 
             # Find all exits and put their ID's into the exit_routes array
-            for route in pulled_routes["rotues"]:
+            for route in pulled_routes["routes"]:
                 if route["enabled"]:
                     if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                         exit_routes.append(route["id"])
