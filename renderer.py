@@ -272,15 +272,34 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             """
             app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
             app.logger.debug("All    Routes Dump:  "+str(all_routes))
-            exit_routes = []
 
             # Find all exits and put their ID's into the exit_routes array
+            exit_routes  = []
+            exit_enabled = "red"
+            exit_tooltip = "disable"
+            exit_enabled = False
+            exit_id      = machine["id"]+"exit"
+            
             for route in pulled_routes["routes"]:
-                if route["enabled"]:
-                    if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
-                        exit_routes.append(route["id"])
-                        exit_node = True
-                        app.logger.debug("Exit route ID's:  "+str(exit_routes))
+                if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                    exit_routes.append(route["id"])
+                    exit_node = True
+                    app.logger.debug("Exit route ID's:  "+str(exit_routes))
+                    # Test if it is enabled:
+                    if route["enabled"]:
+                        exit_enabled_color = "green"
+                        exit_tooltip       = 'disable'
+                        exit_enabled       = True
+
+            # Print the button for the Exit routes:
+            routes = routes+"""
+            <p 
+                class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
+                data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
+                id='"""+exit_id+"""'
+                onclick="toggle_route("""+exit_routes[0]+""", """+exit_routes[1]+""", """+exit_id+""", '"""+str(route['enabled'])+"""')"> Exit Route
+            </p>
+            """
 
             for route in pulled_routes["routes"]:
                 app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
