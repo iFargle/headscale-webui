@@ -291,7 +291,8 @@ def thread_machine_content(machine, machine_content, idx):
 
     # Get machine tags
     tag_array = ""
-    for tag in machine["forcedTags"]: tag_array = tag_array+"{tag: '"+tag[4:]+"'}, "
+    for tag in machine["forcedTags"]: 
+        tag_array = tag_array+"{tag: '"+tag[4:]+"'}, "
     tags = """
         <li class="collection-item avatar">
             <i class="material-icons circle tooltipped" data-position="right" data-tooltip="Spaces will be replaced with a dash (-) upon page refresh">label</i>
@@ -397,6 +398,7 @@ def thread_machine_content(machine, machine_content, idx):
         preauth_key       = str(preauth_key),
         expiration_badge  = Markup(expiration_badge),
         machine_tags      = Markup(tags),
+        taglist           = machine["forcedTags"]
     )))
     app.logger.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 

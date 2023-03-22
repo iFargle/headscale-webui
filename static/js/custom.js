@@ -19,10 +19,6 @@ function liveSearch() {
     let cards = document.querySelectorAll('.searchable');
     let search_query = document.getElementById("search").value;
     
-    // Use innerText if all contents are visible
-    // Use textContent for including hidden elements
-    console.log("Cards Length: " + cards.length);
-    console.log("Search query:  "+search_query)
     for (var i = 0; i < cards.length; i++) {
         if(cards[i].textContent.toLowerCase() .includes(search_query.toLowerCase())) {
             cards[i].classList.remove("hide");
