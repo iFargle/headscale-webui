@@ -1,34 +1,35 @@
 //-----------------------------------------------------------
 // Search on Users and Machines pages
 //-----------------------------------------------------------
-    function show_search() {
-        $('#nav-search').removeClass('hidden');
-        $('#nav-search').addClass('show');
-        $('#nav-content').removeClass('show');
-        $('#nav-content').addClass('hidden');
-    }
-    function hide_search() {
-        $('#nav-content').removeClass('hidden');
-        $('#nav-content').addClass('show');
-        $('#nav-search').removeClass('show');
-        $('#nav-search').addClass('hidden');
-    }
+function show_search() {
+    $('#nav-search').removeClass('hidden');
+    $('#nav-search').addClass('show');
+    $('#nav-content').removeClass('show');
+    $('#nav-content').addClass('hidden');
+}
 
-    function liveSearch() {
-        let cards = document.querySelectorAll('.searchable')
-        let search_query = document.getElementById("searchbox").value;
-        
-        // Use innerText if all contents are visible
-        // Use textContent for including hidden elements
-        for (var i = 0; i < cards.length; i++) {
-            if(cards[i].textContent.toLowerCase()
-                    .includes(search_query.toLowerCase())) {
-                cards[i].classList.remove("hide");
-            } else {
-                cards[i].classList.add("hide");
-            }
+function hide_search() {
+    $('#nav-content').removeClass('hidden');
+    $('#nav-content').addClass('show');
+    $('#nav-search').removeClass('show');
+    $('#nav-search').addClass('hidden');
+}
+
+function liveSearch() {
+    let cards = document.querySelectorAll('.searchable');
+    let search_query = document.getElementById("searchbox").value;
+    
+    // Use innerText if all contents are visible
+    // Use textContent for including hidden elements
+    for (var i = 0; i < cards.length; i++) {
+        if(cards[i].textContent.toLowerCase()
+                .includes(search_query.toLowerCase())) {
+            cards[i].classList.remove("hide");
+        } else {
+            cards[i].classList.add("hide");
         }
     }
+}
 //-----------------------------------------------------------
 // General Helpers
 //-----------------------------------------------------------
