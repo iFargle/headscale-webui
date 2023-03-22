@@ -264,6 +264,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 <li class="collection-item avatar">
                     <i class="material-icons circle">directions</i>
                     <span class="title">Routes</span>
+                    <p>
             """
             # app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
             # app.logger.debug("All    Routes Dump:  "+str(all_routes))
@@ -314,7 +315,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         """+route['prefix']+"""
                     </p>
                     """
-            routes = routes+"</li>"
+            routes = routes+"</p></li>"
 
     # Get machine tags
     tag_array = ""
