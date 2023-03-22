@@ -297,7 +297,8 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                 data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
                 id='"""+exit_id+"""'
-                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", """+exit_id+""", '"""+str(exit_enabled)+"""')"> Exit Route
+                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", """+exit_id+""", '"""+str(exit_enabled)+"""')">
+                Exit Route
             </p>
             """
 
