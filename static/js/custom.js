@@ -864,12 +864,12 @@ function toggle_failover_route(route_id, current_state, color) {
                 element.className  = enabledClass
                 var action_taken   = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'")')
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+enableState+'", "'+color+'")')
             } else if (element.className == enabledClass) {
                 element.className    = disabledClass
                 var action_taken     = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'")')
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+disableState+'", "'+color+'")')
             }
             M.toast({html: 'Route '+action_taken});
         }
