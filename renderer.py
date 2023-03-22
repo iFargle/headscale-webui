@@ -285,7 +285,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         exit_tooltip       = 'disable'
                         exit_route_enabled = True
                     app.logger.debug("Found exit route ID's:  "+str(exit_routes))
-                    app.logger.debug("Exit Route Information:  ID:  %s | Enabled:  %s | exit_route_enabled:  %s / Found:  %s", str(route["id"]), str(route["enabled"], str(exit_route_enabled)), str(exit_route_found))
+                    app.logger.debug("Exit Route Information:  ID:  %s | Enabled:  %s | exit_route_enabled:  %s / Found:  %s", str(route["id"]), str(route["enabled"]), str(exit_route_enabled), str(exit_route_found))
 
             # Print the button for the Exit routes:
             if exit_route_found:
