@@ -74,5 +74,5 @@ display: none !important
 }
 
 .add_machine_selector_class.ul {
-    position: absolute;
+    position: unset !important;
 }
