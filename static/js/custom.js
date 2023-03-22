@@ -788,12 +788,12 @@ function toggle_exit(route1, route2, exit_id, current_state) {
                         element.className  = enabledClass
                         var action_taken   = "enabled."
                         element.setAttribute('data-tooltip', enabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', '+exit_id+', "'+enableState+'")')
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'")')
                     } else if (element.className == enabledClass) {
                         element.className    = disabledClass
                         var action_taken     = "disabled."
                         element.setAttribute('data-tooltip', disabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', '+exit_id+', "'+disableState+'")')
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'")')
                     }
                     M.toast({html: 'Exit Route '+action_taken});
                 }

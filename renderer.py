@@ -285,8 +285,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
             # Print the button for the Exit routes:
             if exit_route_found:
-                routes = routes+"""
-                <p 
+                routes = routes+""" <p 
                     class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                     data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
                     id='"""+machine["id"]+"""-exit'
@@ -304,8 +303,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     if route["enabled"]:
                         route_enabled = "green"
                         route_tooltip = 'disable'
-                    routes = routes+"""
-                    <p 
+                    routes = routes+""" <p 
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
                         data-position='top' data-tooltip='Click to """+route_tooltip+"""'
                         id='"""+route['id']+"""'
@@ -313,7 +311,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         """+route['prefix']+"""
                     </p>
                     """
-                routes = routes+"</li>"
+            routes = routes+"</li>"
 
     # Get machine tags
     tag_array = ""
