@@ -260,7 +260,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
         # First, check if there are any routes that are both enabled and advertised
         for route in pulled_routes["routes"]:
-            failover_route = route["isPrimary"]
             if route ["advertised"] and route["enabled"]: 
                 advertised_and_enabled = True
             if route["advertised"]:
@@ -272,7 +271,8 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     <span class="title">Routes</span>
                     <p><div>
             """
-            app.logger.debug("Route Dump:  "+str(pulled_routes))
+            app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
+            app.logger.debug("All    Routes Dump:  "+str(all_routes))
             for route in pulled_routes["routes"]:
                 app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
