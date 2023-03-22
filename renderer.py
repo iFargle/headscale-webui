@@ -231,7 +231,7 @@ def render_overview():
     content = "<br>" + overview_content + general_content + derp_content + oidc_content + dns_content + ""
     return Markup(content)
 
-def thread_machine_content(machine, machine_content, idx):
+def thread_machine_content(machine, machine_content, idx, all_routes):
     # machine      = passed in machine information
     # content      = place to write the content
 
@@ -272,26 +272,40 @@ def thread_machine_content(machine, machine_content, idx):
                     <span class="title">Routes</span>
                     <p><div>
             """
+            app.logger.debug("Route Dump:  "+str(pulled_routes))
             for route in pulled_routes["routes"]:
                 app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
-                app.logger.debug("Route Dump:  "+str(route))
                 # Check if the route is enabled:
                 route_enabled = "red"
                 route_tooltip = 'enable'
+                route_exit    = False
+
                 if route["enabled"]:
                     route_enabled = "green"
                     route_tooltip = 'disable'
-                    if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0" and str(route["enabled"]) == "True":
+                    if (route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0") and str(route["enabled"]) == "True" and exit_node is False:
                         exit_node = True
-                routes = routes+"""
-                <p 
-                    class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
-                    data-position='top' data-tooltip='Click to """+route_tooltip+"""'
-                    id='"""+route['id']+"""'
-                    onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
-                    """+route['prefix']+"""
-                </p>
-                """
+                        route_exit = True
+                if route_exit is True and exit_node is True: # This will only trigger once if there are two routes: 0.0.0.0/0 and ::/0
+                    routes = routes+"""
+                    <p 
+                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
+                        data-position='top' data-tooltip='Click to """+route_tooltip+"""'
+                        id='"""+route['id']+"""'
+                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
+                        """+route['prefix']+"""
+                    </p>
+                    """
+                else:
+                    routes = routes+"""
+                    <p 
+                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
+                        data-position='top' data-tooltip='Click to """+route_tooltip+"""'
+                        id='"""+route['id']+"""'
+                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
+                        """+route['prefix']+"""
+                    </p>
+                    """
             routes = routes+"</div></p></li>"
 
     # Get machine tags
@@ -380,7 +394,6 @@ def thread_machine_content(machine, machine_content, idx):
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_node else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
     expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
-    failover_badge    = "" if not failover_route else "<span class='badge green white-text text-lighten-3 tooltipped' data-position='left' data-tooltip='This machine has HA failover routes enabled'>HA Route</span>"
 
     machine_content[idx] = (str(render_template(
         'machines_card.html', 
@@ -397,7 +410,6 @@ def thread_machine_content(machine, machine_content, idx):
         exit_node_badge   = Markup(exit_node_badge),
         status_badge      = Markup(status_badge),
         user_badge        = Markup(user_badge),
-        failover_badge    = Markup(failover_badge),
         last_update_time  = str(last_update_time),
         last_seen_time    = str(last_seen_time),
         created_time      = str(created_time),
@@ -425,12 +437,18 @@ def render_machines_cards():
         app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
     # Flask-Executor Method:
+
+    # Get all routes
+    all_routes = headscale.get_routes(url, api_key)
+    app.logger.debug("All found routes")
+    app.logger.debug(str(all_routes))
+
     if LOG_LEVEL == "DEBUG":
         # DEBUG:  Do in a forloop:
-        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx)
+        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes)
     else:
         app.logger.info("Starting futures")
-        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx) for idx in iterable]
+        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes) for idx in iterable]
         # Wait for the executor to finish all jobs:
         wait(futures, return_when=ALL_COMPLETED)
         app.logger.info("Finished futures")

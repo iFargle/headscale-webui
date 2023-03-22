@@ -756,6 +756,11 @@ function delete_machine(machine_id) {
     })
 }
 
+function toggle_exit(route1, route2, current_state) {
+    toggle_route(route1, current_state);
+    toggle_route(route2, current_state)
+}
+
 function toggle_route(route_id, current_state) {
     var data = {"route_id": route_id, "current_state": current_state}
     $.ajax({
