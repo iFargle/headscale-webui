@@ -17,7 +17,7 @@ function hide_search() {
 
 function liveSearch() {
     let cards = document.querySelectorAll('.searchable');
-    let search_query = document.getElementById("searchbox").value;
+    let search_query = document.getElementById("search").value;
     
     // Use innerText if all contents are visible
     // Use textContent for including hidden elements

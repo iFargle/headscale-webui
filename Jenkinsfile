@@ -21,14 +21,11 @@ pipeline {
         timestamps()
     }
     stages {
-        stage ('Jenkins ENV') {
+        stage('Build ENV') {
             steps {
+
                 sh 'printenv'
                 script { BUILD_DATE = java.time.LocalDate.now() }
-            }
-        }
-        stage('Create Build ENV') {
-            steps {
                 sh """
                     # Create the builder:
                     docker buildx create --name $BUILDER_NAME --driver-opt=image=moby/buildkit
