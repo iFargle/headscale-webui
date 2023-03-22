@@ -303,21 +303,22 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             # Check if the route has another enabled identical route.  
             for route in pulled_routes["routes"]:
                 for route_info in all_routes["routes"]:
-                    if str(route_info["prefix"]) == str(route["prefix"]):
+                    if str(route_info["prefix"]) == str(route["prefix"]) and route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0":
                         if route_info["id"] != route["id"]:
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
                             failover_pair_prefixes = str(route["prefix"])
-                if route["prefix"] in failover_pair_prefixes:
+                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
                     route_tooltip = 'enable'
                     if route["enabled"]:
-                        route_enabled = helper.get_color(failover_pair_prefixes.index(str(route["prefix"])), "failover")
+                        color_index   = failover_pair_prefixes.index(str(route["prefix"]))
+                        route_enabled = helper.get_color(color_index, "failover")
                         route_tooltip = 'disable'
                     routes = routes+""" <p 
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
                         data-position='top' data-tooltip='Click to """+route_tooltip+""" (Failover Pair)'
                         id='"""+route['id']+"""'
-                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
+                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route_enabled)+"""')">
                         """+route['prefix']+"""
                     </p>
                     """
