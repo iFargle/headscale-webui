@@ -253,7 +253,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     exit_route_enabled = False
     # If the device has enabled Failover routes (High Availability routes)
     ha_routes = False
-    ha_color  = ""
 
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
@@ -310,9 +309,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
                         if route_info["id"] != route["id"]:
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
-                            ha_routes   = True
-                            color_index = failover_pair_prefixes.index(str(route["prefix"]))
-                            ha_color    = helper.get_color(color_index, "failover")
+                            ha_routes = True
                             failover_pair_prefixes = str(route["prefix"])
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
@@ -434,7 +431,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
     status_badge      = "<i class='material-icons left tooltipped " + text_color + "' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_route_enabled else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit</span>"
-    ha_route_badge    = "" if not ha_routes     else "<span class='badge "+ha_color+" white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled HA route.'>HA</span>"
+    ha_route_badge    = "" if not ha_routes     else "<span class='badge blue-grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled HA route.'>HA</span>"
     expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
