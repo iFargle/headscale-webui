@@ -310,7 +310,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                     route_enabled = "red"
                     route_tooltip = 'enable'
                     if route["enabled"]:
-                        route_enabled = helper.set_color_failover_pair(failover_pair_prefixes.index(str(route["prefix"])), "failover")
+                        route_enabled = helper.get_color(failover_pair_prefixes.index(str(route["prefix"])), "failover")
                         route_tooltip = 'disable'
                     routes = routes+""" <p 
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
