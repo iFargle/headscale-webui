@@ -275,10 +275,10 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
             # Find all exits and put their ID's into the exit_routes array
             exit_routes  = []
-            exit_enabled = "red"
+            exit_enabled_color = "red"
             exit_tooltip = "disable"
             exit_enabled = False
-            exit_id      = machine["id"]+"exit"
+            exit_id      = machine["id"]+"-exit"
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -297,7 +297,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                 data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
                 id='"""+exit_id+"""'
-                onclick="toggle_route("""+exit_routes[0]+""", """+exit_routes[1]+""", """+exit_id+""", '"""+str(route['enabled'])+"""')"> Exit Route
+                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", """+exit_id+""", '"""+str(route['enabled'])+"""')"> Exit Route
             </p>
             """
 
