@@ -274,6 +274,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_enabled_color = "red"
             exit_tooltip = "enable"
             exit_route_enabled = False
+            failover_pair_prefixes = []
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -298,13 +299,32 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 </p>
                 """
 
-            # Get the remaining routes
             for route in pulled_routes["routes"]:
                 # Check if the route has another enabled identical route.  This means it's a Route Failover pair:
-                for route in all_routes:
-
-
-                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0":
+                for route_info in all_routes:
+                    if route_info["prefix"] == route["prefix"]:
+                        if route_info["id"] != route["id"]:
+                            app.logger.info("HA pair found:  %s", str(route["prefix"]))
+                            failover_pair_prefixes = str(route["prefix"])
+                if route["prefix"] in failover_pair_prefixes:
+                    route_enabled = "red"
+                    route_tooltip = 'enable'
+                    if route["enabled"]:
+                        route_enabled = helper.set_color_failover_pair(failover_pair_prefixes.index(str(route["prefix"])), "failover")
+                        route_tooltip = 'disable'
+                    routes = routes+""" <p 
+                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
+                        data-position='top' data-tooltip='Click to """+route_tooltip+""" (Failover Pair)'
+                        id='"""+route['id']+"""'
+                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
+                        """+route['prefix']+"""
+                    </p>
+                    """
+                    
+            # Get the remaining routes:
+            for route in pulled_routes["routes"]:
+                # Get the remaining routes - No exits or failover pairs
+                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] not in failover_pair_prefixes:
                     app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                     route_enabled = "red"
                     route_tooltip = 'enable'
