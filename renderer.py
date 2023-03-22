@@ -251,7 +251,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
     # Test if the machine is an exit node:
     exit_node = False
-    failover_route = False
     # If the LENGTH of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
         advertised_and_enabled = False
@@ -273,6 +272,16 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             """
             app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
             app.logger.debug("All    Routes Dump:  "+str(all_routes))
+            exit_routes = []
+
+            # Find all exits and put their ID's into the exit_routes array
+            for route in pulled_routes["rotues"]:
+                if route["enabled"]:
+                    if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                        exit_routes.append(route["id"])
+                        exit_node = True
+                        app.logger.debug("Exit route ID's:  "+str(exit_routes))
+
             for route in pulled_routes["routes"]:
                 app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                 # Check if the route is enabled:
