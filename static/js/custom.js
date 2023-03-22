@@ -851,8 +851,8 @@ function toggle_failover_route(route_id, current_state, color) {
             var element         = document.getElementById(route_id);
             var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
             var enabledClass    = "waves-effect waves-light btn-small "+color+" lighten-2 tooltipped";
-            var disabledTooltip = "Click to enable"
-            var enabledTooltip  = "Click to disable"
+            var disabledTooltip = "Click to enable (Failover Pair)"
+            var enabledTooltip  = "Click to disable (Failover Pair)"
             var disableState    = "False"
             var enableState     = "True"
             var action_taken    = "unchanged.";

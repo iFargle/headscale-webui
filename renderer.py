@@ -324,7 +324,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
                         data-position='top' data-tooltip='Click to """+route_tooltip+""" (Failover Pair)'
                         id='"""+route['id']+"""'
-                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route['enabled'])+"""')">
+                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route_enabled)+"""')">
                         """+route['prefix']+"""
                     </p>
                     """
