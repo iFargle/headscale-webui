@@ -16,6 +16,10 @@ function hide_search() {
 
     // Also remove the contents of the searchbox:
     document.getElementById("search").value = ""
+    let cards = document.querySelectorAll('.searchable');
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.remove("hide");
+    }
 }
 
 function liveSearch() {
