@@ -85,6 +85,30 @@ pipeline {
                 }
             }
         }
+        stage('Pull Test') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        sh """
+                            docker pull git.sysctl.io/albert/headscale-webui:latest
+                            docker pull registry-1.docker.io/ifargle/headscale-webui:latest
+                            docker pull ghcr.io/ifargle/headscale-webui:latest
+                            docker pull git.sysctl.io/albert/headscale-webui:${APP_VERSION}
+                            docker pull registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION}
+                            docker pull ghcr.io/ifargle/headscale-webui:${APP_VERSION}
+                        """
+                    }
+                    else {
+                        sh """
+                            docker pull git.sysctl.io/albert/headscale-webui:testing 
+                            docker pull ghcr.io/ifargle/headscale-webui:testing 
+                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} 
+                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} 
+                        """
+                    }
+                }
+            }
+        }
     }
     post {
         always {
