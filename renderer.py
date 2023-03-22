@@ -300,6 +300,10 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
             # Get the remaining routes
             for route in pulled_routes["routes"]:
+                # Check if the route has another enabled identical route.  This means it's a Route Failover pair:
+                for route in all_routes:
+
+
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0":
                     app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                     route_enabled = "red"
