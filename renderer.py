@@ -310,7 +310,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         if route_info["id"] != route["id"]:
                             ha_enabled = False
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
-                            failover_pair_prefixes = str(route["prefix"])
+                            failover_pair_prefixes.append(str(route["prefix"]))
                             if route["enabled"]:
                                 ha_enabled = True
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
