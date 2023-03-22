@@ -22,8 +22,7 @@ function liveSearch() {
     // Use innerText if all contents are visible
     // Use textContent for including hidden elements
     for (var i = 0; i < cards.length; i++) {
-        if(cards[i].textContent.toLowerCase()
-                .includes(search_query.toLowerCase())) {
+        if(cards[i].textContent.toLowerCase() .includes(search_query.toLowerCase())) {
             cards[i].classList.remove("hide");
         } else {
             cards[i].classList.add("hide");
@@ -594,7 +593,7 @@ function load_modal_add_machine() {
 
             modal_body.innerHTML = select_html
             // Initialize the form and the machine tabs
-            M.FormSelect.init(document.querySelectorAll('select'){classes='add_machine_selector_class'})
+            M.FormSelect.init(document.querySelectorAll('select'), {classes: 'add_machine_selector_class'})
             M.Tabs.init(document.getElementById('new_machine_tabs'));
         }
     })
