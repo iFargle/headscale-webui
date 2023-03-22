@@ -250,6 +250,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
 
     # Test if the machine is an exit node:
     exit_route_found = False
+    exit_route_enabled = False
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
     if len(pulled_routes["routes"]) > 0:
         advertised_routes = False
@@ -299,8 +300,8 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                 </p>
                 """
 
+            # Check if the route has another enabled identical route.  
             for route in pulled_routes["routes"]:
-                # Check if the route has another enabled identical route.  This means it's a Route Failover pair:
                 for route_info in all_routes["routes"]:
                     if str(route_info["prefix"]) == str(route["prefix"]):
                         if route_info["id"] != route["id"]:
