@@ -1,6 +1,6 @@
 name: Remove old package versions
 on:
-  [push]
+  workflow_dispatch:
 jobs:
   remove-package-versions:
     runs-on: ubuntu-latest
