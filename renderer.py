@@ -278,7 +278,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_enabled_color = "red"
             exit_tooltip = "enable"
             exit_enabled = False
-            exit_id      = machine["id"]+"-exit"
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -296,26 +295,21 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             <p 
                 class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                 data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
-                id='"""+exit_id+"""'
-                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+exit_id+"""', '"""+str(exit_enabled)+"""')">
+                id='"""+machine["id"]+"""-exit'
+                onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_enabled)+"""')">
                 Exit Route
             </p>
             """
 
+            # Get the remaining routes
             for route in pulled_routes["routes"]:
-                app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
-                # Check if the route is enabled:
-                route_enabled = "red"
-                route_tooltip = 'enable'
-                route_exit    = False
-
-                if route["enabled"]:
-                    route_enabled = "green"
-                    route_tooltip = 'disable'
-                    if (route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0") and str(route["enabled"]) == "True" and exit_node is False:
-                        exit_node = True
-                        route_exit = True
-                if route_exit is True and exit_node is True: # This will only trigger once if there are two routes: 0.0.0.0/0 and ::/0
+                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0":
+                    app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                    route_enabled = "red"
+                    route_tooltip = 'enable'
+                    if route["enabled"]:
+                        route_enabled = "green"
+                        route_tooltip = 'disable'
                     routes = routes+"""
                     <p 
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
@@ -325,17 +319,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
                         """+route['prefix']+"""
                     </p>
                     """
-                else:
-                    routes = routes+"""
-                    <p 
-                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
-                        data-position='top' data-tooltip='Click to """+route_tooltip+"""'
-                        id='"""+route['id']+"""'
-                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
-                        """+route['prefix']+"""
-                    </p>
-                    """
-            routes = routes+"</div></p></li>"
+                routes = routes+"</div></p></li>"
 
     # Get machine tags
     tag_array = ""
@@ -413,15 +397,14 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
         preauth_key = str(machine["preAuthKey"]["key"])[0:10]
     else: preauth_key = "None"
 
-    # Set the status badge color:
+    # Set the status and user badge color:
     text_color = helper.text_color_duration(last_seen_delta)
-    # Set the user badge color:
     user_color = helper.get_color(int(machine["user"]["id"]))
 
     # Generate the various badges:
     status_badge      = "<i class='material-icons left tooltipped "+text_color+"' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
-    exit_node_badge   = "" if not exit_node else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
+    exit_node_badge   = "" if not exit_enabled  else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit Node</span>"
     expiration_badge  = "" if not expiring_soon else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
