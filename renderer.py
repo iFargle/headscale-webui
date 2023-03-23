@@ -701,7 +701,7 @@ def render_routes():
         enabled    = route["enabled"]
         primary    = route["isPrimary"]
         # Build a simple table:
-        conetnt += """
+        content += """
         <tr>
             <td>"""+str(route_id   )+"""</td>
             <td>"""+str(machine    )+"""</td>
