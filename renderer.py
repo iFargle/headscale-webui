@@ -731,9 +731,8 @@ def render_routes():
         is_exit     = False 
 
 
-        enabled = "<i id='%s' onclick='toggle_route_routes_page(%s, \'True\')' class='material-icons green-text text-lighten-2 tooltipped'data-tooltip='Click to disable'>fiber_manual_record</i>", route["id"], route["id"]
-        enabled = "<i id='%s' onclick='toggle_route_routes_page(%s, \'False\')' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>", route["id"], route["id"]
-        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+        enabled =  "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \'True\')'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+        disabled = "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \'False\')' class='material-icons red-text   text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
 
         # Set the displays:
         enabled_display  = disabled
