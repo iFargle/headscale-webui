@@ -682,45 +682,61 @@ def render_routes():
     content += """
     <thead>
         <tr>
-            <th>ID      </th>
-            <th>Machine </th>
-            <th>prefix  </th>
-            <th>Enabled </th>
-            <th>Primary </th>
+            <th>ID       </th>
+            <th>Machine  </th>
+            <th>prefix   </th>
+            <th>Enabled  </th>
+            <th>Primary  </th>
+            <th>Failover </th>
         </tr>
     </thead>
     <tbody>
     """
     for route in all_routes["routes"]:
         # Get relevant info:
-        route_id   = route["id"]
-        machine    = route["machine"]["givenName"]
-        prefix     = route["prefix"]
-        is_enabled = route["enabled"]
-        is_primary = route["isPrimary"]
+        route_id    = route["id"]
+        machine     = route["machine"]["givenName"]
+        prefix      = route["prefix"]
+        is_enabled  = route["enabled"]
+        is_primary  = route["isPrimary"]
+        is_failover = False
+        is_exit     = False 
 
         # Set up the display code:
-        enabled = "<i class='material-icons left tooltipped green-text' id='"+route["id"]+"-status'>fiber_manual_record</i>"
+        enabled = "<i class='material-icons left green-text'>fiber_manual_record</i>"
         disabled = ""
 
         # Set the displays:
-        if is_enabled: is_enabled = enabled
-        else:          is_enabled = disabled
-        if is_primary: is_primary = enabled
-        else:          is_primary = disabled
+        enabled_display  = disabled
+        primary_display  = disabled
+        failover_display = disabled
+        exit_display     = disabled
 
-        is_exit = False 
-        if prefix == "0.0.0.0/0" or "::/0": is_exit = True
+        if is_enabled: 
+            enabled_display = enabled
+        if is_primary: 
+            primary_display = enabled
+        # Check if a prefix is an Exit route:
+        if prefix == "0.0.0.0/0" or prefix == "::/0": 
+            is_exit = True
+            exit_display = True
+        # Check if a prefix is part of a failover pair:
+        for route_check in all_routes["routes"]:
+            if route["prefix"] == route_check["prefix"]:
+                if route["id"] != route_check["id"]:
+                    is_failover = True
+                    failover_display = enabled
 
         if prefix is not is_exit:
         # Build a simple table for all non-exit routes:
             content += """
             <tr>
-                <td>"""+str(route_id   )+"""</td>
-                <td>"""+str(machine    )+"""</td>
-                <td>"""+str(prefix     )+"""</td>
-                <td>"""+str(is_enabled )+"""</td>
-                <td>"""+str(is_primary )+"""</td>
+                <td>"""+str(route_id         )+"""</td>
+                <td>"""+str(machine          )+"""</td>
+                <td>"""+str(prefix           )+"""</td>
+                <td>"""+str(enabled_display  )+"""</td>
+                <td>"""+str(primary_display  )+"""</td>
+                <td>"""+str(failover_display )+"""</td>
             </tr>
             """
     content += "</tbody></table>"
