@@ -810,7 +810,7 @@ def render_routes():
                         is_failover = True
                         failover_display = enabled
 
-        if not is_exit and not is_failover:
+        if not is_exit and is_failover:
         # Build a simple table for all non-exit routes:
             failover_content += """
             <tr>
@@ -870,7 +870,7 @@ def render_routes():
                         is_failover = True
                         failover_display = enabled
 
-        if not is_exit and not is_failover:
+        if is_exit:
         # Build a simple table for all non-exit routes:
             exit_content += """
             <tr>
