@@ -479,7 +479,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
     )))
     app.logger.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
-# Render the cards for the machines page:
 def render_machines_cards():
     app.logger.info("Rendering machine cards")
     url           = headscale.get_url()
@@ -525,7 +524,6 @@ def render_machines_cards():
 
     return Markup(content)
 
-# Render the cards for the Users page:
 def render_users_cards():
     app.logger.info("Rendering Users cards")
     url       = headscale.get_url()
@@ -553,7 +551,6 @@ def render_users_cards():
     content = content+"</ul>"
     return Markup(content)
 
-# Builds the preauth key table for the User page
 def build_preauth_key_table(user_name):
     app.logger.info("Building the PreAuth key table for User:  %s", str(user_name))
     url            = headscale.get_url()
@@ -661,7 +658,6 @@ def oidc_nav_dropdown(user_name, email_address, name):
     return Markup(html_payload)
 
 def oidc_nav_mobile(user_name, email_address, name):
-# https://materializecss.github.io/materialize/sidenav.html
     html_payload = """
          <li><hr><a href="logout"><i class="material-icons left">exit_to_app</i>Logout</a></li>
     """
@@ -674,3 +670,11 @@ def render_search():
     </li>
     """
     return Markup(html_payload)
+
+def render_routes():
+    app.logger.info("Rendering Routes page")
+    url           = headscale.get_url()
+    api_key       = headscale.get_api_key()
+
+    all_routes = headscale.get_routes(url, api_key)
+    return str(all_routes)

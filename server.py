@@ -154,12 +154,39 @@ def overview_page():
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     return render_template('overview.html',
-        render_page = renderer.render_overview(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        render_page       = renderer.render_overview(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE
     )
+
+@app.route('/routes', methods=('GET', 'POST'))
+@oidc.require_login
+def routes_page():
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search())
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
+    
+    return render_template('routes.html',
+        render_page       = renderer.render_routes(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE
+    )
+
 
 @app.route('/machines', methods=('GET', 'POST'))
 @oidc.require_login

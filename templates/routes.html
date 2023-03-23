@@ -1,0 +1,30 @@
+{% extends 'template.html' %}
+{% set page = "Routes" %}
+{% set routes_active = "active" %}
+
+{% block title  %} {{ page }} {% endblock %}
+{% block header %} {{ page }} {% endblock %}
+
+{% block OIDC_NAV_DROPDOWN %} {{ OIDC_NAV_DROPDOWN}} {% endblock %}
+{% block OIDC_NAV_MOBILE %}   {{ OIDC_NAV_MOBILE  }} {% endblock %}
+
+{% block content %}
+<div class="row"><br>
+    <div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>
+        {{ render_page }}
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="card_modal" class="modal">
+    <div class="modal-content">
+        <h4 id="modal_title"></h4>
+        <p id="modal_content"></p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" id="modal_confirm" class="hide">Confirm</a>
+        <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </div>
+</div>
+        
+{% endblock %}
