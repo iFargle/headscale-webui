@@ -314,16 +314,19 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                     # ... If the route prefixes match and are not exit nodes ... 
                     if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
                         # Check if the route ID's match.  If they don't ... 
+                        app.logger.debug("Found a match:  %s and %s", str(route["prefix"]), str(route_info["prefix"]))
                         if route_info["id"] != route["id"]:
+                            app.logger.debug("Route ID's don't match.  They're on different nodes.")
                             # ... Check if the routes prefix is already in the array...
                             if route["prefix"] not in failover_pair_prefixes:
                                 #  IF it isn't, add it.
-                                app.logger.info("HA pair found:  %s", str(route["prefix"]))
+                                app.logger.info("New HA pair found:  %s", str(route["prefix"]))
                                 failover_pair_prefixes.append(str(route["prefix"]))
                             else:
                                 # If it is already in the array. . .
                                 # Show as HA only if both routes are enabled:
                                 if route["enabled"] and route_info["enabled"]:
+                                    app.logger.debug("Both routes are enabled.  Setting as HA [%s] (%s) ", str(machine["givenMame"]), str(route["prefix"]))
                                     ha_enabled = True
                 # If the route is an exit node and already counted as a failover route, it IS a failover route, so display it.
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
