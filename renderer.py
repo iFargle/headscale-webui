@@ -278,7 +278,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             exit_enabled_color = "red"
             exit_tooltip = "enable"
             exit_route_enabled = False
-            failover_pair_prefixes = []
             
             for route in pulled_routes["routes"]:
                 if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
@@ -307,7 +306,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes):
             for route in pulled_routes["routes"]:
                 for route_info in all_routes["routes"]:
                     if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
-                        if route_info["id"] != route["id"]:
+                        if route_info["id"] != route["id"] and route["prefix"] not in failover_pair_prefixes:
                             ha_enabled = False
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
                             failover_pair_prefixes.append(str(route["prefix"]))
@@ -477,6 +476,7 @@ def render_machines_cards():
     num_threads = len(machines_list["machines"])
     iterable = []
     machine_content = {}
+    failover_pair_prefixes = []
     for i in range (0, num_threads):
         app.logger.debug("Appending iterable:  "+str(i))
         iterable.append(i)
@@ -489,10 +489,10 @@ def render_machines_cards():
 
     if LOG_LEVEL == "DEBUG":
         # DEBUG:  Do in a forloop:
-        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes)
+        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
     else:
         app.logger.info("Starting futures")
-        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes) for idx in iterable]
+        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
         # Wait for the executor to finish all jobs:
         wait(futures, return_when=ALL_COMPLETED)
         app.logger.info("Finished futures")
