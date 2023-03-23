@@ -690,7 +690,8 @@ def render_routes():
 
     markup_pre = """
     <div class="row">
-        <div class="col">
+        <div class="col m1"></div>
+        <div class="col s12 m10">
             <div class="card">
                 <div class="card-content">
     """
@@ -698,6 +699,7 @@ def render_routes():
                 </div>
             </div>
         </div>
+        <div class="col m1"></div>
     </div>
     """
 
