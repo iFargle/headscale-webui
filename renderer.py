@@ -722,12 +722,13 @@ def render_routes():
             exit_display = True
         # Check if a prefix is part of a failover pair:
         for route_check in all_routes["routes"]:
-            if route["prefix"] == route_check["prefix"]:
-                if route["id"] != route_check["id"]:
-                    is_failover = True
-                    failover_display = enabled
+            if not is_exit:
+                if route["prefix"] == route_check["prefix"]:
+                    if route["id"] != route_check["id"]:
+                        is_failover = True
+                        failover_display = enabled
 
-        if prefix is not is_exit:
+        if not is_exit:
         # Build a simple table for all non-exit routes:
             content += """
             <tr>
