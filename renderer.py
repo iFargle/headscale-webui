@@ -307,7 +307,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
             # Check if the route has another enabled identical route.  
             # Check all routes from the current machine...
             for route in pulled_routes["routes"]:
-                ha_enabled = False
                 # ... against all routes from all machines ....
                 for route_info in all_routes["routes"]:
                     app.logger.debug("Comparing routes %s and %s", str(route["prefix"]), str(route_info["prefix"]))
