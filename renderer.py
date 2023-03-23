@@ -704,7 +704,7 @@ def render_routes():
 
     # Step 1:  Get all non-exit and non-failover routes:
     route_content = markup_pre+route_title
-    route_content += "<table>"
+    route_content += "<li><table>"
     route_content += """
     <thead>
         <tr>
@@ -760,11 +760,11 @@ def render_routes():
                 <td>"""+str(enabled_display  )+"""</td>
             </tr>
             """
-    route_content += "</tbody></table>"+markup_post
+    route_content += "</tbody></table></li></li>"+markup_post
 
     # Step 2:  Get all failover routes only:
     failover_content = markup_pre+failover_title
-    failover_content += "<table>"
+    failover_content += "<li><table>"
     failover_content += """
     <thead>
         <tr>
@@ -820,11 +820,11 @@ def render_routes():
                 <td>"""+str(enabled_display  )+"""</td>
             </tr>
             """
-    failover_content += "</tbody></table>"+markup_post
+    failover_content += "</tbody></table></li>"+markup_post
     # Step 3:  Get exit nodes only:
 
     exit_content = markup_pre+exit_title
-    exit_content += "<table>"
+    exit_content += "<li><table>"
     exit_content += """
     <thead>
         <tr>
@@ -880,7 +880,7 @@ def render_routes():
                 <td>"""+str(enabled_display  )+"""</td>
             </tr>
             """
-    exit_content += "</tbody></table>"+markup_post
+    exit_content += "</tbody></table></li>"+markup_post
 
     content = route_content + failover_content + exit_content
     return Markup(content)
