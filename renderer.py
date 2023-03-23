@@ -715,7 +715,7 @@ def render_routes():
             <th>ID       </th>
             <th>Machine  </th>
             <th>Route    </th>
-            <th>Enabled  </th>
+            <th width="60px">Enabled  </th>
         </tr>
     </thead>
     <tbody>
@@ -770,8 +770,8 @@ def render_routes():
             <th>ID       </th>
             <th>Machine  </th>
             <th>Route    </th>
-            <th>Enabled  </th>
-            <th>Primary  </th>
+            <th width="60px">Enabled  </th>
+            <th width="60px">Primary  </th>
         </tr>
     </thead>
     <tbody>
@@ -859,7 +859,7 @@ def render_routes():
             exit_content += """
             <tr>
                 <td>"""+str(machine          )+"""</td>
-                <td><center>"""+str(enabled_display  )+"""</center></td>
+                <td width="60px"><center>"""+str(enabled_display  )+"""</center></td>
             </tr>
             """
     exit_content += "</tbody></table></p>"+markup_post
