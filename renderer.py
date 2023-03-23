@@ -820,8 +820,8 @@ def render_routes():
                 <td>"""+str(route_id         )+"""</td>
                 <td>"""+str(machine          )+"""</td>
                 <td>"""+str(prefix           )+"""</td>
-                <td>"""+str(enabled_display  )+"""</td>
-                <td>"""+str(primary_display  )+"""</td>
+                <td><center>"""+str(enabled_display  )+"""</center></td>
+                <td><center>"""+str(primary_display  )+"""</center></td>
             </tr>
             """
     failover_content += "</tbody></table></p>"+markup_post
@@ -871,7 +871,7 @@ def render_routes():
             exit_content += """
             <tr>
                 <td>"""+str(machine          )+"""</td>
-                <td>"""+str(enabled_display  )+"""</td>
+                <td><center>"""+str(enabled_display  )+"""</center></td>
             </tr>
             """
     exit_content += "</tbody></table></p>"+markup_post
