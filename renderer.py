@@ -675,19 +675,21 @@ def render_routes():
     app.logger.info("Rendering Routes page")
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
+    all_routes    = headscale.get_routes(url, api_key)
 
-    all_routes = headscale.get_routes(url, api_key)
+    # Set up the displays:
+    enabled = "<i class='material-icons left tooltipped green-text' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
+    disabled = ""
     
     content = "<table>"
     content += """
     <thead>
         <tr>
-            <th>route_id   </th>
-            <th>machine    </th>
-            <th>prefix     </th>
-            <th>advertised </th>
-            <th>enabled    </th>
-            <th>primary    </th>
+            <th>ID      </th>
+            <th>Machine </th>
+            <th>prefix  </th>
+            <th>Enabled </th>
+            <th>Primary </th>
         </tr>
     </thead>
     <tbody>
@@ -697,20 +699,29 @@ def render_routes():
         route_id   = route["id"]
         machine    = route["machine"]["givenName"]
         prefix     = route["prefix"]
-        advertised = route["advertised"]
-        enabled    = route["enabled"]
-        primary    = route["isPrimary"]
-        # Build a simple table:
-        content += """
-        <tr>
-            <td>"""+str(route_id   )+"""</td>
-            <td>"""+str(machine    )+"""</td>
-            <td>"""+str(prefix     )+"""</td>
-            <td>"""+str(advertised )+"""</td>
-            <td>"""+str(enabled    )+"""</td>
-            <td>"""+str(primary    )+"""</td>
-        </tr>
-        """
+        is_enabled = route["enabled"]
+        is_primary = route["isPrimary"]
+
+        # Set the displays:
+        if is_enabled: is_enabled = enabled
+        else:          is_enabled = disabled
+        if is_primary: is_primary = enabled
+        else:          is_primary = disabled
+
+        is_exit = False 
+        if prefix == "0.0.0.0/0" or "::/0": is_exit = True
+
+        if prefix is not is_exit:
+        # Build a simple table for all non-exit routes:
+            content += """
+            <tr>
+                <td>"""+str(route_id   )+"""</td>
+                <td>"""+str(machine    )+"""</td>
+                <td>"""+str(prefix     )+"""</td>
+                <td>"""+str(is_enabled )+"""</td>
+                <td>"""+str(is_primary )+"""</td>
+            </tr>
+            """
     content += "</tbody></table>"
 
     return Markup(content)
