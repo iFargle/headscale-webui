@@ -687,6 +687,9 @@ def render_routes():
     failover_title='<span class="card-title"><h4>Failover Routes</h4></span>'
     exit_title='<span class="card-title"><h4>Exit Routes</h4></span>'
 
+    # Set up the display code:
+    enabled = "<i class='material-icons green-text'>fiber_manual_record</i>"
+    disabled = ""
 
     markup_pre = """
     <div class="row">
@@ -727,10 +730,6 @@ def render_routes():
         is_primary  = route["isPrimary"]
         is_failover = False
         is_exit     = False 
-
-        # Set up the display code:
-        enabled = "<i class='material-icons left green-text'>fiber_manual_record</i>"
-        disabled = ""
 
         # Set the displays:
         enabled_display  = disabled
@@ -789,10 +788,6 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
-        # Set up the display code:
-        enabled = "<i class='material-icons left green-text'>fiber_manual_record</i>"
-        disabled = ""
-
         # Set the displays:
         enabled_display  = disabled
         primary_display  = disabled
@@ -820,8 +815,8 @@ def render_routes():
                 <td>"""+str(route_id         )+"""</td>
                 <td>"""+str(machine          )+"""</td>
                 <td>"""+str(prefix           )+"""</td>
-                <td><center>"""+str(enabled_display  )+"""</center></td>
-                <td><center>"""+str(primary_display  )+"""</center></td>
+                <td>"""+str(enabled_display  )+"""</td>
+                <td>"""+str(primary_display  )+"""</td>
             </tr>
             """
     failover_content += "</tbody></table></p>"+markup_post
@@ -849,10 +844,6 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
-        # Set up the display code:
-        enabled = "<i class='material-icons left green-text'>fiber_manual_record</i>"
-        disabled = ""
-
         # Set the displays:
         enabled_display  = disabled
         primary_display  = disabled
@@ -871,7 +862,7 @@ def render_routes():
             exit_content += """
             <tr>
                 <td>"""+str(machine          )+"""</td>
-                <td><center>"""+str(enabled_display  )+"""</center></td>
+                <td>"""+str(enabled_display  )+"""</td>
             </tr>
             """
     exit_content += "</tbody></table></p>"+markup_post
