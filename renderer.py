@@ -687,10 +687,6 @@ def render_routes():
     failover_title='<span class="card-title"><h4>Failover Routes</h4></span>'
     exit_title='<span class="card-title"><h4>Exit Routes</h4></span>'
 
-    # Set up the display code:
-    enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-    disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
-
     markup_pre = """
     <div class="row">
         <div class="col m1"></div>
@@ -730,9 +726,8 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
-
-        enabled =  "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \'True\')'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
-        disabled = "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \'False\')' class='material-icons red-text   text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
+        enabled =  "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"True\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+        disabled = "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"False\")' class='material-icons red-text   text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
 
         # Set the displays:
         enabled_display  = disabled
@@ -786,6 +781,10 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
+        # Set up the display code:
+        enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+
         # Set the displays:
         enabled_display  = disabled
         primary_display  = disabled
@@ -838,6 +837,10 @@ def render_routes():
         is_primary  = route["isPrimary"]
         is_failover = False
         is_exit     = False 
+
+        # Set up the display code:
+        enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
 
         # Set the displays:
         enabled_display  = disabled
