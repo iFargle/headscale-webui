@@ -677,4 +677,40 @@ def render_routes():
     api_key       = headscale.get_api_key()
 
     all_routes = headscale.get_routes(url, api_key)
-    return str(all_routes)
+    
+    content = "<table>"
+    content += """
+    <thead>
+        <tr>
+            <th>route_id   </th>
+            <th>machine    </th>
+            <th>prefix     </th>
+            <th>advertised </th>
+            <th>enabled    </th>
+            <th>primary    </th>
+        </tr>
+    </thead>
+    <tbody>
+    """
+    for route in all_routes["routes"]:
+        # Get relevant info:
+        route_id   = route["id"]
+        machine    = route["machine"]["givenName"]
+        prefix     = route["prefix"]
+        advertised = route["advertised"]
+        enabled    = route["enabled"]
+        primary    = route["primary"]
+        # Build a simple table:
+        conetnt += """
+        <tr>
+            <td>"""+str(route_id   )+"""</td>
+            <td>"""+str(machine    )+"""</td>
+            <td>"""+str(prefix     )+"""</td>
+            <td>"""+str(advertised )+"""</td>
+            <td>"""+str(enabled    )+"""</td>
+            <td>"""+str(primary    )+"""</td>
+        </tr>
+        """
+    content += "</tbody></table>"
+
+    return Markup(content)
