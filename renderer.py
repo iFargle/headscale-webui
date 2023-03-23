@@ -688,8 +688,8 @@ def render_routes():
     exit_title='<span class="card-title"><h4>Exit Routes</h4></span>'
 
     # Set up the display code:
-    enabled = "<i class='material-icons green-text'>fiber_manual_record</i>"
-    disabled = ""
+    enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+    disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
 
     markup_pre = """
     <div class="row">
@@ -730,14 +730,15 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
+
+        enabled = "<i id='%s' onclick='toggle_route_routes_page(%s, \'True\')' class='material-icons green-text text-lighten-2 tooltipped'data-tooltip='Click to disable'>fiber_manual_record</i>", route["id"], route["id"]
+        enabled = "<i id='%s' onclick='toggle_route_routes_page(%s, \'False\')' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>", route["id"], route["id"]
+        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+
         # Set the displays:
         enabled_display  = disabled
-        primary_display  = disabled
-        failover_display = disabled
-        exit_display     = disabled
 
         if is_enabled:  enabled_display = enabled
-        if is_primary:  primary_display = enabled
         # Check if a prefix is an Exit route:
         if prefix == "0.0.0.0/0" or prefix == "::/0": 
             is_exit = True
@@ -789,8 +790,6 @@ def render_routes():
         # Set the displays:
         enabled_display  = disabled
         primary_display  = disabled
-        failover_display = disabled
-        exit_display     = disabled
 
         if is_enabled:  enabled_display = enabled
         if is_primary:  primary_display = enabled
