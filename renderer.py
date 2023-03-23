@@ -677,17 +677,41 @@ def render_routes():
     api_key       = headscale.get_api_key()
     all_routes    = headscale.get_routes(url, api_key)
 
-    
-    content = "<table>"
-    content += """
+    # If there are no routes, just exit:
+    if len(all_routes) == 0: return Markup("<br><br><br><center>There are no routes to display!</center>")
+    routes_content   = ""
+    failover_content = ""
+    exit_content     = ""
+
+    routes_title='<li class="collection-header"><h4>Routes</h4></li>'
+    failover_title='<li class="collection-header"><h4>Failover Routes</h4></li>'
+    exit_title='<li class="collection-header"><h4>Exit Routes</h4></li>'
+
+
+    markup_pre = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+    """
+    markup_post = """ 
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+
+
+    # Step 1:  Get all non-exit and non-failover routes:
+    route_content = markup_pre+route_title
+    routes_content += "<table>"
+    routes_content += """
     <thead>
         <tr>
             <th>ID       </th>
             <th>Machine  </th>
             <th>prefix   </th>
             <th>Enabled  </th>
-            <th>Primary  </th>
-            <th>Failover </th>
         </tr>
     </thead>
     <tbody>
@@ -712,10 +736,8 @@ def render_routes():
         failover_display = disabled
         exit_display     = disabled
 
-        if is_enabled: 
-            enabled_display = enabled
-        if is_primary: 
-            primary_display = enabled
+        if is_enabled:  enabled_display = enabled
+        if is_primary:  primary_display = enabled
         # Check if a prefix is an Exit route:
         if prefix == "0.0.0.0/0" or prefix == "::/0": 
             is_exit = True
@@ -730,16 +752,19 @@ def render_routes():
 
         if not is_exit:
         # Build a simple table for all non-exit routes:
-            content += """
+            routes_content += """
             <tr>
                 <td>"""+str(route_id         )+"""</td>
                 <td>"""+str(machine          )+"""</td>
                 <td>"""+str(prefix           )+"""</td>
                 <td>"""+str(enabled_display  )+"""</td>
-                <td>"""+str(primary_display  )+"""</td>
-                <td>"""+str(failover_display )+"""</td>
             </tr>
             """
-    content += "</tbody></table>"
+    routes_content += "</tbody></table>"+markup_post
 
+    # Step 2:  Get all failover routes only:
+
+    # Step 3:  Get exit nodes only:
+
+    content = routes_content + failover_content + exit_content
     return Markup(content)
