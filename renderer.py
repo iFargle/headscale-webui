@@ -230,7 +230,7 @@ def render_overview():
     content = "<br>" + overview_content + general_content + derp_content + oidc_content + dns_content + ""
     return Markup(content)
 
-def thread_machine_content(machine, machine_content, idx, all_routes):
+def thread_machine_content(machine, machine_content, idx, all_routes, failover_pair_prefixes):
     # machine      = passed in machine information
     # content      = place to write the content
 
