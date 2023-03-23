@@ -234,8 +234,10 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
     # machine      = passed in machine information
     # content      = place to write the content
 
-    app.logger.debug("Machine Information")
-    app.logger.debug(str(machine))
+    # app.logger.debug("Machine Information")
+    # app.logger.debug(str(machine))
+    app.logger.debug("Machine Information =================")
+    app.logger.debug("Name:  %s, ID:  %s, User:  %s, givenName: %s, ", str(machine["name"]), str(machine["id"]), str(machine["user"]["name"]), str(machine["givenName"]))
 
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
@@ -310,7 +312,8 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                             ha_enabled = False
                             app.logger.info("HA pair found:  %s", str(route["prefix"]))
                             failover_pair_prefixes.append(str(route["prefix"]))
-                            if route["enabled"]:
+                            # Show as HA only if both routes are enabled:
+                            if route["enabled"] and route_info["enabled"]:
                                 ha_enabled = True
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
@@ -484,8 +487,8 @@ def render_machines_cards():
 
     # Get all routes
     all_routes = headscale.get_routes(url, api_key)
-    app.logger.debug("All found routes")
-    app.logger.debug(str(all_routes))
+    # app.logger.debug("All found routes")
+    # app.logger.debug(str(all_routes))
 
     if LOG_LEVEL == "DEBUG":
         # DEBUG:  Do in a forloop:
