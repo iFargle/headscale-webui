@@ -699,7 +699,7 @@ def render_routes():
         prefix     = route["prefix"]
         advertised = route["advertised"]
         enabled    = route["enabled"]
-        primary    = route["primary"]
+        primary    = route["isPrimary"]
         # Build a simple table:
         conetnt += """
         <tr>
