@@ -825,16 +825,15 @@ def render_routes():
             </tr>
             """
     failover_content += "</tbody></table></p>"+markup_post
-    # Step 3:  Get exit nodes only:
 
+    # Step 3:  Get exit nodes only:
+    # Display by machine, not by route
     exit_content = markup_pre+exit_title
     exit_content += "<p><table>"
     exit_content += """
     <thead>
         <tr>
-            <th>ID       </th>
             <th>Machine  </th>
-            <th>Route    </th>
             <th>Enabled  </th>
         </tr>
     </thead>
@@ -863,7 +862,7 @@ def render_routes():
         if is_enabled:  enabled_display = enabled
         if is_primary:  primary_display = enabled
         # Check if a prefix is an Exit route:
-        if prefix == "0.0.0.0/0" or prefix == "::/0": 
+        if prefix == "0.0.0.0/0": # I assume nodes have both ::/0 and 0.0.0.0/0
             is_exit = True
             exit_display = True
 
@@ -871,9 +870,7 @@ def render_routes():
         # Build a simple table for all non-exit routes:
             exit_content += """
             <tr>
-                <td>"""+str(route_id         )+"""</td>
                 <td>"""+str(machine          )+"""</td>
-                <td>"""+str(prefix           )+"""</td>
                 <td>"""+str(enabled_display  )+"""</td>
             </tr>
             """
