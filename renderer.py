@@ -774,6 +774,7 @@ def render_routes():
             <th>Machine  </th>
             <th>Route    </th>
             <th>Enabled  </th>
+            <th>Primary  </th>
         </tr>
     </thead>
     <tbody>
@@ -820,6 +821,7 @@ def render_routes():
                 <td>"""+str(machine          )+"""</td>
                 <td>"""+str(prefix           )+"""</td>
                 <td>"""+str(enabled_display  )+"""</td>
+                <td>"""+str(primary_display  )+"""</td>
             </tr>
             """
     failover_content += "</tbody></table></p>"+markup_post
@@ -864,13 +866,6 @@ def render_routes():
         if prefix == "0.0.0.0/0" or prefix == "::/0": 
             is_exit = True
             exit_display = True
-        # Check if a prefix is part of a failover pair:
-        for route_check in all_routes["routes"]:
-            if not is_exit:
-                if route["prefix"] == route_check["prefix"]:
-                    if route["id"] != route_check["id"]:
-                        is_failover = True
-                        failover_display = enabled
 
         if is_exit:
         # Build a simple table for all non-exit routes:
