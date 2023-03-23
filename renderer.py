@@ -677,9 +677,6 @@ def render_routes():
     api_key       = headscale.get_api_key()
     all_routes    = headscale.get_routes(url, api_key)
 
-    # Set up the displays:
-    enabled = "<i class='material-icons left tooltipped green-text' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
-    disabled = ""
     
     content = "<table>"
     content += """
@@ -701,6 +698,10 @@ def render_routes():
         prefix     = route["prefix"]
         is_enabled = route["enabled"]
         is_primary = route["isPrimary"]
+
+        # Set up the display code:
+        enabled = "<i class='material-icons left tooltipped green-text' id='"+route["id"]+"-status'>fiber_manual_record</i>"
+        disabled = ""
 
         # Set the displays:
         if is_enabled: is_enabled = enabled
