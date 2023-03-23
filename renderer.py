@@ -326,7 +326,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                                 # If it is already in the array. . .
                                 # Show as HA only if both routes are enabled:
                                 if route["enabled"] and route_info["enabled"]:
-                                    app.logger.debug("Both routes are enabled.  Setting as HA [%s] (%s) ", str(machine["givenMame"]), str(route["prefix"]))
+                                    app.logger.debug("Both routes are enabled.  Setting as HA [%s] (%s) ", str(machine["name"]), str(route["prefix"]))
                                     ha_enabled = True
                 # If the route is an exit node and already counted as a failover route, it IS a failover route, so display it.
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
