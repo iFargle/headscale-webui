@@ -305,16 +305,26 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                 """
 
             # Check if the route has another enabled identical route.  
+            # Check all routes from the current machine...
             for route in pulled_routes["routes"]:
+                # ... against all routes from all machines ....
                 for route_info in all_routes["routes"]:
+                    # ... If the route prefixes match and are not exit nodes ... 
                     if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
-                        if route_info["id"] != route["id"] and route["prefix"] not in failover_pair_prefixes:
-                            ha_enabled = False
-                            app.logger.info("HA pair found:  %s", str(route["prefix"]))
-                            failover_pair_prefixes.append(str(route["prefix"]))
-                            # Show as HA only if both routes are enabled:
-                            if route["enabled"] and route_info["enabled"]:
-                                ha_enabled = True
+                        # Check if the route ID's match.  If they don't ... 
+                        if route_info["id"] != route["id"]:
+                            # ... Check if the routes prefix is already in the array...
+                            if route["prefix"] not in failover_pair_prefixes:
+                                #  IF it isn't, add it.
+                                ha_enabled = False
+                                app.logger.info("HA pair found:  %s", str(route["prefix"]))
+                                failover_pair_prefixes.append(str(route["prefix"]))
+                            else:
+                                # If it is already in the array. . .
+                                # Show as HA only if both routes are enabled:
+                                if route["enabled"] and route_info["enabled"]:
+                                    ha_enabled = True
+                # If the route is an exit node and already counted as a failover route, it IS a failover route, so display it.
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
                     route_tooltip = 'enable'
