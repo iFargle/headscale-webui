@@ -756,9 +756,30 @@ function delete_machine(machine_id) {
     })
 }
 
-function toggle_exit(route1, route2, exit_id, current_state) {
+function toggle_exit(route1, route2, exit_id, current_state, page) {
     var data1 = {"route_id": route1, "current_state": current_state}
     var data2 = {"route_id": route2, "current_state": current_state}
+    var element = document.getElementById(exit_id);
+
+    var disabledClass = ""
+    var enabledClass  = ""
+
+    if (page == "machines") {
+        disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
+        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+    }
+    if (page == "routes") {
+        disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    }
+
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged.";
+
+
     $.ajax({
         type:"POST", 
         url: "api/update_route",
@@ -772,26 +793,14 @@ function toggle_exit(route1, route2, exit_id, current_state) {
                 contentType: "application/json",
                 success: function(response) {
                     // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-                    var element         = document.getElementById(exit_id);
-                    var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-                    var enabledClass    = "waves-effect waves-light btn-small green lighten-2 tooltipped";
-                    var disabledTooltip = "Click to enable"
-                    var enabledTooltip  = "Click to disable"
-                    var disableState    = "False"
-                    var enableState     = "True"
-                    var action_taken    = "unchanged.";
-                    
                     if (element.className == disabledClass) {
-                        // 1.  Change the class to change the color of the icon
-                        // 2.  Change the "action taken" for the M.toast popup
-                        // 3.  Change the tooltip to say "Click to enable/disable"
                         element.className  = enabledClass
-                        var action_taken   = "enabled."
+                        action_taken   = "enabled."
                         element.setAttribute('data-tooltip', enabledTooltip)
                         element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'")')
                     } else if (element.className == enabledClass) {
                         element.className    = disabledClass
-                        var action_taken     = "disabled."
+                        action_taken     = "disabled."
                         element.setAttribute('data-tooltip', disabledTooltip)
                         element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'")')
                     }
@@ -818,12 +827,6 @@ function toggle_route(route_id, current_state, page) {
         enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
     }
 
-    console.log("In toggle_routes:  ")
-    console.log("Editing route "+route_id+" for page:  "+page+" (enabled? "+current_state+")")
-    console.log("disabledClass:  "+disabledClass)
-    console.log("enabledClass:  "+enabledClass)
-    console.log("Data:  "+data)
-
     var disabledTooltip = "Click to enable"
     var enabledTooltip  = "Click to disable"
     var disableState    = "False"
@@ -835,13 +838,9 @@ function toggle_route(route_id, current_state, page) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(response) {
-            // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
             if (element.className == disabledClass) {
-                // 1.  Change the class to change the color of the icon
                 element.className = enabledClass
-                // 2.  Change the "action taken" for the M.toast popup
                 action_taken      = "enabled."
-                // 3.  Change the tooltip to say "Click to enable/disable"
                 element.setAttribute('data-tooltip', enabledTooltip)
                 element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'", "'+page+'")')
             } else if (element.className == enabledClass) {

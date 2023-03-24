@@ -299,7 +299,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                     class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
                     data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
                     id='"""+machine["id"]+"""-exit'
-                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""')">
+                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""', 'machines')">
                     Exit Route
                 </p>
                 """
@@ -707,7 +707,7 @@ def render_routes():
     route_content = markup_pre+route_title
     route_content += """<p><table>
     <thead>
-        <tr>d
+        <tr>
             <th>ID       </th>
             <th>Machine  </th>
             <th>Route    </th>
@@ -814,52 +814,55 @@ def render_routes():
     failover_content += "</tbody></table></p>"+markup_post
 
     # Step 3:  Get exit nodes only:
+    exit_node_list = []
+    # Get a list of nodes with exit routes:
+    for route in all_routes["routes"]:
+        # For every exit route found, store the machine name in an array:
+        if prefix == "0.0.0.0/0" or prefix == "::/0":
+            if machine not in exit_node_list: 
+                exit_node_list.append(machine)
+
+    # Exit node display building:
     # Display by machine, not by route
     exit_content = markup_pre+exit_title
     exit_content += """<p><table>
     <thead>
         <tr>
-            <th>Machine  </th>
-            <th>Enabled  </th>
+            <th>Machine</th>
+            <th>Enabled</th>
         </tr>
     </thead>
     <tbody>
     """
-    for route in all_routes["routes"]:
-        # Get relevant info:
-        route_id    = route["id"]
-        machine     = route["machine"]["givenName"]
-        prefix      = route["prefix"]
-        is_enabled  = route["enabled"]
-        is_primary  = route["isPrimary"]
-        is_failover = False
-        is_exit     = False 
+    # Get exit route ID's for each node in the list: 
+    # onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""')
+    for node in exit_node_list:
+        node_exit_routes = []
+        exit_enabled = False
+        for route in all_routes["routes"]:
+            # Get all exit route ID's for that node:
+            route_id = route["id"]
+            machine  = route["machine"]["givenName"]
+
+            if machine == node:
+                if route_id == "0.0.0.0/0" or route_id == "::/0":
+                    node_exit_routes.append(route_id)
+                    if route["enabled"]: 
+                        exit_enabled = True
 
         # Set up the display code:
-        enabled = "<a href='#'><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
-        disabled = "<a href='#'><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
+        enabled  = "<a href='#'><i id='"+node["id"]+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+node['id']+", '"+node['id']+"-exit', 'routes')' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
+        disabled = "<a href='#'><i id='"+node["id"]+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+node['id']+", '"+node['id']+"-exit', 'routes')' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
 
         # Set the displays:
-        enabled_display  = disabled
-        primary_display  = disabled
-        failover_display = disabled
-        exit_display     = disabled
-
-        if is_enabled:  enabled_display = enabled
-        if is_primary:  primary_display = enabled
-        # Check if a prefix is an Exit route:
-        if prefix == "0.0.0.0/0": # I assume nodes have both ::/0 and 0.0.0.0/0
-            is_exit = True
-            exit_display = True
-
-        if is_exit:
-        # Build a simple table for all non-exit routes:
-            exit_content += """
-            <tr>
-                <td>"""+str(machine          )+"""</td>
-                <td width="60px"><center>"""+str(enabled_display  )+"""</center></td>
-            </tr>
-            """
+        enabled_display = enabled if exit_enabled else disabled
+        # Build a table for all exit routes:
+        exit_content += """
+        <tr>
+            <td>"""+str(machine          )+"""</td>
+            <td width="60px"><center>"""+str(enabled_display)+"""</center></td>
+        </tr>
+        """
     exit_content += "</tbody></table></p>"+markup_post
 
     content = route_content + failover_content + exit_content
