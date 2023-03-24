@@ -805,18 +805,25 @@ function toggle_exit(route1, route2, exit_id, current_state) {
 function toggle_route(route_id, current_state, page) {
     var data    = {"route_id": route_id, "current_state": current_state}
     var element = document.getElementById(route_id);
-    console.log("Editing route "+route_id+" for page:  "+page+" (enabled? "+current_state+")")
+
     var disabledClass = ""
     var enabledClass  = ""
 
     if (page == "routes") {
-        disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
-        enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
+        disabledClass = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
+        enabledClass  = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
     }
     if (page == "machines") {
-        disabledClass   = "material-icons red-text text-lighten-2 tooltipped";
-        enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
+        disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
     }
+
+    console.log("In toggle_routes:  ")
+    console.log("Editing route "+route_id+" for page:  "+page+" (enabled? "+current_state+")")
+    console.log("disabledClass:  "+disabledClass)
+    console.log("enabledClass:  "+enabledClass)
+    console.log("Data:  "+data)
+
     var disabledTooltip = "Click to enable"
     var enabledTooltip  = "Click to disable"
     var disableState    = "False"
