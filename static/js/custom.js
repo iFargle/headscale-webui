@@ -803,8 +803,8 @@ function toggle_exit(route1, route2, exit_id, current_state) {
 }
 
 function toggle_route(route_id, current_state, page="machines") {
-    var data = {"route_id": route_id, "current_state": current_state}
-    var element         = document.getElementById(route_id);
+    var data    = {"route_id": route_id, "current_state": current_state}
+    var element = document.getElementById(route_id);
     if (page == "machines") {
         var disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
         var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
@@ -825,7 +825,6 @@ function toggle_route(route_id, current_state, page="machines") {
         contentType: "application/json",
         success: function(response) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-
             if (element.className == disabledClass) {
                 // 1.  Change the class to change the color of the icon
                 element.className = enabledClass
