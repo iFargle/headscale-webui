@@ -711,7 +711,7 @@ def render_routes():
             <th>ID       </th>
             <th>Machine  </th>
             <th>Route    </th>
-            <th width="60px">Enabled  </th>
+            <th width="60px">Enabled</th>
         </tr>
     </thead>
     <tbody>
