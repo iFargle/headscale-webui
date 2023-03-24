@@ -837,32 +837,30 @@ def render_routes():
     # Get exit route ID's for each node in the list: 
     # onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""')
     for node in exit_node_list:
-        node_exit_routes = []
+        node_exit_route_ids = []
         exit_enabled = False
+        exit_available = False
         machine_id = 0
         for route in all_routes["routes"]:
-            # Get all exit route ID's for that node:
-            route_id = route["id"]
-            machine  = route["machine"]["givenName"]
-            machine_id  = route["machine"]["id"]
-
-            if machine == node:
-                if route_id == "0.0.0.0/0" or route_id == "::/0":
-                    node_exit_routes.append(route_id)
-                    if route["enabled"]: 
+            if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                if route["machine"]["givenName"] == node:
+                    node_exit_route_ids.append(route["id"])
+                    machine_id = route["machine"]["id"]
+                    exit_available = True
+                    if route["enabled"]:
                         exit_enabled = True
 
-        # Set up the display code:
-        enabled  = "<a href='#'><i id='"+str(machine_id)+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+machine_id+", '"+machine_id+"-exit', 'routes')' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
-        disabled = "<a href='#'><i id='"+str(machine_id)+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+machine_id+", '"+machine_id+"-exit', 'routes')' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
+        
+        if exit_available:
+            # Set up the display code:
+            enabled  = "<a href='#'><i id='"+str(machine_id)+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+machine_id+", '"+machine_id+"-exit', 'routes')' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
+            disabled = "<a href='#'><i id='"+str(machine_id)+"-exit' onclick='toggle_exit("+node_exit_routes[0]+","+node_exit_routes[1]+","+machine_id+", '"+machine_id+"-exit', 'routes')' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
+            # Set the displays:
+            enabled_display = enabled if exit_enabled else disabled
 
-        # Set the displays:
-        enabled_display = enabled if exit_enabled else disabled
-        # Build a table for all exit routes:
-        if exit_enabled:
             exit_content += """
             <tr>
-                <td>"""+str(node )+"""</td>
+                <td>"""+str(node)+"""</td>
                 <td width="60px"><center>"""+str(enabled_display)+"""</center></td>
             </tr>
             """
