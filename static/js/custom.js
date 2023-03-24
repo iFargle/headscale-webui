@@ -806,14 +806,16 @@ function toggle_route(route_id, current_state, page) {
     var data    = {"route_id": route_id, "current_state": current_state}
     var element = document.getElementById(route_id);
     console.log("Editing route "+route_id+" for page:  "+page+" (enabled? "+current_state+")")
-    
+    var disabledClass = ""
+    var enabledClass  = ""
+
     if (page == "machines") {
-        var disabledClass   = "waves-effect waves-light btn-small red-text   lighten-2 tooltipped";
-        var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
+        disabledClass   = "waves-effect waves-light btn-small red-text   lighten-2 tooltipped";
+        enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
     }
     if (page == "routes") {
-        var disabledClass   = "material-icons red-text   text-lighten-2 tooltipped";
-        var enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
+        disabledClass   = "material-icons red-text   text-lighten-2 tooltipped";
+        enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
     }
     var disabledTooltip = "Click to enable"
     var enabledTooltip  = "Click to disable"
