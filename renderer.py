@@ -726,24 +726,21 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
-        enabled =  "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"True\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
-        disabled = "<i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"False\")' class='material-icons red-text   text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
+        enabled =  "<a href=""><i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"True\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
+        disabled = "<a href=""><i id='"+route["id"]+"' onclick='toggle_route_routes_page("+route["id"]+", \"False\")' class='material-icons red-text   text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
 
         # Set the displays:
         enabled_display  = disabled
 
         if is_enabled:  enabled_display = enabled
         # Check if a prefix is an Exit route:
-        if prefix == "0.0.0.0/0" or prefix == "::/0": 
-            is_exit = True
-            exit_display = True
+        if prefix == "0.0.0.0/0" or prefix == "::/0":  is_exit = True
         # Check if a prefix is part of a failover pair:
         for route_check in all_routes["routes"]:
             if not is_exit:
                 if route["prefix"] == route_check["prefix"]:
                     if route["id"] != route_check["id"]:
                         is_failover = True
-                        failover_display = enabled
 
         if not is_exit and not is_failover:
         # Build a simple table for all non-exit routes:
@@ -839,8 +836,8 @@ def render_routes():
         is_exit     = False 
 
         # Set up the display code:
-        enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+        enabled = "<a href=""><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
+        disabled = "<a href=""><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
 
         # Set the displays:
         enabled_display  = disabled
