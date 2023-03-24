@@ -772,7 +772,7 @@ function toggle_exit(route1, route2, exit_id, current_state) {
                 contentType: "application/json",
                 success: function(response) {
                     // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-                    var element         = document.getElementById(exit_id);
+                    var element         = document.getElementById(edddddddxit_id);
                     var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
                     var enabledClass    = "waves-effect waves-light btn-small green lighten-2 tooltipped";
                     var disabledTooltip = "Click to enable"
@@ -812,8 +812,8 @@ function toggle_route(route_id, current_state) {
         success: function(response) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
             var element         = document.getElementById(route_id);
-            var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-            var enabledClass    = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+            var disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
+            var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
             var disabledTooltip = "Click to enable"
             var enabledTooltip  = "Click to disable"
             var disableState    = "False"
