@@ -848,8 +848,8 @@ function toggle_route_routes_page(route_id, current_state) {
         success: function(response) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
             var element         = document.getElementById(route_id);
-            var disabledClass   = "material-icons green-text text-lighten-2 tooltipped";
-            var enabledClass    = "material-icons red-text text-lighten-2 tooltipped";
+            var disabledClass   = "material-icons red-text text-lighten-2 tooltipped";
+            var enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
             var disabledTooltip = "Click to enable"
             var enabledTooltip  = "Click to disable"
             var disableState    = "False"
