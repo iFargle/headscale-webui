@@ -863,12 +863,12 @@ function toggle_route_routes_page(route_id, current_state) {
                 element.className  = enabledClass
                 var action_taken   = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'")')
+                element.setAttribute('onclick', 'toggle_route_routes_page('+route_id+', "'+enableState+'")')
             } else if (element.className == enabledClass) {
                 element.className    = disabledClass
                 var action_taken     = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'")')
+                element.setAttribute('onclick', 'toggle_route_routes_page('+route_id+', "'+disableState+'")')
             }
             M.toast({html: 'Route '+action_taken});
         }

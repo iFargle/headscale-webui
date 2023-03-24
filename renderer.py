@@ -707,7 +707,7 @@ def render_routes():
     route_content = markup_pre+route_title
     route_content += """<p><table>
     <thead>
-        <tr>
+        <tr>d
             <th>ID       </th>
             <th>Machine  </th>
             <th>Route    </th>
