@@ -809,11 +809,11 @@ function toggle_route(route_id, current_state, page) {
     var disabledClass = ""
     var enabledClass  = ""
 
-    if (page == "routes") {
-        disabledClass = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
-        enabledClass  = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
-    }
     if (page == "machines") {
+        disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
+        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+    }
+    if (page == "routes") {
         disabledClass = "material-icons red-text text-lighten-2 tooltipped";
         enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
     }
