@@ -859,12 +859,13 @@ def render_routes():
         # Set the displays:
         enabled_display = enabled if exit_enabled else disabled
         # Build a table for all exit routes:
-        exit_content += """
-        <tr>
-            <td>"""+str(node          )+"""</td>
-            <td width="60px"><center>"""+str(enabled_display)+"""</center></td>
-        </tr>
-        """
+        if exit_enabled:
+            exit_content += """
+            <tr>
+                <td>"""+str(node )+"""</td>
+                <td width="60px"><center>"""+str(enabled_display)+"""</center></td>
+            </tr>
+            """
     exit_content += "</tbody></table></p>"+markup_post
 
     content = route_content + failover_content + exit_content
