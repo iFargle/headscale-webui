@@ -802,15 +802,17 @@ function toggle_exit(route1, route2, exit_id, current_state) {
     })
 }
 
-function toggle_route(route_id, current_state, page="machines") {
+function toggle_route(route_id, current_state, page) {
     var data    = {"route_id": route_id, "current_state": current_state}
     var element = document.getElementById(route_id);
+    console.log("Editing route "+route_id+" for page:  "+page+" (enabled? "+current_state+")")
+    
     if (page == "machines") {
-        var disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
+        var disabledClass   = "waves-effect waves-light btn-small red-text   lighten-2 tooltipped";
         var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
     }
     if (page == "routes") {
-        var disabledClass   = "material-icons red-text text-lighten-2 tooltipped";
+        var disabledClass   = "material-icons red-text   text-lighten-2 tooltipped";
         var enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
     }
     var disabledTooltip = "Click to enable"

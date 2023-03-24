@@ -359,7 +359,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
                         class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
                         data-position='top' data-tooltip='Click to """+route_tooltip+"""'
                         id='"""+route['id']+"""'
-                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""')">
+                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""', 'machines')">
                         """+route['prefix']+"""
                     </p>
                     """
@@ -779,8 +779,8 @@ def render_routes():
         is_exit     = False 
 
         # Set up the display code:
-        enabled = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+        enabled  = "<a href='#'><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
+        disabled = "<a href='#'><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
 
         # Set the displays:
         enabled_display  = disabled
@@ -836,8 +836,8 @@ def render_routes():
         is_exit     = False 
 
         # Set up the display code:
-        enabled = "<a href=""><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
-        disabled = "<a href=""><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
+        enabled = "<a href='#'><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
+        disabled = "<a href='#'><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
 
         # Set the displays:
         enabled_display  = disabled
