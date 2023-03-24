@@ -772,7 +772,7 @@ function toggle_exit(route1, route2, exit_id, current_state) {
                 contentType: "application/json",
                 success: function(response) {
                     // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-                    var element         = document.getElementById(edddddddxit_id);
+                    var element         = document.getElementById(exit_id);
                     var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
                     var enabledClass    = "waves-effect waves-light btn-small green lighten-2 tooltipped";
                     var disabledTooltip = "Click to enable"
@@ -802,8 +802,22 @@ function toggle_exit(route1, route2, exit_id, current_state) {
     })
 }
 
-function toggle_route(route_id, current_state) {
+function toggle_route(route_id, current_state, page="machines") {
     var data = {"route_id": route_id, "current_state": current_state}
+    var element         = document.getElementById(route_id);
+    if (page == "machines") {
+        var disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
+        var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
+    }
+    if (page == "routes") {
+        var disabledClass   = "material-icons red-text text-lighten-2 tooltipped";
+        var enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
+    }
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged.";
     $.ajax({
         type:"POST", 
         url: "api/update_route",
@@ -811,69 +825,26 @@ function toggle_route(route_id, current_state) {
         contentType: "application/json",
         success: function(response) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-            var element         = document.getElementById(route_id);
-            var disabledClass   = "waves-effect waves-light btn-small red-text lighten-2 tooltipped";
-            var enabledClass    = "waves-effect waves-light btn-small green-text lighten-2 tooltipped";
-            var disabledTooltip = "Click to enable"
-            var enabledTooltip  = "Click to disable"
-            var disableState    = "False"
-            var enableState     = "True"
-            var action_taken    = "unchanged.";
-            
+
             if (element.className == disabledClass) {
                 // 1.  Change the class to change the color of the icon
+                element.className = enabledClass
                 // 2.  Change the "action taken" for the M.toast popup
+                action_taken      = "enabled."
                 // 3.  Change the tooltip to say "Click to enable/disable"
-                element.className  = enabledClass
-                var action_taken   = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'")')
+                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'", "'+page+'")')
             } else if (element.className == enabledClass) {
-                element.className    = disabledClass
-                var action_taken     = "disabled."
+                element.className = disabledClass
+                action_taken      = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'")')
+                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'", "'+page+'")')
             }
             M.toast({html: 'Route '+action_taken});
         }
     })
 }
-function toggle_route_routes_page(route_id, current_state) {
-    var data = {"route_id": route_id, "current_state": current_state}
-    $.ajax({
-        type:"POST", 
-        url: "api/update_route",
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function(response) {
-            // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-            var element         = document.getElementById(route_id);
-            var disabledClass   = "material-icons red-text text-lighten-2 tooltipped";
-            var enabledClass    = "material-icons green-text text-lighten-2 tooltipped";
-            var disabledTooltip = "Click to enable"
-            var enabledTooltip  = "Click to disable"
-            var disableState    = "False"
-            var enableState     = "True"
-            var action_taken    = "unchanged.";
-            
-            if (element.className == disabledClass) {
-                // 1.  Change the class to change the color of the icon
-                // 2.  Change the "action taken" for the M.toast popup
-                // 3.  Change the tooltip to say "Click to enable/disable"
-                element.className  = enabledClass
-                var action_taken   = "enabled."
-                element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route_routes_page('+route_id+', "'+enableState+'")')
-            } else if (element.className == enabledClass) {
-                element.className    = disabledClass
-                var action_taken     = "disabled."
-                element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route_routes_page('+route_id+', "'+disableState+'")')
-            }
-            M.toast({html: 'Route '+action_taken});
-        }
-    })
-}
+
 function toggle_failover_route(route_id, current_state, color) {
     var data = {"route_id": route_id, "current_state": current_state}
     $.ajax({
