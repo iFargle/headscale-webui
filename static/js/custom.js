@@ -779,7 +779,6 @@ function toggle_exit(route1, route2, exit_id, current_state, page) {
     var enableState     = "True"
     var action_taken    = "unchanged.";
 
-
     $.ajax({
         type:"POST", 
         url: "api/update_route",
@@ -797,12 +796,12 @@ function toggle_exit(route1, route2, exit_id, current_state, page) {
                         element.className  = enabledClass
                         action_taken   = "enabled."
                         element.setAttribute('data-tooltip', enabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'")')
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'", "'+page+'")')
                     } else if (element.className == enabledClass) {
                         element.className    = disabledClass
                         action_taken     = "disabled."
                         element.setAttribute('data-tooltip', disabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'")')
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'", "'+page+'")')
                     }
                     M.toast({html: 'Exit Route '+action_taken});
                 }
