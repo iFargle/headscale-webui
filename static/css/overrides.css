@@ -76,3 +76,8 @@ display: none !important
 .select-dropdown {
     position: unset !important;
 }
+
+/* Make all onlcick elements a pointer on hover */
+[onClick] {
+    cursor:pointer;
+}

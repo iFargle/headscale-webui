@@ -726,8 +726,8 @@ def render_routes():
         is_failover = False
         is_exit     = False 
 
-        enabled  = "<a href='#'><i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
-        disabled = "<a href='#'><i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
+        enabled  = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+        disabled = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
 
         # Set the displays:
         enabled_display  = disabled
@@ -779,8 +779,8 @@ def render_routes():
         is_exit     = False 
 
         # Set up the display code:
-        enabled  = "<a href='#'><i class='material-icons green-text text-lighten-2'>fiber_manual_record</i></a>"
-        disabled = "<a href='#'><i class='material-icons red-text text-lighten-1'>fiber_manual_record</i></a>"
+        enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
 
         # Set the displays:
         enabled_display  = disabled
@@ -852,8 +852,8 @@ def render_routes():
         
         if exit_available:
             # Set up the display code:
-            enabled  = "<a href='#'><i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"True\",  \"routes\")' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i></a>"
-            disabled = "<a href='#'><i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i></a>"
+            enabled  = "<i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"True\",  \"routes\")' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+            disabled = "<i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
             # Set the displays:
             enabled_display = enabled if exit_enabled else disabled
 
