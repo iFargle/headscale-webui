@@ -790,9 +790,7 @@ function toggle_exit(route1, route2, exit_id, current_state, page) {
                 url: "api/update_route",
                 data: JSON.stringify(data2),
                 contentType: "application/json",
-                success: function(response) {@inlophe  Maybe best to make your own thread.  This seems like a different issue.
-                    My first question is:  are you using Podman or Docker?
-                    Can you paste your docker-compose.yml?  new thread 
+                success: function(response) {
                     // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
                     if (element.className == disabledClass) {
                         element.className  = enabledClass
