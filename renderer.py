@@ -804,13 +804,13 @@ def render_routes():
             # Build the display:
             for route_id in route_id_list:
                 # Get info on every route in the list:
-                machine = all_routes["routes"][int(route_id)]["machine"]["givenName"]
+                machine    = all_routes["routes"][int(route_id)]["machine"]["givenName"]
                 machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
                 is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
                 is_enabled = all_routes["routes"][int(route_id)]["enabled"]
-                # Dump info about this route:
-                app.logger.debug(str(all_routes["routes"][int(route_id)]))
+                
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
+                app.logger.debug(str(all_routes["routes"][int(route_id)]))
 
                 # Set up the display code:
                 enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
