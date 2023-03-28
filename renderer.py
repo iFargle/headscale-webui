@@ -791,8 +791,8 @@ def render_routes():
                     route_id_list.append(route["id"])
 
             # Set up the display code:
-            failover_enabled  = "<i class='material-icons left green-text text-lighten-2'>fiber_manual_record</i>"
-            failover_disabled = "<i class='material-icons left red-text text-lighten-1'>fiber_manual_record</i>"
+            failover_enabled  = "<i  style='vertical-align: -6px;' class='material-icons left green-text text-lighten-2'>fiber_manual_record</i>"
+            failover_disabled = "<i  style='vertical-align: -6px;' class='material-icons left red-text text-lighten-1'>fiber_manual_record</i>"
 
             failover_display = failover_disabled 
             for route_id in route_id_list:
@@ -802,7 +802,7 @@ def render_routes():
             # Get all route_id's associated with the route prefix:
             failover_content += """
             <p>
-            <span class="valign-wrapper">"""+failover_display+"""<h5>"""+str(route_prefix)+"""</h5></span>
+            """+failover_display+"""<h5>"""+str(route_prefix)+"""</h5>
             <table>
                 <thead>
                     <tr>
