@@ -702,7 +702,7 @@ def render_routes():
     </div>
     """
 
-
+    ##############################################################################################
     # Step 1:  Get all non-exit and non-failover routes:
     route_content = markup_pre+route_title
     route_content += """<p><table>
@@ -754,65 +754,76 @@ def render_routes():
             """
     route_content += "</tbody></table></p>"+markup_post
 
-    # Step 2:  Get all failover routes only:
+    ##############################################################################################
+    # Step 2:  Get all failover routes only.  Add a separate table per failover prefix
+    failover_route_prefix = []
     failover_content = markup_pre+failover_title
-    failover_content += """<p><table>
-    <thead>
-        <tr>
-            <th>ID       </th>
-            <th>Machine  </th>
-            <th>Route    </th>
-            <th width="60px">Enabled  </th>
-            <th width="60px">Primary  </th>
-        </tr>
-    </thead>
-    <tbody>
-    """
     for route in all_routes["routes"]:
         # Get relevant info:
-        route_id    = route["id"]
-        machine     = route["machine"]["givenName"]
         prefix      = route["prefix"]
         is_enabled  = route["enabled"]
-        is_primary  = route["isPrimary"]
-        is_failover = False
-        is_exit     = False 
 
-        # Set up the display code:
-        enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
-
-        # Set the displays:
-        enabled_display  = disabled
-        primary_display  = disabled
-
-        if is_enabled:  enabled_display = enabled
-        if is_primary:  primary_display = enabled
-        # Check if a prefix is an Exit route:
-        if prefix == "0.0.0.0/0" or prefix == "::/0": 
-            is_exit = True
-            exit_display = True
-        # Check if a prefix is part of a failover pair:
+        # Get a list of all prefixes for all routes...
         for route_check in all_routes["routes"]:
-            if not is_exit:
+            # ... that  aren't exit routes... 
+            if prefix !="0.0.0.0/0" and prefix !="::/0":
+                # if the curren route matches any prefix of any route...
                 if route["prefix"] == route_check["prefix"]:
+                    # and the route ID's are different
                     if route["id"] != route_check["id"]:
-                        is_failover = True
-                        failover_display = enabled
+                        # If they are, append the prefix to the failover_route_prefix list
+                        failover_route_prefix.append(prefix)
 
-        if not is_exit and is_failover:
-        # Build a simple table for all non-exit routes:
-            failover_content += """
+    # Build the display for failover routes:
+    for route_prefix in failover_route_prefix:
+        # Get all route_id's associated with the route prefix:
+        failover_content += """<h5>"""+str(route_prefix)+"""</h5>
+        <thead>
             <tr>
-                <td>"""+str(route_id         )+"""</td>
-                <td>"""+str(machine          )+"""</td>
-                <td>"""+str(prefix           )+"""</td>
-                <td><center>"""+str(enabled_display  )+"""</center></td>
-                <td><center>"""+str(primary_display  )+"""</center></td>
+                <th>Machine</th>
+                <th width="60px">Enabled  </th>
+                <th width="60px">Primary  </th>
             </tr>
-            """
-    failover_content += "</tbody></table></p>"+markup_post
+        </thead>
+        <tbody>
+        """
 
+        # Get all route ID's associated with the route_prefix:
+        route_id_list = []
+        for route in all_routes["routes"]:
+            if route["prefix"] == route_prefix:
+                route_id_list.append(route["id"])
+
+        # Build the display:
+        for route_id in route_id_list:
+            # Get info on every route in the list:
+            machine = all_routes[route_id]["machine"]["givenName"]
+            machine_id = all_routes[route_id][machine]["id"]
+            is_primary = all_routes[route_id]["isPrimary"]
+            is_enabled = all_routes[route_id]["enabled"]
+
+            # Set up the display code:
+            enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+            disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+
+            # Set the displays:
+            enabled_display  = disabled
+            primary_display  = disabled
+
+            if is_enabled:  enabled_display = enabled
+            if is_primary:  primary_display = enabled
+
+            # Build a simple table for all non-exit routes:
+            failover_content += """
+                <tr>
+                    <td>"""+str(machine)+"""</td>
+                    <td><center>"""+str(enabled_display)+"""</center></td>
+                    <td><center>"""+str(primary_display)+"""</center></td>
+                </tr>
+                """
+        failover_content += "</tbody></table></p>"
+    failover_content += markup_post
+    ##############################################################################################
     # Step 3:  Get exit nodes only:
     exit_node_list = []
     # Get a list of nodes with exit routes:
@@ -849,7 +860,6 @@ def render_routes():
                     if route["enabled"]:
                         exit_enabled = True
 
-        
         if exit_available:
             # Set up the display code:
             enabled  = "<i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"True\",  \"routes\")' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
