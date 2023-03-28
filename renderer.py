@@ -681,8 +681,6 @@ def render_routes():
     if len(all_routes) == 0: return Markup("<br><br><br><center>There are no routes to display!</center>")
     # Testing...
 
-    return Markup("<br><br><br><center>There are no routes to display!</center>")
-
     route_content    = ""
     failover_content = ""
     exit_content     = ""
@@ -762,6 +760,8 @@ def render_routes():
     # Step 2:  Get all failover routes only.  Add a separate table per failover prefix
     failover_route_prefix = []
     failover_available = False
+    app.logger.debug("JSON Dump of All Routes:  ")
+    app.logger.debug(str(all_routes))
     for route in all_routes["routes"]:
         # Get relevant info:
         prefix      = route["prefix"]
@@ -836,6 +836,7 @@ def render_routes():
                     """
             failover_content += "</tbody></table></p>"
         failover_content += markup_post
+
     ##############################################################################################
     # Step 3:  Get exit nodes only:
     exit_node_list = []
