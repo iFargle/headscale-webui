@@ -798,7 +798,7 @@ def render_routes():
         for route_id in route_id_list:
             # Get info on every route in the list:
             machine = all_routes["routes"][int(route_id)]["machine"]["givenName"]
-            machine_id = all_routes["routes"][int(route_id)][machine]["id"]
+            machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
             is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
             is_enabled = all_routes["routes"][int(route_id)]["enabled"]
 
