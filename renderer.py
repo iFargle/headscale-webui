@@ -781,7 +781,7 @@ def render_routes():
         # Get all route_id's associated with the route prefix:
         failover_content += """
         <p>
-        <h6>"""+str(route_prefix)+"""</h6>
+        <h5>"""+str(route_prefix)+"""</h5>
         <table>
             <thead>
                 <tr>
@@ -804,8 +804,8 @@ def render_routes():
             # Get info on every route in the list:
             machine = all_routes["routes"][int(route_id)]["machine"]["givenName"]
             machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
-            is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
-            is_enabled = all_routes["routes"][int(route_id)]["enabled"]
+            is_primary = bool(all_routes["routes"][int(route_id)]["isPrimary"])
+            is_enabled = bool(all_routes["routes"][int(route_id)]["enabled"])
 
             # Set up the display code:
             enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
