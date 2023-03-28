@@ -784,22 +784,20 @@ def render_routes():
         failover_content = markup_pre+failover_title
         # Build the display for failover routes:
         for route_prefix in failover_route_prefix:
-
-            failover_display = disabled 
-            # Get info about the failvoer prefix.  If any route is avaailable, the "failover route" itself will be enabled:
-
             # Get all route ID's associated with the route_prefix:
             route_id_list = []
             for route in all_routes["routes"]:
                 if route["prefix"] == route_prefix:
                     route_id_list.append(route["id"])
 
-            for route_id in route_id_list:
-                if all_routes["routes"][int(route_id) - 1]["enabled"]: failover_display = enabled
-
             # Set up the display code:
-            failover_enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-            failover_disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+            failover_enabled  = "<i class='material-icons left green-text text-lighten-2'>fiber_manual_record</i>"
+            failover_disabled = "<i class='material-icons left red-text text-lighten-1'>fiber_manual_record</i>"
+
+            failover_display = failover_disabled 
+            for route_id in route_id_list:
+                if all_routes["routes"][int(route_id) - 1]["enabled"]: failover_display = failover_enabled
+
 
             # Get all route_id's associated with the route prefix:
             failover_content += """
