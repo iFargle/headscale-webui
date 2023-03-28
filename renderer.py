@@ -760,8 +760,7 @@ def render_routes():
     # Step 2:  Get all failover routes only.  Add a separate table per failover prefix
     failover_route_prefix = []
     failover_available = False
-    app.logger.debug("JSON Dump of All Routes:  ")
-    app.logger.debug(str(all_routes))
+
     for route in all_routes["routes"]:
         # Get relevant info:
         prefix      = route["prefix"]
@@ -813,7 +812,7 @@ def render_routes():
                 machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
                 is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
                 is_enabled = all_routes["routes"][int(route_id)]["enabled"]
-                app.logger.debug("Machine:  [%s]  %s : %s / %s", str(machine_id), str(machine), str(is_enabled), str(is_primary))
+                app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
 
                 # Set up the display code:
                 enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
