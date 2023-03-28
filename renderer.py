@@ -797,10 +797,10 @@ def render_routes():
         # Build the display:
         for route_id in route_id_list:
             # Get info on every route in the list:
-            machine = all_routes[route_id]["machine"]["givenName"]
-            machine_id = all_routes[route_id][machine]["id"]
-            is_primary = all_routes[route_id]["isPrimary"]
-            is_enabled = all_routes[route_id]["enabled"]
+            machine = all_routes["routes"][route_id]["machine"]["givenName"]
+            machine_id = all_routes["routes"][route_id][machine]["id"]
+            is_primary = all_routes["routes"][route_id]["isPrimary"]
+            is_enabled = all_routes["routes"][route_id]["enabled"]
 
             # Set up the display code:
             enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
