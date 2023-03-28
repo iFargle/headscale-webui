@@ -803,12 +803,11 @@ def render_routes():
 
             # Build the display:
             for route_id in route_id_list:
-                app.logger.debug("Getting details for route ID %s", str(route_id))
                 # Get info on every route in the list:
-                machine    = all_routes["routes"][int(route_id)]["machine"]["givenName"]
-                machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
-                is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
-                is_enabled = all_routes["routes"][int(route_id)]["enabled"]
+                machine    = all_routes["routes"][int(route_id)-1]["machine"]["givenName"]
+                machine_id = all_routes["routes"][int(route_id)-1]["machine"]["id"]
+                is_primary = all_routes["routes"][int(route_id)-1]["isPrimary"]
+                is_enabled = all_routes["routes"][int(route_id)-1]["enabled"]
 
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
                 app.logger.debug(str(all_routes["routes"][int(route_id)]))
