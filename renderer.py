@@ -773,7 +773,7 @@ def render_routes():
                         # ... and the prefix is not already in the list...
                         if route["prefix"] not in failover_route_prefix:
                             # append the prefix to the failover_route_prefix list
-                            failover_route_prefix.append(prefix)
+                            failover_route_prefix.append(route["prefix"])
                             failover_available = True
 
     if failover_available:
