@@ -810,7 +810,7 @@ def render_routes():
                 is_enabled = all_routes["routes"][int(route_id)-1]["enabled"]
 
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
-                app.logger.debug(str(all_routes["routes"][int(route_id)]))
+                app.logger.debug(str(all_routes["routes"][int(route_id)-1]))
 
                 # Set up the display code:
                 enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
