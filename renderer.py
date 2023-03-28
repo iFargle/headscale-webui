@@ -762,14 +762,10 @@ def render_routes():
     failover_available = False
 
     for route in all_routes["routes"]:
-        # Get relevant info:
-        prefix      = route["prefix"]
-        is_enabled  = route["enabled"]
-
         # Get a list of all prefixes for all routes...
         for route_check in all_routes["routes"]:
             # ... that  aren't exit routes... 
-            if prefix !="0.0.0.0/0" and prefix !="::/0":
+            if route["prefix"] !="0.0.0.0/0" and route["prefix"] !="::/0":
                 # if the curren route matches any prefix of any other route...
                 if route["prefix"] == route_check["prefix"]:
                     # and the route ID's are different ...
@@ -812,6 +808,8 @@ def render_routes():
                 machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
                 is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
                 is_enabled = all_routes["routes"][int(route_id)]["enabled"]
+                # Dump info about this route:
+                app.logger.debug(str(all_routes["routes"][int(route_id)]))
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
 
                 # Set up the display code:
