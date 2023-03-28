@@ -767,25 +767,30 @@ def render_routes():
         for route_check in all_routes["routes"]:
             # ... that  aren't exit routes... 
             if prefix !="0.0.0.0/0" and prefix !="::/0":
-                # if the curren route matches any prefix of any route...
+                # if the curren route matches any prefix of any other route...
                 if route["prefix"] == route_check["prefix"]:
-                    # and the route ID's are different
+                    # and the route ID's are different ...
                     if route["id"] != route_check["id"]:
-                        # If they are, append the prefix to the failover_route_prefix list
-                        failover_route_prefix.append(prefix)
+                        # ... and the prefix is not already in the list...
+                        if route["prefix"] not in failover_route_prefix:
+                            # append the prefix to the failover_route_prefix list
+                            failover_route_prefix.append(prefix)
 
     # Build the display for failover routes:
     for route_prefix in failover_route_prefix:
         # Get all route_id's associated with the route prefix:
-        failover_content += """<h5>"""+str(route_prefix)+"""</h5>
-        <thead>
-            <tr>
-                <th>Machine</th>
-                <th width="60px">Enabled  </th>
-                <th width="60px">Primary  </th>
-            </tr>
-        </thead>
-        <tbody>
+        failover_content += """
+        <p>
+        <h6>"""+str(route_prefix)+"""</h6>
+        <table>
+            <thead>
+                <tr>
+                    <th>Machine</th>
+                    <th width="60px">Enabled</th>
+                    <th width="60px">Primary</th>
+                </tr>
+            </thead>
+            <tbody>
         """
 
         # Get all route ID's associated with the route_prefix:
