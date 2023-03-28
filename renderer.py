@@ -679,6 +679,10 @@ def render_routes():
 
     # If there are no routes, just exit:
     if len(all_routes) == 0: return Markup("<br><br><br><center>There are no routes to display!</center>")
+    # Testing...
+
+    return Markup("<br><br><br><center>There are no routes to display!</center>")
+
     route_content    = ""
     failover_content = ""
     exit_content     = ""
@@ -757,7 +761,7 @@ def render_routes():
     ##############################################################################################
     # Step 2:  Get all failover routes only.  Add a separate table per failover prefix
     failover_route_prefix = []
-    failover_content = markup_pre+failover_title
+    failover_available = False
     for route in all_routes["routes"]:
         # Get relevant info:
         prefix      = route["prefix"]
@@ -775,60 +779,63 @@ def render_routes():
                         if route["prefix"] not in failover_route_prefix:
                             # append the prefix to the failover_route_prefix list
                             failover_route_prefix.append(prefix)
+                            failover_available = True
 
-    # Build the display for failover routes:
-    for route_prefix in failover_route_prefix:
-        # Get all route_id's associated with the route prefix:
-        failover_content += """
-        <p>
-        <h5>"""+str(route_prefix)+"""</h5>
-        <table>
-            <thead>
-                <tr>
-                    <th>Machine</th>
-                    <th width="60px">Enabled</th>
-                    <th width="60px">Primary</th>
-                </tr>
-            </thead>
-            <tbody>
-        """
-
-        # Get all route ID's associated with the route_prefix:
-        route_id_list = []
-        for route in all_routes["routes"]:
-            if route["prefix"] == route_prefix:
-                route_id_list.append(route["id"])
-
-        # Build the display:
-        for route_id in route_id_list:
-            # Get info on every route in the list:
-            machine = all_routes["routes"][int(route_id)]["machine"]["givenName"]
-            machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
-            is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
-            is_enabled = all_routes["routes"][int(route_id)]["enabled"]
-            app.logger.debug("Machine:  [%s]  %s : %s / %s", str(machine_id), str(machine), str(is_enabled), str(is_primary))
-
-            # Set up the display code:
-            enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-            disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
-
-            # Set the displays:
-            enabled_display  = disabled
-            primary_display  = disabled
-
-            if is_enabled:  enabled_display = enabled
-            if is_primary:  primary_display = enabled
-
-            # Build a simple table for all non-exit routes:
+    if failover_available:
+        failover_content = markup_pre+failover_title
+        # Build the display for failover routes:
+        for route_prefix in failover_route_prefix:
+            # Get all route_id's associated with the route prefix:
             failover_content += """
-                <tr>
-                    <td>"""+str(machine)+"""</td>
-                    <td><center>"""+str(enabled_display)+"""</center></td>
-                    <td><center>"""+str(primary_display)+"""</center></td>
-                </tr>
-                """
-        failover_content += "</tbody></table></p>"
-    failover_content += markup_post
+            <p>
+            <h5>"""+str(route_prefix)+"""</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Machine</th>
+                        <th width="60px">Enabled</th>
+                        <th width="60px">Primary</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
+
+            # Get all route ID's associated with the route_prefix:
+            route_id_list = []
+            for route in all_routes["routes"]:
+                if route["prefix"] == route_prefix:
+                    route_id_list.append(route["id"])
+
+            # Build the display:
+            for route_id in route_id_list:
+                # Get info on every route in the list:
+                machine = all_routes["routes"][int(route_id)]["machine"]["givenName"]
+                machine_id = all_routes["routes"][int(route_id)]["machine"]["id"]
+                is_primary = all_routes["routes"][int(route_id)]["isPrimary"]
+                is_enabled = all_routes["routes"][int(route_id)]["enabled"]
+                app.logger.debug("Machine:  [%s]  %s : %s / %s", str(machine_id), str(machine), str(is_enabled), str(is_primary))
+
+                # Set up the display code:
+                enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+                disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+
+                # Set the displays:
+                enabled_display  = disabled
+                primary_display  = disabled
+
+                if is_enabled:  enabled_display = enabled
+                if is_primary:  primary_display = enabled
+
+                # Build a simple table for all non-exit routes:
+                failover_content += """
+                    <tr>
+                        <td>"""+str(machine)+"""</td>
+                        <td><center>"""+str(enabled_display)+"""</center></td>
+                        <td><center>"""+str(primary_display)+"""</center></td>
+                    </tr>
+                    """
+            failover_content += "</tbody></table></p>"
+        failover_content += markup_post
     ##############################################################################################
     # Step 3:  Get exit nodes only:
     exit_node_list = []
