@@ -803,7 +803,7 @@ def render_routes():
 
             # Build the display:
             for route_id in route_id_list:
-                # Get info on every route in the list:
+                # Get info on every route in the list: route_id-1 is the position in the array starting 0
                 machine    = all_routes["routes"][int(route_id)-1]["machine"]["givenName"]
                 machine_id = all_routes["routes"][int(route_id)-1]["machine"]["id"]
                 is_primary = all_routes["routes"][int(route_id)-1]["isPrimary"]
