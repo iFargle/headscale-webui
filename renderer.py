@@ -802,7 +802,7 @@ def render_routes():
             # Get all route_id's associated with the route prefix:
             failover_content += """
             <p>
-            """+failover_display+"""<h5>"""+str(route_prefix)+"""</h5>
+            <div class="valign-wrapper">"""+failover_display+"""</div><h5>"""+str(route_prefix)+"""</h5>
             <table>
                 <thead>
                     <tr>
