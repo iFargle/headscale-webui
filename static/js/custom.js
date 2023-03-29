@@ -868,10 +868,12 @@ function get_routes() {
 function toggle_failover_route(route_id, current_state, page, prefix, route_id_list) {
     // First, toggle the route:
     toggle_route(route_id, current_state, page)
+    console.log("Getting info for prefix "+prefix)
     var routes = get_Routes()
     // Second, set the primary and enabled displays for the prefix:
     for (let i=0; i < route_id_list.length; i++) {
         var route_id = route_id_list[i]
+        console.log("route_id_list["+i+"]: "+route_id_list[i])
         // If one of the two routes is enabled, keep the prefix's route green.
         // Step 1:  Get info for these routes:
     }}
