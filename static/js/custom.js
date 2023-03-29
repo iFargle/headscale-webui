@@ -865,7 +865,7 @@ function get_routes() {
     })
 }
 
-function toggle_failover_route(route_id, current_state, prefix, route_id_list) {
+function toggle_failover_route_routespage(route_id, current_state, prefix, route_id_list) {
     // First, toggle the route:
     // toggle_route(route_id, current_state, page)
 
@@ -890,12 +890,12 @@ function toggle_failover_route(route_id, current_state, prefix, route_id_list) {
                 element.className = enabledClass
                 action_taken      = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+enableState+'", "'+prefix+'", "'+route_id_list+'")')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+enableState+'", "'+prefix+'", "'+route_id_list+'")')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
                 action_taken      = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+disableState+'", "'+prefix+'", "'+route_id_list+'")')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+disableState+'", "'+prefix+'", "'+route_id_list+'")')
             }
             M.toast({html: 'Route '+action_taken});
 
