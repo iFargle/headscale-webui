@@ -829,7 +829,7 @@ def render_routes():
                 # Step 1:  Create an array of all route_id's
                 payload = "{"
                 index = 0
-                for item in route_id_list: payload += "'"+str(index)+"': '"+str(route_id)+"', "
+                for item in route_id_list: payload += "\""+str(index)+"\": \""+str(item)+"\", "
                 payload+="}"
                 json_payload = json.loads(payload)
 
