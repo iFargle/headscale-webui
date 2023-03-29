@@ -779,7 +779,7 @@ def render_routes():
     if failover_available:
         # Set up the display code:
         enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-        disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+        disabled = "<i class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
 
         failover_content = markup_pre+failover_title
         # Build the display for failover routes:
@@ -792,7 +792,7 @@ def render_routes():
 
             # Set up the display code:
             failover_enabled  = "<i class='material-icons small left green-text text-lighten-2'>fiber_manual_record</i>"
-            failover_disabled = "<i class='material-icons small left red-text text-lighten-1'>fiber_manual_record</i>"
+            failover_disabled = "<i class='material-icons small left red-text text-lighten-2'>fiber_manual_record</i>"
 
             failover_display = failover_disabled
             for route_id in route_id_list:
@@ -801,7 +801,7 @@ def render_routes():
 
             # Get all route_id's associated with the route prefix:
             failover_content += """<p>
-            <h5>"""+failover_display+"""</h5><h5>"""+str(route_prefix)+"""</h5>
+            <h6>"""+failover_display+"""</h5><h5>"""+str(route_prefix)+"""</h6>
             <table>
                 <thead>
                     <tr>
