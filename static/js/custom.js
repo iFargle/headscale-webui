@@ -837,7 +837,7 @@ function toggle_route(route_id, current_state, page) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(response) {
-            console.log(response)
+            console.log(SON.stringify(response.body.message))
             if (element.className == disabledClass) {
                 element.className = enabledClass
                 action_taken      = "enabled."
