@@ -833,8 +833,8 @@ def render_routes():
                 # Is there a better way to do this??
                 for item in route_id_list: 
                     payload += "\""+str(index)+"\": \""+str(item)+"\""
-                    if index != len(route_id_list): payload += ", "
                     index += 1
+                    if index != len(route_id_list): payload += ", "
                 payload+="}"
                 app.logger.debug("JSON:  %s", str(payload))
                 json_payload = json.loads(payload)
