@@ -870,6 +870,7 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
     // toggle_route(route_id, current_state, page)
 
     var data    = {"route_id": route_id, "current_state": current_state}
+    console.log("Data:  "+data)
     var element = document.getElementById(route_id);
 
     var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
@@ -890,12 +891,12 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
                 element.className = enabledClass
                 action_taken      = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+enableState+'", "'+prefix+'", "'+route_id_list+'")')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+enableState+'", "'+prefix+'", '+route_id_list+')')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
                 action_taken      = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+disableState+'", "'+prefix+'", "'+route_id_list+'")')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+disableState+'", "'+prefix+'", '+route_id_list+')')
             }
             M.toast({html: 'Route '+action_taken});
 
