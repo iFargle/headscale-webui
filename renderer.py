@@ -1,6 +1,6 @@
 # pylint: disable=line-too-long, wrong-import-order
 
-import headscale, helper, pytz, os, yaml, logging
+import headscale, helper, pytz, os, yaml, logging, json
 from flask              import Flask, Markup, render_template
 from datetime           import datetime
 from dateutil           import parser
@@ -827,14 +827,14 @@ def render_routes():
                 # and which route ID to make primary.  We then toggle each route
                 # in order, with the primary route being toggled last
                 # Step 1:  Create an array of all route_id's
-                # json_payload = json.loads(route_id_list)
+                json_payload = json.loads(route_id_list)
 
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
                 app.logger.debug(str(all_routes["routes"][idx]))
 
                 # Set up the display code:
-                enabled_display_enabled  = "<i id='"+str(route_id)+"' onclick='toggle_failover_route("+str(route_id)+", \"True\", \"routes\" , "+str(route_prefix)+", "+str(route_id_list)+")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
-                enabled_display_disabled = "<i id='"+str(route_id)+"' onclick='toggle_failover_route("+str(route_id)+", \"False\", \"routes\", "+str(route_prefix)+", "+str(route_id_list)+")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable'>fiber_manual_record</i>"
+                enabled_display_enabled  = "<i id='"+str(route_id)+"' onclick='toggle_failover_route("+str(route_id)+", \"True\", \"routes\" , "+str(route_prefix)+", "+str(json_payload)+")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+                enabled_display_disabled = "<i id='"+str(route_id)+"' onclick='toggle_failover_route("+str(route_id)+", \"False\", \"routes\", "+str(route_prefix)+", "+str(json_payload)+")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable'>fiber_manual_record</i>"
                 primary_display_enabled  = "<i id='"+str(route_id)+"-primary' class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
                 primary_display_disabled = "<i id='"+str(route_id)+"-primary' class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
                 
