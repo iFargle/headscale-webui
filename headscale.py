@@ -225,6 +225,7 @@ def update_route(url, api_key, route_id, current_state):
             'Authorization': 'Bearer '+str(api_key)
         }
     )
+    app.logger.debug("Toggled route.  Headscale response:  %s", str(response.json()))
     return response.json()
 
 # Get all machines on the Headscale network
