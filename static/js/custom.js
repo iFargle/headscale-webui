@@ -902,6 +902,8 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
             // Next, get the information for the primary route and the failover route status:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
+            console.log(routes)
+
             // Second, set the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
                 var route_id = route_id_list[i]
