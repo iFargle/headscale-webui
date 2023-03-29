@@ -870,7 +870,7 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
     // toggle_route(route_id, current_state, page)
 
     var data    = {"route_id": route_id, "current_state": current_state}
-    console.log("Data:  "+data)
+    console.log("Data:  "+JSON.stringify(data))
     var element = document.getElementById(route_id);
 
     var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
