@@ -835,8 +835,8 @@ def render_routes():
                 app.logger.debug(str(all_routes["routes"][idx]))
 
                 # Set up the display code:
-                enabled_display_enabled  = "<i id='"+str(route_id)+"' onclick='toggle_route("+int(route_id)+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
-                enabled_display_disabled = "<i id='"+str(route_id)+"' onclick='toggle_route("+int(route_id)+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable'>fiber_manual_record</i>"
+                enabled_display_enabled  = "<i id='"+str(route_id)+"' onclick='toggle_route("+str(route_id)+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+                enabled_display_disabled = "<i id='"+str(route_id)+"' onclick='toggle_route("+str(route_id)+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable'>fiber_manual_record</i>"
                 primary_display_enabled  = "<i id='"+str(route_id)+"-primary' class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
                 primary_display_disabled = "<i id='"+str(route_id)+"-primary' class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
                 
