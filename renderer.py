@@ -831,8 +831,8 @@ def render_routes():
                 index = 0
                 for item in route_id_list: payload += "\""+str(index)+"\": \""+str(item)+"\", "
                 payload+="}"
+                app.logger.debug("JSON:  %s", str(payload))
                 json_payload = json.loads(payload)
-                app.logger.debug("JSON:  %s", str(json_payload))
 
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
                 app.logger.debug(str(all_routes["routes"][idx]))
