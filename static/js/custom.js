@@ -889,6 +889,7 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
         contentType: "application/json",
         success: function(response) {
             console.log("Route ID:  "+route_id)
+            console.log("data['route_id']:  "+data['route_id'])
             console.log("route_id_list:  "+route_id_list)
             if (element.className == disabledClass) {
                 element.className = enabledClass
