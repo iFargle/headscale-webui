@@ -837,7 +837,6 @@ function toggle_route(route_id, current_state, page) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(response) {
-            console.log(JSON.stringify(response.message))
             if (element.className == disabledClass) {
                 element.className = enabledClass
                 action_taken      = "enabled."
@@ -853,6 +852,29 @@ function toggle_route(route_id, current_state, page) {
         }
     })
 }
+
+function get_routes() {
+    $.ajax({
+        type:"POST", 
+        url: "api/get_routes",
+        contentType: "application/json",
+        success: function(response) {
+            console.log(JSON.stringify(response.message))
+            return JSON.stringify(response.message)
+        }
+    })
+}
+
+function toggle_failover_route(route_id, current_state, page, prefix, route_id_list) {
+    // First, toggle the route:
+    toggle_route(route_id, current_state, page)
+    var routes = get_Routes()
+    // Second, set the primary and enabled displays for the prefix:
+    for (let i=0; i < route_id_list.length; i++) {
+        var route_id = route_id_list[i]
+        // If one of the two routes is enabled, keep the prefix's route green.
+        // Step 1:  Get info for these routes:
+    }}
 
 function toggle_failover_route(route_id, current_state, color) {
     var data = {"route_id": route_id, "current_state": current_state}

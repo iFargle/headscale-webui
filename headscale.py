@@ -207,9 +207,8 @@ def move_user(url, api_key, machine_id, new_user):
     return response.json()
 
 def update_route(url, api_key, route_id, current_state):
-    action = ""
-    if current_state == "True":  action = "disable"
-    if current_state == "False": action = "enable"
+    action = "disable" if current_state == "True" else "enable"
+
     app.logger.info("Updating Route %s:  Action: %s", str(route_id), str(action))
 
     # Debug
@@ -225,7 +224,6 @@ def update_route(url, api_key, route_id, current_state):
             'Authorization': 'Bearer '+str(api_key)
         }
     )
-    app.logger.debug("Toggled route.  Headscale response:  %s", str(response.json()))
     return response.json()
 
 # Get all machines on the Headscale network
@@ -313,9 +311,8 @@ def get_routes(url, api_key):
         }
     )
     return response.json()
-
 ##################################################################
-# Functions related to NAMESPACES
+# Functions related to USERS
 ##################################################################
 
 # Get all users in use
@@ -384,7 +381,7 @@ def add_user(url, api_key, data):
     return {"status": status, "body": response.json()}
 
 ##################################################################
-# Functions related to PREAUTH KEYS in NAMESPACES
+# Functions related to PREAUTH KEYS in USERS
 ##################################################################
 
 # Get all PreAuth keys associated with a user "user_name"

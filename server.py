@@ -516,6 +516,18 @@ def build_preauth_key_table():
     return renderer.build_preauth_key_table(user_name)
 
 ########################################################################################
+# Route API Endpoints
+########################################################################################
+@app.route('/api/get_routes', methods=['POST'])
+@oidc.require_login
+def get_route_info():
+    url     = headscale.get_url()
+    api_key = headscale.get_api_key()
+
+    return headscale.get_routes(url, api_key)
+
+
+########################################################################################
 # Main thread
 ########################################################################################
 if __name__ == '__main__':
