@@ -449,7 +449,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
     status_badge      = "<i class='material-icons left tooltipped " + text_color + "' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
     user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
     exit_node_badge   = "" if not exit_route_enabled else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit</span>"
-    ha_route_badge    = "" if not ha_enabled         else "<span class='badge blue-grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled HA route.'>HA</span>"
+    ha_route_badge    = "" if not ha_enabled         else "<span class='badge blue-grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled High Availabiilty (Failover) route.'>HA</span>"
     expiration_badge  = "" if not expiring_soon      else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
     machine_content[idx] = (str(render_template(
@@ -685,9 +685,9 @@ def render_routes():
     failover_content = ""
     exit_content     = ""
 
-    route_title='<span class="card-title"><h4>Routes</h4></span>'
-    failover_title='<span class="card-title"><h4>Failover Routes</h4></span>'
-    exit_title='<span class="card-title"><h4>Exit Routes</h4></span>'
+    route_title='<span class="card-title">Routes</span>'
+    failover_title='<span class="card-title">Failover Routes</span>'
+    exit_title='<span class="card-title">Exit Routes</span>'
 
     markup_pre = """
     <div class="row">
@@ -822,19 +822,27 @@ def render_routes():
                 is_primary = all_routes["routes"][idx]["isPrimary"]
                 is_enabled = all_routes["routes"][idx]["enabled"]
 
+                # route_id_list contains all routes associated with that prefix.
+                # To toggle which is primary, we need to transfer all routes
+                # and which route ID to make primary.  We then toggle each route
+                # in order, with the primary route being toggled last
+                # Step 1:  Create an array of all route_id's that JavaScript likes:
+                json_route_ids = {}
+                for route in route_id_list:
+                    json_route_ids.append(int(route))
+
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
                 app.logger.debug(str(all_routes["routes"][idx]))
 
                 # Set up the display code:
-                enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
-                disabled = "<i class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
-
-                # Set the displays:
-                enabled_display  = disabled
-                primary_display  = disabled
-
-                if is_enabled:  enabled_display = enabled
-                if is_primary:  primary_display = enabled
+                enabled_display_enabled  = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+                enabled_display_disabled = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
+                primary_display_enabled  = "<i id='"+str(route_id)+"-primary' class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+                primary_display_disabled = "<i id='"+str(route_id)+"-primary' class='material-icons red-text text-lighten-1'>fiber_manual_record</i>"
+                
+                # Set displays:
+                enabled_display = enabled_display_enabled if is_enabled else enabled_display_disabled
+                primary_display = primary_display_enabled if is_primary else primary_display_disabled
 
                 # Build a simple table for all non-exit routes:
                 failover_content += """
