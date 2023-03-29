@@ -827,7 +827,11 @@ def render_routes():
                 # and which route ID to make primary.  We then toggle each route
                 # in order, with the primary route being toggled last
                 # Step 1:  Create an array of all route_id's
-                json_payload = json.loads(str(route_id_list))
+                payload = "{"
+                index = 0
+                for item in route_id_list: payload += "'"+str(index)+"': '"+str(route_id)+"', "
+                payload+="}"
+                json_payload = json.loads(payload)
 
                 app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
                 app.logger.debug(str(all_routes["routes"][idx]))
