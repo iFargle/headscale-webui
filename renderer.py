@@ -829,6 +829,8 @@ def render_routes():
                 # Step 1:  Create an array of all route_id's
                 payload = "{"
                 index = 0
+
+                # Is there a better way to do this??
                 for item in route_id_list: 
                     payload += "\""+str(index)+"\": \""+str(item)+"\""
                     if index != len(route_id_list): payload += ", "
