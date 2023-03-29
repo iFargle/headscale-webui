@@ -881,12 +881,15 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
     var disableState    = "False"
     var enableState     = "True"
     var action_taken    = "unchanged.  See logs.";
+
     $.ajax({
         type:"POST", 
         url: "api/update_route",
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(response) {
+            console.log("Route ID:  "+route_id)
+            console.log("route_id_list:  "+route_id_list)
             if (element.className == disabledClass) {
                 element.className = enabledClass
                 action_taken      = "enabled."
