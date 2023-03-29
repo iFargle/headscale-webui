@@ -865,18 +865,53 @@ function get_routes() {
     })
 }
 
-function toggle_failover_route(route_id, current_state, page, prefix, route_id_list) {
+function toggle_failover_route(route_id, current_state, prefix, route_id_list) {
     // First, toggle the route:
-    toggle_route(route_id, current_state, page)
-    console.log("Getting info for prefix "+prefix)
-    var routes = get_Routes()
-    // Second, set the primary and enabled displays for the prefix:
-    for (let i=0; i < route_id_list.length; i++) {
-        var route_id = route_id_list[i]
-        console.log("route_id_list["+i+"]: "+route_id_list[i])
-        // If one of the two routes is enabled, keep the prefix's route green.
-        // Step 1:  Get info for these routes:
-    }}
+    // toggle_route(route_id, current_state, page)
+
+    var data    = {"route_id": route_id, "current_state": current_state}
+    var element = document.getElementById(route_id);
+
+    var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+    var enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged.  See logs.";
+    $.ajax({
+        type:"POST", 
+        url: "api/update_route",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(response) {
+            if (element.className == disabledClass) {
+                element.className = enabledClass
+                action_taken      = "enabled."
+                element.setAttribute('data-tooltip', enabledTooltip)
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+enableState+'", "'+prefix+'", "'+route_id_list+'")')
+            } else if (element.className == enabledClass) {
+                element.className = disabledClass
+                action_taken      = "disabled."
+                element.setAttribute('data-tooltip', disabledTooltip)
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+disableState+'", "'+prefix+'", "'+route_id_list+'")')
+            }
+            M.toast({html: 'Route '+action_taken});
+
+            // Next, get the information for the primary route and the failover route status:
+            console.log("Getting info for prefix "+prefix)
+            var routes = get_routes()
+            // Second, set the primary and enabled displays for the prefix:
+            for (let i=0; i < route_id_list.length; i++) {
+                var route_id = route_id_list[i]
+                console.log("route_id_list["+i+"]: "+route_id_list[i])
+                // If one of the two routes is enabled, keep the prefix's route green.
+                // Step 1:  Get info for these routes:
+            }
+        }
+    })
+}
 
 function toggle_failover_route(route_id, current_state, color) {
     var data = {"route_id": route_id, "current_state": current_state}
