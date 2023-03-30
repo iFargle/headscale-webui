@@ -859,7 +859,8 @@ function get_routes() {
         url: "api/get_routes",
         contentType: "application/json",
         success: function(response) {
-            console.log(JSON.stringify(response.message))
+            console.log("Got all routes.  ")
+            console.log("Headscale response:  "+JSON.stringify(response.message))
             return JSON.stringify(response.message)
         }
     })
@@ -880,8 +881,8 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
     var enabledTooltip  = "Click to disable"
     var disableState    = "False"
     var enableState     = "True"
-    var action_taken    = "unchanged.";
-    
+    var action_taken    = "unchanged."
+
     $.ajax({
         type:"POST", 
         url: "api/update_route",
@@ -906,7 +907,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             // Next, get the information for the primary route and the failover route status:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
-            console.log(routes)
+            console.log("Routes:  "+routes)
 
             // Second, set the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
