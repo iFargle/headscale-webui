@@ -854,6 +854,7 @@ function toggle_route(route_id, current_state, page) {
 }
 
 function get_routes() {
+    console.log("Getting info for all routes")
     $.ajax({
         type:"POST", 
         url: "api/get_routes",
