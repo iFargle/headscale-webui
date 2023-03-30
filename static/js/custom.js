@@ -930,10 +930,10 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
                 console.log("enabled_status:  "+enabled_status)
 
                 if (enabled_status == true) {
-                    failover_status = true
+                    failover_enabled = true
                 }
                 else {
-                    failover_status = false
+                    failover_enabled = false
                 }
                 
                 console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
