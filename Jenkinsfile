@@ -3,10 +3,11 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION    = 'v0.5.6'
-        HS_VERSION     = "v0.20.0" // Version of Headscale this is compatible with
+        APP_VERSION    = 'v0.6.0'
+        HS_VERSION     = "v0.21.0" // Version of Headscale this is compatible with
         BUILD_DATE     = ''
-        BUILDER_NAME   = "multiarch-${env.BRANCH_NAME}"
+        BUILDER_NAME   = "multiarch-${env.BUILD_TAG}"
+
 
         DOCKERHUB_CRED = credentials('dockerhub-ifargle-pat')
 
@@ -21,14 +22,11 @@ pipeline {
         timestamps()
     }
     stages {
-        stage ('Jenkins ENV') {
+        stage('Build ENV') {
             steps {
+
                 sh 'printenv'
                 script { BUILD_DATE = java.time.LocalDate.now() }
-            }
-        }
-        stage('Create Build ENV') {
-            steps {
                 sh """
                     # Create the builder:
                     docker buildx create --name $BUILDER_NAME --driver-opt=image=moby/buildkit
@@ -80,6 +78,30 @@ pipeline {
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
                                 --platform linux/amd64 \
                                 --push
+                        """
+                    }
+                }
+            }
+        }
+        stage('Pull Test') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        sh """
+                            docker pull git.sysctl.io/albert/headscale-webui:latest
+                            docker pull registry-1.docker.io/ifargle/headscale-webui:latest
+                            docker pull ghcr.io/ifargle/headscale-webui:latest
+                            docker pull git.sysctl.io/albert/headscale-webui:${APP_VERSION}
+                            docker pull registry-1.docker.io/ifargle/headscale-webui:${APP_VERSION}
+                            docker pull ghcr.io/ifargle/headscale-webui:${APP_VERSION}
+                        """
+                    }
+                    else {
+                        sh """
+                            docker pull git.sysctl.io/albert/headscale-webui:testing 
+                            docker pull ghcr.io/ifargle/headscale-webui:testing 
+                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} 
+                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} 
                         """
                     }
                 }

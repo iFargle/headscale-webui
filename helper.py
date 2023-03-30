@@ -73,6 +73,21 @@ def key_check():
 def get_color(import_id, item_type = ""):
     """ Sets colors for users/namespaces """
     # Define the colors... Seems like a good number to start with
+    if item_type == "failover":
+        colors = [
+            "teal        lighten-1",
+            "blue        lighten-1",
+            "blue-grey   lighten-1",
+            "indigo      lighten-2",
+            "brown       lighten-1",
+            "grey        lighten-1",
+            "indigo      lighten-2",
+            "deep-orange lighten-1",
+            "yellow      lighten-2",
+            "purple      lighten-2",
+        ]
+        index = import_id % len(colors)
+        return colors[index]
     if item_type == "text":
         colors = [
             "red-text         text-lighten-1",

@@ -6,6 +6,14 @@
     margin-left: 5px;
 }
 
+.dropdown-search {
+    top: 64px !important;
+    width: max-content !important;
+    left: unset !important;
+    right: 10px !important;
+    cursor: unset !important;
+    height: unset !important;
+}
 .dropdown-oidc {
     top: 64px !important;
     width: max-content !important;
@@ -38,4 +46,38 @@ li.dropdown-oidc-collection{
 
 .datepicker-modal {
     width: max-content !important;
+}
+  
+.hide-transition.hide-out {
+-webkit-transform: hide(0);
+        transform: scale(0);
+-webkit-transition: -webkit-transform .2s !important;
+transition: -webkit-transform .2s !important;
+transition: transform .2s !important; 
+transition: transform .2s, -webkit-transform .2s !important;
+display: none !important
+}
+
+.nav-search {
+    z-index: 1000;
+    visibility: visible;
+    position: absolute; 
+    width: 100%;
+}
+.nav-search.hidden, .nav-content.hidden {
+    z-index: -1000;
+    visibility: hidden;
+}
+.nav-search.show, .nav-content.show {
+    z-index: 1000;
+    visibility: visible;
+}
+
+.select-dropdown {
+    position: unset !important;
+}
+
+/* Make all onlcick elements a pointer on hover */
+[onClick] {
+    cursor:pointer;
 }

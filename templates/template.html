@@ -23,19 +23,14 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <!-- CSS and Icons -->
-        <!--<link href="static/css/materialize.css" type="text/css" rel="stylesheet"/>-->
         <link href="static/css/materialize.min.css" type="text/css" rel="stylesheet"/> 
-        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
         <link href="static/css/overrides.css"   type="text/css" rel="stylesheet"/>
-        <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
-        <!-- <link href="static/css/fonts.css" type="text/css" rel="stylesheet"/> -->
         <style>
          /* fallback */
             @font-face {
                font-family: 'Material Icons';
                font-style: normal;
                font-weight: 400;
-               /* src: url(https://fonts.gstatic.com/s/materialicons/v139/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2'); */
                src: url(static/fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
             }
             
@@ -60,35 +55,51 @@
      <body>
         <nav>
          <div class="nav-wrapper {{ COLOR_NAV }}">
-           <img class="hide-on-med-and-down" style="padding-left: 10px" src="static/img/headscale3-dots.png" height="64px"></img>
-           <a href="overview" class="brand-logo bold" style="padding-left: 10px">
-						Headscale
-						<div class="right">
-							<span class="left-align thin hide-on-small-only" style="padding-left: 10px">
-								{% block header %}{% endblock %}
-							</span>
-						</div>
-					</a>
-           <a href="#!" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-           <ul class="right hide-on-med-and-down">
-               <li role="menu-item" class="tooltipped {{ overview_active   }}" data-position="bottom" data-tooltip="Overview">
-                  <a href="overview"><i class="material-icons">map</i></a>
-               </li>
-               <li role="menu-item" class="tooltipped {{ machines_active    }}" data-position="bottom" data-tooltip="Machines">
-                  <a href="machines"><i class="material-icons">devices</i></a>
-               </li>
-               <li role="menu-item" class="tooltipped {{ users_active }}" data-position="bottom" data-tooltip="Users">
-                  <a href="users"><i class="material-icons">people</i></a>
-               </li>
-               <li role="menu-item" class="tooltipped {{ settings_active   }}" data-position="bottom" data-tooltip="Settings">
-                  <a href="settings"><i class="material-icons">settings</i></a>
-               </li>
-               {% block OIDC_NAV_DROPDOWN %}{% endblock %}
-            </ul>
+           <div id="nav-search" class="nav-search hidden">
+            <form>
+               <div class="input-field">
+                 <input id="search" type="search" required   oninput="liveSearch()">
+                 <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                 <i class="material-icons" onclick="hide_search()">close</i>
+               </div>
+             </form>
+           </div>
+           <div id="nav-content" class="nav-content">
+            <img class="hide-on-med-and-down" style="padding-left: 10px" src="static/img/headscale3-dots.png" height="64px"></img>
+            <a href="overview" class="brand-logo bold" style="padding-left: 10px">
+                Headscale
+                <div class="right">
+                   <span class="left-align thin hide-on-small-only" style="padding-left: 10px">
+                      {% block header %}{% endblock %}
+                   </span>
+                </div>
+             </a>
+            <a href="#!" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                {% block INPAGE_SEARCH %}{% endblock %}
+                <li role="menu-item" class="tooltipped {{ overview_active   }}" data-position="bottom" data-tooltip="Overview">
+                   <a href="overview"><i class="material-icons">map</i></a>
+                </li>
+                <li role="menu-item" class="tooltipped {{ routes_active   }}" data-position="bottom" data-tooltip="Routes">
+                   <a href="routes"><i class="material-icons">alt_route</i></a>
+                </li>
+                <li role="menu-item" class="tooltipped {{ machines_active    }}" data-position="bottom" data-tooltip="Machines">
+                   <a href="machines"><i class="material-icons">devices</i></a>
+                </li>
+                <li role="menu-item" class="tooltipped {{ users_active }}" data-position="bottom" data-tooltip="Users">
+                   <a href="users"><i class="material-icons">people</i></a>
+                </li>
+                <li role="menu-item" class="tooltipped {{ settings_active   }}" data-position="bottom" data-tooltip="Settings">
+                   <a href="settings"><i class="material-icons">settings</i></a>
+                </li>
+                {% block OIDC_NAV_DROPDOWN %}{% endblock %}
+             </ul>
+           </div>
          </div>
        </nav>
        <ul class="sidenav" id="mobile">
-         <li><a href="/"><i class="material-icons left">map</i>Overview</a></li>
+         <li><a href="overview"><i class="material-icons left">map</i>Overview</a></li>
+         <li><a href="routes"><i class="material-icons left">alt_route</i>Routes</a></li>
          <li><a href="machines"><i class="material-icons left">devices</i>Machines</a></li>
          <li><a href="users"><i class="material-icons left">people</i>Users</a></li>
          <li><a href="settings"><i class="material-icons left">settings</i>Settings</a></li>
@@ -109,10 +120,15 @@
    </div>
    </body>
    <!-- JavaScript / jQuery -->
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
-   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
     <script type="text/javascript" src="static/js/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="static/js/materialize.min.js"></script> 
    <script>M.AutoInit();</script>
+   <!-- Prevent the collapsibles on the Users and Machines pages from collapsing when another element is clicked -->
+   <script> 
+      var elem = document.querySelector('.collapsible.expandable');
+      var instance = M.Collapsible.init(elem, {
+      accordion: false
+      });
+   </script>
    <script type="text/javascript" src="static/js/custom.js"></script>
 </html>

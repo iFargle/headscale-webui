@@ -19,7 +19,7 @@ LOG_LEVEL   = os.environ["LOG_LEVEL"].replace('"', '').upper()
 DEBUG_STATE = True if LOG_LEVEL == "DEBUG" else False
 
 # Initiate the Flask application and logging:
-app          = Flask(__name__, static_url_path="/static")
+app = Flask(__name__, static_url_path="/static")
 match LOG_LEVEL:
     case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
     case "INFO"    : app.logger.setLevel(logging.INFO)
@@ -27,7 +27,7 @@ match LOG_LEVEL:
     case "ERROR"   : app.logger.setLevel(logging.ERROR)
     case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
 
-executor     = Executor(app)
+executor = Executor(app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.logger.info("Headscale-WebUI Version:  "+os.environ["APP_VERSION"]+" / "+os.environ["GIT_BRANCH"])
 app.logger.info("LOG LEVEL SET TO %s", str(LOG_LEVEL))
@@ -134,7 +134,7 @@ else:
 
 ########################################################################################
 # / pages - User-facing pages
-######################################################ddddddddddd##################################
+########################################################################################
 @app.route('/')
 @app.route('/overview')
 @oidc.require_login
@@ -154,12 +154,39 @@ def overview_page():
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
 
     return render_template('overview.html',
-        render_page = renderer.render_overview(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        render_page       = renderer.render_overview(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE
     )
+
+@app.route('/routes', methods=('GET', 'POST'))
+@oidc.require_login
+def routes_page():
+    # Some basic sanity checks:
+    pass_checks = str(helper.load_checks())
+    if pass_checks != "Pass": return redirect(url_for(pass_checks))
+
+    # Check if OIDC is enabled.  If it is, display the buttons:
+    OIDC_NAV_DROPDOWN = Markup("")
+    OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search())
+    if AUTH_TYPE == "oidc":
+        email_address = oidc.user_getfield("email")
+        user_name     = oidc.user_getfield("preferred_username")
+        name          = oidc.user_getfield("name")
+        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
+        OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
+    
+    return render_template('routes.html',
+        render_page       = renderer.render_routes(),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
+        OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE
+    )
+
 
 @app.route('/machines', methods=('GET', 'POST'))
 @oidc.require_login
@@ -171,6 +198,7 @@ def machines_page():
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search())
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
@@ -180,12 +208,13 @@ def machines_page():
     
     cards = renderer.render_machines_cards()
     return render_template('machines.html',
-        cards            = cards,
-        headscale_server = headscale.get_url(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        cards             = cards,
+        headscale_server  = headscale.get_url(True),
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE,
+        INPAGE_SEARCH     = INPAGE_SEARCH
     )
 
 @app.route('/users', methods=('GET', 'POST'))
@@ -198,6 +227,7 @@ def users_page():
     # Check if OIDC is enabled.  If it is, display the buttons:
     OIDC_NAV_DROPDOWN = Markup("")
     OIDC_NAV_MOBILE = Markup("")
+    INPAGE_SEARCH = Markup(renderer.render_search())
     if AUTH_TYPE == "oidc":
         email_address = oidc.user_getfield("email")
         user_name     = oidc.user_getfield("preferred_username")
@@ -207,12 +237,12 @@ def users_page():
 
     cards = renderer.render_users_cards()
     return render_template('users.html',
-        cards = cards,
-        headscale_server = headscale.get_url(),
-        COLOR_NAV   = COLOR_NAV,
-        COLOR_BTN   = COLOR_BTN,
+        cards             = cards,
+        COLOR_NAV         = COLOR_NAV,
+        COLOR_BTN         = COLOR_BTN,
         OIDC_NAV_DROPDOWN = OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE = OIDC_NAV_MOBILE
+        OIDC_NAV_MOBILE   = OIDC_NAV_MOBILE,
+        INPAGE_SEARCH     = INPAGE_SEARCH
     )
 
 @app.route('/settings', methods=('GET', 'POST'))
@@ -396,7 +426,7 @@ def move_user_page():
 def set_machine_tags():
     json_response = request.get_json()
     machine_id    = escape(json_response['id'])
-    machine_tags  = escape(json_response['tags_list'])
+    machine_tags  = json_response['tags_list']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
@@ -484,6 +514,18 @@ def build_preauth_key_table():
     user_name      = str(escape(json_response['name']))
 
     return renderer.build_preauth_key_table(user_name)
+
+########################################################################################
+# Route API Endpoints
+########################################################################################
+@app.route('/api/get_routes', methods=['POST'])
+@oidc.require_login
+def get_route_info():
+    url     = headscale.get_url()
+    api_key = headscale.get_api_key()
+
+    return headscale.get_routes(url, api_key)
+
 
 ########################################################################################
 # Main thread

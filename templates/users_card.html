@@ -1,63 +1,61 @@
-<ul class="collapsible popout" id="{{ user_id }}-main-collapsible">
-    <li>
-        <div class="collapsible-header ">
-            <div class="col">
-                {{ status_badge }}
-                <span class="truncate hover-container" id="{{ user_id }}-name-container">
-                    {{ user_id }}. <span id="{{user_id}}-name-span">{{ user_name }} </span>
-                </span>
-            </div>
+<li id="{{ user_id }}-main-collapsible" class="searchable">
+    <div class="collapsible-header ">
+        <div class="col">
+            {{ status_badge }}
+            <span class="truncate hover-container" id="{{ user_id }}-name-container">
+                {{ user_id }}. <span id="{{user_id}}-name-span">{{ user_name }} </span>
+            </span>
         </div>
-        <div class="collapsible-body">
-            <ul class="collection">
-                <li class="collection-item avatar">
-                    <i class="material-icons circle">settings</i>
-                    <span class="title">User Actions</span>
-                    <p class="hide-on-small-only">
-                        <a 
+    </div>
+    <div class="collapsible-body">
+        <ul class="collection">
+            <li class="collection-item avatar">
+                <i class="material-icons circle">settings</i>
+                <span class="title">User Actions</span>
+                <p class="hide-on-small-only">
+                    <a 
+                        href="#card_modal" 
+                        id="{{user_id}}-rename-user-lg"  
+                        onclick="load_modal_rename_user( {{user_id}}, '{{user_name}}' )" 
+                        class="modal-trigger waves-effect waves-light btn-small tooltipped"
+                        data-tooltip="Rename this user.">
+                        Rename
+                    </a>
+                    <a 
+                        href="#card_modal" 
+                        id="{{user_id}}-remove-user-lg"  
+                        onclick="load_modal_delete_user( {{user_id}}, '{{user_name}}' )" 
+                        class="modal-trigger red waves-effect waves-light btn-small tooltipped" 
+                        data-tooltip="Remove this user.">
+                        Delete
+                    </a>
+                </p>
+                <p class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
+                    <ul class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
+                        <li>
+                            <a 
                             href="#card_modal" 
-                            id="{{user_id}}-rename-user-lg"  
+                            id="{{user_id}}-rename-user-sm"  
                             onclick="load_modal_rename_user( {{user_id}}, '{{user_name}}' )" 
                             class="modal-trigger waves-effect waves-light btn-small tooltipped"
                             data-tooltip="Rename this user.">
-                            Rename
-                        </a>
-                        <a 
+                                Rename
+                            </a>
+                        </li>
+                        <li>
+                            <a 
                             href="#card_modal" 
-                            id="{{user_id}}-remove-user-lg"  
+                            id="{{user_id}}-remove-user-sm"  
                             onclick="load_modal_delete_user( {{user_id}}, '{{user_name}}' )" 
                             class="modal-trigger red waves-effect waves-light btn-small tooltipped" 
                             data-tooltip="Remove this user.">
-                            Delete
-                        </a>
-                    </p>
-                    <p class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
-                        <ul class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
-                            <li>
-                                <a 
-                                href="#card_modal" 
-                                id="{{user_id}}-rename-user-sm"  
-                                onclick="load_modal_rename_user( {{user_id}}, '{{user_name}}' )" 
-                                class="modal-trigger waves-effect waves-light btn-small tooltipped"
-                                data-tooltip="Rename this user.">
-                                    Rename
-                                </a>
-                            </li>
-                            <li>
-                                <a 
-                                href="#card_modal" 
-                                id="{{user_id}}-remove-user-sm"  
-                                onclick="load_modal_delete_user( {{user_id}}, '{{user_name}}' )" 
-                                class="modal-trigger red waves-effect waves-light btn-small tooltipped" 
-                                data-tooltip="Remove this user.">
-                                    Delete
-                                </a>
-                            </li>
-                        </ul>
-                    </p>
-                </li>
-                <div id="{{user_name}}-preauth-keys-collection">{{ preauth_keys_collection }}</div>
-            </ul>
-        </div>
-    </li>
-</ul>
+                                Delete
+                            </a>
+                        </li>
+                    </ul>
+                </p>
+            </li>
+            <div id="{{user_name}}-preauth-keys-collection">{{ preauth_keys_collection }}</div>
+        </ul>
+    </div>
+</li>

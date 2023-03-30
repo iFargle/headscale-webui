@@ -1,6 +1,6 @@
 # pylint: disable=wrong-import-order
 
-import requests, json, os, logging
+import requests, json, os, logging, yaml
 from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
@@ -19,8 +19,21 @@ match LOG_LEVEL:
 ##################################################################
 # Functions related to HEADSCALE and API KEYS
 ##################################################################
-
-def get_url():  return os.environ['HS_SERVER']
+def get_url(inpage=False):
+    if not inpage: 
+        return os.environ['HS_SERVER']
+    config_file = ""
+    try:
+        config_file = open("/etc/headscale/config.yml",  "r")
+        app.logger.info("Opening /etc/headscale/config.yml")
+    except: 
+        config_file = open("/etc/headscale/config.yaml", "r")
+        app.logger.info("Opening /etc/headscale/config.yaml")
+    config_yaml = yaml.safe_load(config_file)
+    if "server_url" in config_yaml: 
+        return str(config_yaml["server_url"])
+    app.logge.warning("Failed to find server_url in the config. Falling back to ENV variable")
+    return os.environ['HS_SERVER']
 
 def set_api_key(api_key):
     # User-set encryption key
@@ -194,9 +207,8 @@ def move_user(url, api_key, machine_id, new_user):
     return response.json()
 
 def update_route(url, api_key, route_id, current_state):
-    action = ""
-    if current_state == "True":  action = "disable"
-    if current_state == "False": action = "enable"
+    action = "disable" if current_state == "True" else "enable"
+
     app.logger.info("Updating Route %s:  Action: %s", str(route_id), str(action))
 
     # Debug
@@ -299,9 +311,8 @@ def get_routes(url, api_key):
         }
     )
     return response.json()
-
 ##################################################################
-# Functions related to NAMESPACES
+# Functions related to USERS
 ##################################################################
 
 # Get all users in use
@@ -370,7 +381,7 @@ def add_user(url, api_key, data):
     return {"status": status, "body": response.json()}
 
 ##################################################################
-# Functions related to PREAUTH KEYS in NAMESPACES
+# Functions related to PREAUTH KEYS in USERS
 ##################################################################
 
 # Get all PreAuth keys associated with a user "user_name"

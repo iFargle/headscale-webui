@@ -1,4 +1,40 @@
 //-----------------------------------------------------------
+// Search on Users and Machines pages
+//-----------------------------------------------------------
+function show_search() {
+    $('#nav-search').removeClass('hidden');
+    $('#nav-search').addClass('show');
+    $('#nav-content').removeClass('show');
+    $('#nav-content').addClass('hidden');
+}
+
+function hide_search() {
+    $('#nav-content').removeClass('hidden');
+    $('#nav-content').addClass('show');
+    $('#nav-search').removeClass('show');
+    $('#nav-search').addClass('hidden');
+
+    // Also remove the contents of the searchbox:
+    document.getElementById("search").value = ""
+    let cards = document.querySelectorAll('.searchable');
+    for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.remove("hide");
+    }
+}
+
+function liveSearch() {
+    let cards = document.querySelectorAll('.searchable');
+    let search_query = document.getElementById("search").value;
+    
+    for (var i = 0; i < cards.length; i++) {
+        if(cards[i].textContent.toLowerCase() .includes(search_query.toLowerCase())) {
+            cards[i].classList.remove("hide");
+        } else {
+            cards[i].classList.add("hide");
+        }
+    }
+}
+//-----------------------------------------------------------
 // General Helpers
 //-----------------------------------------------------------
 function loading () { 
@@ -555,14 +591,11 @@ function load_modal_add_machine() {
             </div>`
             for (let i=0; i < response.users.length; i++) {
                 var name = response["users"][i]["name"]
-                select_html = select_html+`<p><br></p>`
             }
-            select_html = select_html+`<p><br></p>`
-            select_html = select_html+`<p><br></p>`
 
             modal_body.innerHTML = select_html
             // Initialize the form and the machine tabs
-            M.FormSelect.init(document.querySelectorAll('select'))
+            M.FormSelect.init(document.querySelectorAll('select'), {classes: 'add_machine_selector_class'})
             M.Tabs.init(document.getElementById('new_machine_tabs'));
         }
     })
@@ -723,7 +756,207 @@ function delete_machine(machine_id) {
     })
 }
 
-function toggle_route(route_id, current_state) {
+function toggle_exit(route1, route2, exit_id, current_state, page) {
+    var data1 = {"route_id": route1, "current_state": current_state}
+    var data2 = {"route_id": route2, "current_state": current_state}
+    var element = document.getElementById(exit_id);
+
+    var disabledClass = ""
+    var enabledClass  = ""
+
+    if (page == "machines") {
+        disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
+        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+    }
+    if (page == "routes") {
+        disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    }
+
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged.";
+
+    $.ajax({
+        type:"POST", 
+        url: "api/update_route",
+        data: JSON.stringify(data1),
+        contentType: "application/json",
+        success: function(response) {
+            $.ajax({
+                type:"POST", 
+                url: "api/update_route",
+                data: JSON.stringify(data2),
+                contentType: "application/json",
+                success: function(response) {
+                    // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
+                    if (element.className == disabledClass) {
+                        element.className  = enabledClass
+                        action_taken   = "enabled."
+                        element.setAttribute('data-tooltip', enabledTooltip)
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'", "'+page+'")')
+                    } else if (element.className == enabledClass) {
+                        element.className    = disabledClass
+                        action_taken     = "disabled."
+                        element.setAttribute('data-tooltip', disabledTooltip)
+                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'", "'+page+'")')
+                    }
+                    M.toast({html: 'Exit Route '+action_taken});
+                }
+            })
+        }
+    })
+}
+
+function toggle_route(route_id, current_state, page) {
+    var data    = {"route_id": route_id, "current_state": current_state}
+    var element = document.getElementById(route_id);
+
+    var disabledClass = ""
+    var enabledClass  = ""
+
+    if (page == "machines") {
+        disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
+        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+    }
+    if (page == "routes") {
+        disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    }
+
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged.";
+    $.ajax({
+        type:"POST", 
+        url: "api/update_route",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(response) {
+            if (element.className == disabledClass) {
+                element.className = enabledClass
+                action_taken      = "enabled."
+                element.setAttribute('data-tooltip', enabledTooltip)
+                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'", "'+page+'")')
+            } else if (element.className == enabledClass) {
+                element.className = disabledClass
+                action_taken      = "disabled."
+                element.setAttribute('data-tooltip', disabledTooltip)
+                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'", "'+page+'")')
+            }
+            M.toast({html: 'Route '+action_taken});
+        }
+    })
+}
+
+function get_routes() {
+    console.log("Getting info for all routes")
+    var data
+    $.ajax({
+        async: false,
+        type:"POST", 
+        url: "api/get_routes",
+        contentType: "application/json",
+        success: function(response) {
+            console.log("Got all routes.")
+            data = response
+        }
+    })
+    return data
+}
+
+function toggle_failover_route_routespage(routeid, current_state, prefix, route_id_list) {
+    // First, toggle the route:
+    // toggle_route(route_id, current_state, page)
+    var data    = {"route_id": routeid, "current_state": current_state}
+    console.log("Data:  "+JSON.stringify(data))
+    console.log("Passed in:  "+routeid+", "+current_state+", "+prefix+", "+route_id_list)
+    var element = document.getElementById(routeid);
+
+    var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
+    var enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    var failover_disabledClass = "material-icons small left red-text text-lighten-2"
+    var failover_enabledClass  = "material-icons small left green-text text-lighten-2"
+
+    var disabledTooltip = "Click to enable"
+    var enabledTooltip  = "Click to disable"
+    var disableState    = "False"
+    var enableState     = "True"
+    var action_taken    = "unchanged."
+
+    $.ajax({
+        type:"POST", 
+        url: "api/update_route",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(response) {
+            console.log("Success:  Route ID:  "+routeid)
+            console.log("Success: route_id_list:  "+route_id_list)
+            if (element.className == disabledClass) {
+                element.className = enabledClass
+                action_taken      = "enabled."
+                element.setAttribute('data-tooltip', enabledTooltip)
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+enableState+'", "'+prefix+'", ['+route_id_list+'])')
+            } else if (element.className == enabledClass) {
+                element.className = disabledClass
+                action_taken      = "disabled."
+                element.setAttribute('data-tooltip', disabledTooltip)
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+disableState+'", "'+prefix+'", ['+route_id_list+'])')
+            }
+            M.toast({html: 'Route '+action_taken});
+
+            // Get all route info:
+            console.log("Getting info for prefix "+prefix)
+            var routes = get_routes()
+            var failover_enabled = false
+
+            // Get the primary and enabled displays for the prefix:
+            for (let i=0; i < route_id_list.length; i++) {
+                console.log("route_id_list["+i+"]: "+route_id_list[i])
+                var route_id = route_id_list[i]
+                var route_index = route_id-1
+                console.log("Looking for route "+route_id+" at index "+route_index)
+                console.log("isPrimary:  "+routes["routes"][route_index]["isPrimary"])
+
+                // Set the Primary class:
+                var primary_element = document.getElementById(route_id+"-primary")
+                var primary_status  = routes["routes"][route_index]["isPrimary"]
+                var enabled_status  = routes["routes"][route_index]["enabled"]
+
+                console.log("enabled_status:  "+enabled_status)
+
+                if (enabled_status == true) {
+                    failover_enabled = true
+                }
+                
+                console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
+                if (primary_status == true) {
+                    console.log("Detected this route is primary.  Setting the class")
+                    primary_element.className = enabledClass
+                } else if (primary_status == false) {
+                    console.log("Detected this route is NOT primary.  Setting the class")
+                    primary_element.className = disabledClass
+                }
+            }
+
+            // if any route is enabled, set the prefix enable icon to enabled:
+            var failover_element = document.getElementById(prefix)
+            console.log("Failover enabled:  "+failover_enabled)
+            if (failover_enabled == true) {
+                failover_element.className = failover_enabledClass
+            }
+            else if (failover_enabled == false) {
+                failover_element.className = failover_disabledClass
+            }
+        }
+    })
+}
+
+function toggle_failover_route(route_id, current_state, color) {
     var data = {"route_id": route_id, "current_state": current_state}
     $.ajax({
         type:"POST", 
@@ -734,9 +967,9 @@ function toggle_route(route_id, current_state) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
             var element         = document.getElementById(route_id);
             var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-            var enabledClass    = "waves-effect waves-light btn-small green lighten-2 tooltipped";
-            var disabledTooltip = "Click to enable"
-            var enabledTooltip  = "Click to disable"
+            var enabledClass    = "waves-effect waves-light btn-small "+color+" lighten-2 tooltipped";
+            var disabledTooltip = "Click to enable (Failover Pair)"
+            var enabledTooltip  = "Click to disable (Failover Pair)"
             var disableState    = "False"
             var enableState     = "True"
             var action_taken    = "unchanged.";
@@ -748,12 +981,12 @@ function toggle_route(route_id, current_state) {
                 element.className  = enabledClass
                 var action_taken   = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'")')
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+enableState+'", "'+color+'")')
             } else if (element.className == enabledClass) {
                 element.className    = disabledClass
                 var action_taken     = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'")')
+                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+disableState+'", "'+color+'")')
             }
             M.toast({html: 'Route '+action_taken});
         }

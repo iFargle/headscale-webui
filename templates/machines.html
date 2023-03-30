@@ -7,10 +7,14 @@
 
 {% block OIDC_NAV_DROPDOWN %} {{ OIDC_NAV_DROPDOWN}} {% endblock %}
 {% block OIDC_NAV_MOBILE %}   {{ OIDC_NAV_MOBILE  }} {% endblock %}
+{% block INPAGE_SEARCH%}      {{ INPAGE_SEARCH    }} {% endblock %}
+
 
 {% block content %}
 <div class="row"><br>
-    {{ cards }}    
+    <div class='u-flex u-justify-space-evenly u-flex-wrap u-gap-1'>
+        {{ cards }}
+    </div>
 </div>
 
 <!-- Modals -->

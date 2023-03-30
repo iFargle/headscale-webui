@@ -16,6 +16,7 @@
 ---
 # Features
 1.  Enable/Disable routes and exit nodes
+    * Manage failover routes as well
 2.  Add, move, rename, and remove machines
 3.  Add and remove users/namespaces
 4.  Add and expire PreAuth keys
@@ -32,8 +33,13 @@
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
 7.  Basic and OIDC Authentication
-    * OIDC Authentication tested with Authelia
+    * OIDC Authentication tested with Authelia and Keycloak
 8.  Change your color theme! See MaterializeCSS Documentation for Colors for examples.
+9.  Search your machines and users.
+    * Machines have tags you can use to filter search:
+        * `tag:tagname` Searches only for specific tags
+        * `machine:machine-name` Searches only for specific machines
+        * `user:user-name` Searches only for specific users
 
 
 ---
@@ -42,16 +48,11 @@
 
 ---
 # Screenshots:
-Overview Page:
-![Overview](screenshots/oidc_overview.png)
-Users Page:
+![Overview](screenshots/overview.png)
+![Routes](screenshots/routes.png)
+![Machines](screenshots/machines.png)
 ![Users](screenshots/users.png)
-Machine Information:
-![Add a new machine](screenshots/machines_expanded.png)
-Machines Page:
-![Machine Details](screenshots/machines.png)
-Settings Page showing an API Key Test:
-![API Key Test](screenshots/settings.png)
+![Settings](screenshots/settings.png)
 
 ---
 # Tech used:
