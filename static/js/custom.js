@@ -861,8 +861,8 @@ function get_routes() {
         contentType: "application/json",
         success: function(response) {
             console.log("Got all routes.  ")
-            console.log("Routes:  "+response)
-            return JSON.stringify(response)
+            console.log("Routes:  "+response.message)
+            return JSON.stringify(response.message)
         }
     })
 }
