@@ -916,7 +916,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             for (let i=0; i < route_id_list.length; i++) {
                 console.log("route_id_list["+i+"]: "+route_id_list[i])
                 var route_id = route_id_list[i]
-                var route_index = route_id+1
+                var route_index = route_id-1
                 console.log("Looking for route "+route_id+" at index "+route_index)
                 console.log("isPrimary:  "+routes["routes"][route_index]["isPrimary"])
 
