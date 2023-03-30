@@ -861,8 +861,7 @@ function get_routes() {
         contentType: "application/json",
         success: function(response) {
             console.log("Got all routes.  ")
-            console.log("Headscale response:  "+JSON.stringify(response))
-            return JSON.stringify(response.message)
+            return JSON.stringify(response)
         }
     })
 }
@@ -905,17 +904,27 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             }
             M.toast({html: 'Route '+action_taken});
 
-            // Next, get the information for the primary route and the failover route status:
+            // Get all route info:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
+            var enabled_status = "False"
+
+            // Debug.
             console.log("Routes:  "+routes)
 
-            // Second, set the primary and enabled displays for the prefix:
+            // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
-                var route_id = route_id_list[i]
                 console.log("route_id_list["+i+"]: "+route_id_list[i])
-                // If one of the two routes is enabled, keep the prefix's route green.
-                // Step 1:  Get info for these routes:
+                // Set the Primary class:
+                var primary_element = document.getElementById(routeid+"-primary")
+                var primary_status = routes["route"][route_id_list[i]]["isPrimary"]
+                if (primary_status == "True") {
+                    primary_element.className = enabledClass
+                } else if (primary_status == "False") {
+                    primary_element.className = disabledClass
+                }
+                // Determine if any route is enabled:
+                
             }
         }
     })

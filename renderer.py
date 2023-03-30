@@ -791,8 +791,8 @@ def render_routes():
                     route_id_list.append(route["id"])
 
             # Set up the display code:
-            failover_enabled  = "<i class='material-icons small left green-text text-lighten-2'>fiber_manual_record</i>"
-            failover_disabled = "<i class='material-icons small left red-text text-lighten-2'>fiber_manual_record</i>"
+            failover_enabled  = "<i id='"+str(route_prefix)+"' class='material-icons small left green-text text-lighten-2'>fiber_manual_record</i>"
+            failover_disabled = "<i id='"+str(route_prefix)+"' class='material-icons small left red-text text-lighten-2'>fiber_manual_record</i>"
 
             failover_display = failover_disabled
             for route_id in route_id_list:
@@ -821,23 +821,6 @@ def render_routes():
                 machine_id = all_routes["routes"][idx]["machine"]["id"]
                 is_primary = all_routes["routes"][idx]["isPrimary"]
                 is_enabled = all_routes["routes"][idx]["enabled"]
-
-                # route_id_list contains all routes associated with that prefix.
-                # To toggle which is primary, we need to transfer all routes
-                # and which route ID to make primary.  We then toggle each route
-                # in order, with the primary route being toggled last
-                # Step 1:  Create an array of all route_id's
-                # payload = "{"
-                # index = 0
-
-                # Is there a better way to do this??
-                # for item in route_id_list: 
-                #     payload += "\""+str(index)+"\": \""+str(item)+"\""
-                #     index += 1
-                #     if index != len(route_id_list): payload += ", "
-                # payload+="}"
-                # app.logger.debug("JSON:  %s", str(payload))
-                # json_payload = json.loads(payload)
 
                 payload = []
                 for item in route_id_list: payload.append(int(item))
