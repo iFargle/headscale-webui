@@ -889,18 +889,17 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
         contentType: "application/json",
         success: function(response) {
             console.log("Success:  Route ID:  "+routeid)
-            console.log("Success: data['route_id']:  "+data[routeid])
             console.log("Success: route_id_list:  "+route_id_list)
             if (element.className == disabledClass) {
                 element.className = enabledClass
                 action_taken      = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+enableState+'", "'+prefix+'", '+route_id_list+')')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+enableState+'", "'+prefix+'", ['+route_id_list+'])')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
                 action_taken      = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+disableState+'", "'+prefix+'", '+route_id_list+')')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+disableState+'", "'+prefix+'", ['+route_id_list+'])')
             }
             M.toast({html: 'Route '+action_taken});
 
