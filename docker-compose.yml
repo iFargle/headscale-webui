@@ -8,7 +8,7 @@ services:
       - COLOR=red                              # Use the base colors (ie, no darken-3, etc) - 
       - HS_SERVER=https://headscale.$DOMAIN    # Reachable endpoint for your Headscale server
       - DOMAIN_NAME=https://headscale.$DOMAIN  # The base domain name for this container.
-      - SCRIPT_NAME=/admin                     # This is your applications base path (wsgi requires the name "SCRIPT_NAME")
+      - SCRIPT_NAME=/admin                     # This is your applications base path (wsgi requires the name "SCRIPT_NAME").  Remove if you are hosing at the root /
       - KEY="YourKeyBetweenQuotes"             # Generate with "openssl rand -base64 32" - used to encrypt your key on disk.
       - AUTH_TYPE=oidc                         # AUTH_TYPE is either Basic or OIDC.  Empty for no authentication
       - LOG_LEVEL=info                         # Log level.  "DEBUG", "ERROR", "WARNING", or "INFO".  Default "INFO"

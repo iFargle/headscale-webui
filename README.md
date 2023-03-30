@@ -16,6 +16,7 @@
 ---
 # Features
 1.  Enable/Disable routes and exit nodes
+    * Manage failover routes as well
 2.  Add, move, rename, and remove machines
 3.  Add and remove users/namespaces
 4.  Add and expire PreAuth keys
@@ -48,14 +49,14 @@
 ---
 # Screenshots:
 Overview Page:
-![Overview](screenshots/oidc_overview.png)
+![Overview](screenshots/overview.png)
 Users Page:
 ![Users](screenshots/users.png)
-Machine Information:
-![Add a new machine](screenshots/machines_expanded.png)
+Routes Page:
+![Routes Page](screenshots/routes.png)
 Machines Page:
-![Machine Details](screenshots/machines.png)
-Settings Page showing an API Key Test:
+![Add a new machine](screenshots/machines.png)
+Settings Page:
 ![API Key Test](screenshots/settings.png)
 
 ---

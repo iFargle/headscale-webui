@@ -1,6 +1,4 @@
 *PR's to help expand and improve documentation are always welcome!*
-* Thanks to @FredericIV for assistance with Keycloak and Caddy
-* Thanks to @qiangyt for assistance with general reverse proxy fixes and nginx
 
 # Installation and Setup
 * Use [docker-compose.yml](docker-compose.yml) as an example
@@ -17,7 +15,7 @@
   * `TZ` - Set this to your current timezone.  Example:  `Asia/Tokyo`
   * `COLOR` Set this to your preferred color scheme.  See the [MaterializeCSS docs](https://materializecss.github.io/materialize/color.html#palette) for examples.  Only set the "base" color -- ie, instead of `blue-gray darken-1`, just use `blue-gray`.
   * `HS_SERVER` is the URL for your Headscale control server.
-  * `SCRIPT_NAME` is your "Base Path" for hosting.  For example, if you want to host on http://localhost/admin, set this to `/admin`
+  * `SCRIPT_NAME` is your "Base Path" for hosting.  For example, if you want to host on http://localhost/admin, set this to `/admin`, otherwise remove this variable entirely.
   * `KEY` is your encryption key.  Set this to a random value generated from `openssl rand -base64 32`
   * `AUTH_TYPE` can be set to `Basic` or `OIDC`.  See the [Authentication](#Authentication) section below for more information.
   * `LOG_LEVEL` can be one of `Debug`, `Info`, `Warning`, `Error`, or `Critical` for decreasing verbosity.  Default is `Info` if removed from your Environment.
