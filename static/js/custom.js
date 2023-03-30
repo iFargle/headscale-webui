@@ -919,10 +919,10 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
                 var primary_element = document.getElementById(routeid+"-primary")
                 var primary_status = routes["routes"][route_id_list[i]]["isPrimary"]
                 console.log("Setting primary class '"+routeid+"-primary':  "+primary_status)
-                if (primary_status == "true") {
+                if (primary_status == true) {
                     console.log("Detected this route is primary.  Setting the class")
                     primary_element.className = enabledClass
-                } else if (primary_status == "false") {
+                } else if (primary_status == false) {
                     console.log("Detected this route is NOT primary.  Setting the class")
                     primary_element.className = disabledClass
                 }
