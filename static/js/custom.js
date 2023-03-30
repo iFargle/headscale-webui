@@ -916,9 +916,9 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             for (let i=0; i < route_id_list.length; i++) {
                 console.log("route_id_list["+i+"]: "+route_id_list[i])
                 // Set the Primary class:
-                var primary_element = document.getElementById(routeid+"-primary")
+                var primary_element = document.getElementById([route_id_list[i]+"-primary")
                 var primary_status = routes["routes"][route_id_list[i]]["isPrimary"]
-                console.log("Setting primary class '"+routeid+"-primary':  "+primary_status)
+                console.log("Setting primary class '"+[route_id_list[i]+"-primary':  "+primary_status)
                 if (primary_status == true) {
                     console.log("Detected this route is primary.  Setting the class")
                     primary_element.className = enabledClass
