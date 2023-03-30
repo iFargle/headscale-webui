@@ -912,15 +912,12 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             var routes = get_routes()
             var enabled_status = "False"
 
-            // Debug.
-            console.log("in toggle_failover_state_routespage:  Routes:  "+JSON.stringify(routes))
-
             // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
                 console.log("route_id_list["+i+"]: "+route_id_list[i])
                 // Set the Primary class:
                 var primary_element = document.getElementById(routeid+"-primary")
-                var primary_status = routes["route"][route_id_list[i]]["isPrimary"]
+                var primary_status = routes["routes"][route_id_list[i]]["isPrimary"]
                 console.log("Setting primary class '"+routeid+"-primary':  "+primary_status)
                 if (primary_status == "True") {
                     console.log("Detected this route is primary.  Setting the class")
