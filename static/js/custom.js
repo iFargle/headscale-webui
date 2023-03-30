@@ -858,6 +858,7 @@ function get_routes() {
     var all_routes = ""
     $.ajax({
         type:"POST", 
+        async: false,
         url: "api/get_routes",
         contentType: "application/json",
         success: function(response) {
