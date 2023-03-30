@@ -48,16 +48,11 @@
 
 ---
 # Screenshots:
-Overview Page:
 ![Overview](screenshots/overview.png)
-Users Page:
+![Routes](screenshots/routes.png)
+![Machines](screenshots/machines.png)
 ![Users](screenshots/users.png)
-Routes Page:
-![Routes Page](screenshots/routes.png)
-Machines Page:
-![Add a new machine](screenshots/machines.png)
-Settings Page:
-![API Key Test](screenshots/settings.png)
+![Settings](screenshots/settings.png)
 
 ---
 # Tech used:
