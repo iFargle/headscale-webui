@@ -910,7 +910,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             // Get all route info:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
-            var enabled_status = "False"
+            var failover_enabled = false
 
             // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
@@ -922,10 +922,14 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
                 // Set the Primary class:
                 var primary_element = document.getElementById(route_id+"-primary")
-                var primary_status =  routes["routes"][route_index]["isPrimary"]
+                var primary_status  = routes["routes"][route_index]["isPrimary"]
+                var enabled_status  = routes["routes"][route_index]["enabled"]
 
+                if (enabled_status == true) {
+                    failover_status = true
+                }
+                
                 console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
-
                 if (primary_status == true) {
                     console.log("Detected this route is primary.  Setting the class")
                     primary_element.className = enabledClass
@@ -933,8 +937,15 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
                     console.log("Detected this route is NOT primary.  Setting the class")
                     primary_element.className = disabledClass
                 }
-                // Determine if any route is enabled:
-                
+            }
+
+            // if any route is enabled, set the prefix enable icon to enabled:
+            var failover_element = document.getElementById(prefix)
+            if (failover_enabled == true) {
+                failover_element.className = enabledClass
+            }
+            else if (failover_enabled == false) {
+                failover_element.className = disabledClass
             }
         }
     })
