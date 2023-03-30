@@ -7,7 +7,7 @@
 # Contents
   * [Docker Compose](#docker-compose)
   * [Reverse Proxies](#reverse-proxies)
-  * [Autnentication](#authentication)
+  * [Authentication](#authentication)
 
 ---
 # Docker Compose
