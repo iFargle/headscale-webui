@@ -879,6 +879,8 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
     var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
     var enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    var failover_disabledClass = "material-icons small left red-text text-lighten-2"
+    var failover_enabledClass  = "material-icons small left green-text text-lighten-2"
 
     var disabledTooltip = "Click to enable"
     var enabledTooltip  = "Click to disable"
@@ -910,7 +912,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             // Get all route info:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
-            var failover_enabled = false
+            var failover_enabled
 
             // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
@@ -925,8 +927,13 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
                 var primary_status  = routes["routes"][route_index]["isPrimary"]
                 var enabled_status  = routes["routes"][route_index]["enabled"]
 
+                console.log("enabled_status:  "+enabled_status)
+
                 if (enabled_status == true) {
                     failover_status = true
+                }
+                else {
+                    failover_status = false
                 }
                 
                 console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
@@ -942,10 +949,10 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             // if any route is enabled, set the prefix enable icon to enabled:
             var failover_element = document.getElementById(prefix)
             if (failover_enabled == true) {
-                failover_element.className = enabledClass
+                failover_element.className = failover_enabledClass
             }
             else if (failover_enabled == false) {
-                failover_element.className = disabledClass
+                failover_element.className = failover_disabledClass
             }
         }
     })
