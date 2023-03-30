@@ -865,13 +865,13 @@ function get_routes() {
     })
 }
 
-function toggle_failover_route_routespage(route_id, current_state, prefix, route_id_list) {
+function toggle_failover_route_routespage(routeid, current_state, prefix, route_id_list) {
     // First, toggle the route:
     // toggle_route(route_id, current_state, page)
-
-    var data    = {"route_id": route_id, "current_state": current_state}
+    var data    = {"route_id": routeid, "current_state": current_state}
     console.log("Data:  "+JSON.stringify(data))
-    var element = document.getElementById(route_id);
+    console.log("Passed in:  "+routeid+", "+current_state+", "+prefix+", "+route_id_list)
+    var element = document.getElementById(routeid);
 
     var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
     var enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
@@ -880,27 +880,27 @@ function toggle_failover_route_routespage(route_id, current_state, prefix, route
     var enabledTooltip  = "Click to disable"
     var disableState    = "False"
     var enableState     = "True"
-    var action_taken    = "unchanged.  See logs.";
-
+    var action_taken    = "unchanged.";
+    
     $.ajax({
         type:"POST", 
         url: "api/update_route",
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(response) {
-            console.log("Route ID:  "+route_id)
-            console.log("data['route_id']:  "+data['route_id'])
-            console.log("route_id_list:  "+route_id_list)
+            console.log("Success:  Route ID:  "+routeid)
+            console.log("Success: data['route_id']:  "+data[routeid])
+            console.log("Success: route_id_list:  "+route_id_list)
             if (element.className == disabledClass) {
                 element.className = enabledClass
                 action_taken      = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+enableState+'", "'+prefix+'", '+route_id_list+')')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+enableState+'", "'+prefix+'", '+route_id_list+')')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
                 action_taken      = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+route_id+', "'+disableState+'", "'+prefix+'", '+route_id_list+')')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+disableState+'", "'+prefix+'", '+route_id_list+')')
             }
             M.toast({html: 'Route '+action_taken});
 
