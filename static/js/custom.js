@@ -861,7 +861,7 @@ function get_routes() {
         contentType: "application/json",
         success: function(response) {
             console.log("Got all routes.  ")
-            console.log("Headscale response:  "+JSON.stringify(response.message))
+            console.log("Headscale response:  "+JSON.stringify(response))
             return JSON.stringify(response.message)
         }
     })
