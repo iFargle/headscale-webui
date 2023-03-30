@@ -855,17 +855,17 @@ function toggle_route(route_id, current_state, page) {
 
 function get_routes() {
     console.log("Getting info for all routes")
+    var all_routes = ""
     $.ajax({
         type:"POST", 
         url: "api/get_routes",
         contentType: "application/json",
         success: function(response) {
             console.log("Got all routes.")
-            console.log("Routes:  "+response)
-            console.log("JSON.stringify(response):  "+JSON.stringify(response))
-            return JSON.stringify(response)
+            all_routes = JSON.stringify(response)
         }
     })
+    return all_routes
 }
 
 function toggle_failover_route_routespage(routeid, current_state, prefix, route_id_list) {
@@ -912,7 +912,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             var enabled_status = "False"
 
             // Debug.
-            console.log("Routes:  "+routes)
+            console.log("in toggle_failover_state_routespage:  Routes:  "+routes)
 
             // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
