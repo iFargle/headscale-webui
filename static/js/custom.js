@@ -860,7 +860,7 @@ function get_routes() {
         url: "api/get_routes",
         contentType: "application/json",
         success: function(response) {
-            console.log("Got all routes.  ")
+            console.log("Got all routes.")
             console.log("Routes:  "+response)
             console.log("JSON.stringify(response):  "+JSON.stringify(response))
             return JSON.stringify(response)
