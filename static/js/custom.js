@@ -948,6 +948,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
             // if any route is enabled, set the prefix enable icon to enabled:
             var failover_element = document.getElementById(prefix)
+            console.log("Failover enabled:  "+failover_enabled)
             if (failover_enabled == true) {
                 failover_element.className = failover_enabledClass
             }
