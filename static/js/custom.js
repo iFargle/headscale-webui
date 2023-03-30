@@ -912,7 +912,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
             // Get all route info:
             console.log("Getting info for prefix "+prefix)
             var routes = get_routes()
-            var failover_enabled
+            var failover_enabled = false
 
             // Get the primary and enabled displays for the prefix:
             for (let i=0; i < route_id_list.length; i++) {
@@ -931,9 +931,6 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
                 if (enabled_status == true) {
                     failover_enabled = true
-                }
-                else {
-                    failover_enabled = false
                 }
                 
                 console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
