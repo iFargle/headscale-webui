@@ -805,7 +805,7 @@ def render_routes():
             failover_display = failover_disabled
             for route_id in route_id_list:
                 # Get the routes index:
-                current_route_index = all_routes_id_list.indexof(route_id)
+                current_route_index = all_routes_id_list.indexOf(route_id)
                 if all_routes["routes"][current_route_index]["enabled"]: failover_display = failover_enabled
 
 
@@ -825,8 +825,8 @@ def render_routes():
 
             # Build the display:
             for route_id in route_id_list:
-                idx = all_routes_id_list.indexof(route_id)
-                
+                idx = all_routes_id_list.indexOf(route_id)
+
                 machine    = all_routes["routes"][idx]["machine"]["givenName"]
                 machine_id = all_routes["routes"][idx]["machine"]["id"]
                 is_primary = all_routes["routes"][idx]["isPrimary"]
