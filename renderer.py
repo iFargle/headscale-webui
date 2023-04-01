@@ -752,7 +752,7 @@ def render_routes():
                     if route["id"] != route_check["id"]:
                         is_failover = True
 
-        if not is_exit and not is_failover:
+        if not is_exit and not is_failover and machine != "":
         # Build a simple table for all non-exit routes:
             route_content += """
             <tr>
