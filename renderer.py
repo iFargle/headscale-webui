@@ -679,7 +679,15 @@ def render_routes():
 
     # If there are no routes, just exit:
     if len(all_routes) == 0: return Markup("<br><br><br><center>There are no routes to display!</center>")
-    # Testing...
+    # Get a list of all Route ID's to iterate through:
+    all_routes_id_list = []
+    for route in all_routes["routes"]:
+        all_routes_id_list.append(route["id"])
+        if route["machine"]["name"]:
+            app.logger.info("Found route %s / machine: %s", str(route["id"]), route["machine"]["name"])
+        else: 
+            app.logger.info("Route id %s has no machine associated.", str(route["id"]))
+
 
     route_content    = ""
     failover_content = ""
@@ -744,7 +752,7 @@ def render_routes():
                     if route["id"] != route_check["id"]:
                         is_failover = True
 
-        if not is_exit and not is_failover:
+        if not is_exit and not is_failover and machine != "":
         # Build a simple table for all non-exit routes:
             route_content += """
             <tr>
@@ -796,7 +804,9 @@ def render_routes():
 
             failover_display = failover_disabled
             for route_id in route_id_list:
-                if all_routes["routes"][int(route_id) - 1]["enabled"]: failover_display = failover_enabled
+                # Get the routes index:
+                current_route_index = all_routes_id_list.index(route_id)
+                if all_routes["routes"][current_route_index]["enabled"]: failover_display = failover_enabled
 
 
             # Get all route_id's associated with the route prefix:
@@ -815,8 +825,8 @@ def render_routes():
 
             # Build the display:
             for route_id in route_id_list:
-                idx = int(route_id) - 1
-                # Get info on every route in the list: route_id-1 is the positiond in the array starting 0
+                idx = all_routes_id_list.index(route_id)
+
                 machine    = all_routes["routes"][idx]["machine"]["givenName"]
                 machine_id = all_routes["routes"][idx]["machine"]["id"]
                 is_primary = all_routes["routes"][idx]["isPrimary"]
