@@ -55,21 +55,19 @@ if AUTH_TYPE == "oidc":
     oidc_info = response.json()
     app.logger.debug("JSON Dumps for OIDC_INFO:  "+json.dumps(oidc_info))
 
-    client_secrets = """{
-        "web": {
-            "issuer": \""""+oidc_info["issuer"]+"""\",
-            "auth_uri": \""""+oidc_info["authorization_endpoint"]+"""\",
-            "client_id": \""""+OIDC_CLIENT_ID+"""\",
-            "client_secret": \""""+OIDC_SECRET+"""\",
-            "redirect_uris": [
-                \""""+DOMAIN_NAME+BASE_PATH+"""/oidc_callback"
-            ],
-            "userinfo_uri": \""""+oidc_info["userinfo_endpoint"]+"""\", 
-            "token_uri": \""""+oidc_info["token_endpoint"]+"""\",
-            "token_introspection_uri": \""""+oidc_info["introspection_endpoint"]+"""\"
+    client_secrets = json.dumps(
+        {
+            "web": {
+                "issuer": oidc_info["issuer"],
+                "auth_uri": oidc_info["authorization_endpoint"],
+                "client_id": OIDC_CLIENT_ID,
+                "client_secret": OIDC_SECRET,
+                "redirect_uris": [DOMAIN_NAME + BASE_PATH + "/oidc_callback"],
+                "userinfo_uri": oidc_info["userinfo_endpoint"],
+                "token_uri": oidc_info["token_endpoint"],
+            }
         }
-    }
-    """
+    )
 
     with open("/app/instance/secrets.json", "w+") as secrets_json:
         secrets_json.write(client_secrets)
