@@ -682,11 +682,11 @@ def render_routes():
     # Get a list of all Route ID's to iterate through:
     all_routes_id_list = []
     for route in all_routes["routes"]:
+        all_routes_id_list.append(route["id"])
         if route["machine"]["name"]:
-            all_routes_id_list.append(route["id"])
             app.logger.info("Found route %s / machine: %s", str(route["id"]), route["machine"]["name"])
         else: 
-            app.logger.info("Route id %s has no machine associated. Skipping", str(route["id"]))
+            app.logger.info("Route id %s has no machine associated.", str(route["id"]))
 
 
     route_content    = ""
