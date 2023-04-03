@@ -19,11 +19,17 @@ gunicorn = "^20.1.0"
 flask-basicauth = "^0.2.0"
 flask-providers-oidc = "^1.2.1"
 
-[tool.poetry.dev-dependencies]
-
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.0"
-autopep8 = "^2.0.2"
+black = "^23.3.0"
+isort = "^5.12.0"
+ruff = "^0.0.260"
+pre-commit = "^3.2.1"
+mypy = "^1.1.1"
+pydocstyle = "^6.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
+
+[tool.isort]
+profile = "black"
