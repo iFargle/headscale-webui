@@ -32,7 +32,7 @@ def get_url(inpage=False):
     config_yaml = yaml.safe_load(config_file)
     if "server_url" in config_yaml: 
         return str(config_yaml["server_url"])
-    app.logge.warning("Failed to find server_url in the config. Falling back to ENV variable")
+    app.logger.warning("Failed to find server_url in the config. Falling back to ENV variable")
     return os.environ['HS_SERVER']
 
 def set_api_key(api_key):
