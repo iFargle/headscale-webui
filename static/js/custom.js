@@ -25,9 +25,9 @@ function hide_search() {
 function liveSearch() {
     let cards = document.querySelectorAll('.searchable');
     let search_query = document.getElementById("search").value;
-    
+
     for (var i = 0; i < cards.length; i++) {
-        if(cards[i].textContent.toLowerCase() .includes(search_query.toLowerCase())) {
+        if (cards[i].textContent.toLowerCase().includes(search_query.toLowerCase())) {
             cards[i].classList.remove("hide");
         } else {
             cards[i].classList.add("hide");
@@ -37,7 +37,7 @@ function liveSearch() {
 //-----------------------------------------------------------
 // General Helpers
 //-----------------------------------------------------------
-function loading () { 
+function loading() {
     return `<center>
                 <div class="preloader-wrapper big active">
                     <div class="spinner-layer spinner-blue-only">
@@ -80,9 +80,9 @@ function get_color(id) {
 // Generic modal used for alerts / problems
 function load_modal_generic(type, title, message) {
     console.log("Loading the generic modal")
-    element         = document.getElementById('generic_modal')
+    element = document.getElementById('generic_modal')
     content_element = document.getElementById('generic_modal_content')
-    title_element   = document.getElementById('generic_modal_title')
+    title_element = document.getElementById('generic_modal_title')
 
     content_element.innerHTML = loading()
     title_element.innerHTML = "Loading..."
@@ -91,7 +91,7 @@ function load_modal_generic(type, title, message) {
     switch (type) {
         case "warning" || "Warning":
             title_html = "Warning"
-            content_html =`
+            content_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle yellow">priority_high</i>
@@ -102,7 +102,7 @@ function load_modal_generic(type, title, message) {
             break;
         case "success" || "Success":
             title_html = "Success"
-            content_html =`
+            content_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle green">check</i>
@@ -111,9 +111,9 @@ function load_modal_generic(type, title, message) {
                 </li>
             </ul>`
             break;
-        case "error" || "Error": 
+        case "error" || "Error":
             title_html = "Error"
-            content_html =`
+            content_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle red">warning</i>
@@ -124,7 +124,7 @@ function load_modal_generic(type, title, message) {
             break;
         case "information" || "Information":
             title_html = "Information"
-            content_html =`
+            content_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle grey">help</i>
@@ -142,20 +142,20 @@ function load_modal_generic(type, title, message) {
 }
 
 // https://stackoverflow.com/questions/3043775/how-to-escape-html#22706073
-function escapeHTML(str){
+function escapeHTML(str) {
     var p = document.createElement("p");
     p.appendChild(document.createTextNode(str));
     return p.innerHTML;
 }
 
 // Enables the Floating Action Button (FAB) for the Machines and Users page
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var elems = document.querySelectorAll('.fixed-action-btn');
-    var instances = M.FloatingActionButton.init(elems, {hoverEnabled:false}); 
+    var instances = M.FloatingActionButton.init(elems, { hoverEnabled: false });
 });
 
 // Init the date picker when adding PreAuth keys
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var elems = document.querySelectorAll('.datepicker');
     var instances = M.Datepicker.init(elems);
 });
@@ -166,10 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function test_key() {
     document.getElementById('test_modal_results').innerHTML = loading()
     var data = $.ajax({
-        type:"GET", 
+        type: "GET",
         url: "api/test_key",
-        success: function(response) {
-            if(response == "Unauthenticated") {
+        success: function (response) {
+            if (response == "Unauthenticated") {
                 html = `
                 <ul class="collection">
                     <li class="collection-item avatar">
@@ -234,14 +234,14 @@ function save_key() {
         document.getElementById('test_modal_results').innerHTML = html
         return
     };
-    var data = {"api_key": api_key};
+    var data = { "api_key": api_key };
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/save_key",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            M.toast({html: 'Key saved.  Testing...'});
+        success: function (response) {
+            M.toast({ html: 'Key saved.  Testing...' });
             test_key();
         }
     })
@@ -256,12 +256,12 @@ function load_modal_rename_user(user_id, old_name) {
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Rename"
 
-    modal         = document.getElementById('card_modal');
-    modal_title   = document.getElementById('modal_title');
-    modal_body    = document.getElementById('modal_content');
+    modal = document.getElementById('card_modal');
+    modal_title = document.getElementById('modal_title');
+    modal_body = document.getElementById('modal_content');
     modal_confirm = document.getElementById('modal_confirm');
 
-    modal_title.innerHTML = "Rename user '"+old_name+"'?"
+    modal_title.innerHTML = "Rename user '" + old_name + "'?"
     body_html = `
     <ul class="collection">
         <li class="collection-item avatar">
@@ -278,9 +278,9 @@ function load_modal_rename_user(user_id, old_name) {
     `
 
     modal_body.innerHTML = body_html
-    $(document).ready(function() { $('input#new_user_name_form').characterCounter(); });    
+    $(document).ready(function () { $('input#new_user_name_form').characterCounter(); });
 
-    modal_confirm.setAttribute('onclick', 'rename_user('+user_id+', "'+old_name+'")')
+    modal_confirm.setAttribute('onclick', 'rename_user(' + user_id + ', "' + old_name + '")')
 }
 
 function load_modal_delete_user(user_id, user_name) {
@@ -289,12 +289,12 @@ function load_modal_delete_user(user_id, user_name) {
     document.getElementById('modal_confirm').className = "red btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Delete"
 
-    modal         = document.getElementById('card_modal');
-    modal_title   = document.getElementById('modal_title');
-    modal_body    = document.getElementById('modal_content');
+    modal = document.getElementById('card_modal');
+    modal_title = document.getElementById('modal_title');
+    modal_body = document.getElementById('modal_content');
     modal_confirm = document.getElementById('modal_confirm');
 
-    modal_title.innerHTML = "Delete user '"+user_name+"'?"
+    modal_title.innerHTML = "Delete user '" + user_name + "'?"
     body_html = `
     <ul class="collection">
         <li class="collection-item avatar">
@@ -305,7 +305,7 @@ function load_modal_delete_user(user_id, user_name) {
     </ul>
     `
     modal_body.innerHTML = body_html
-    modal_confirm.setAttribute('onclick', 'delete_user("'+user_id+'", "'+user_name+'")')
+    modal_confirm.setAttribute('onclick', 'delete_user("' + user_id + '", "' + user_name + '")')
 }
 
 function load_modal_add_preauth_key(user_name) {
@@ -314,12 +314,12 @@ function load_modal_add_preauth_key(user_name) {
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Add"
 
-    modal         = document.getElementById('card_modal');
-    modal_title   = document.getElementById('modal_title');
-    modal_body    = document.getElementById('modal_content');
+    modal = document.getElementById('card_modal');
+    modal_title = document.getElementById('modal_title');
+    modal_body = document.getElementById('modal_content');
     modal_confirm = document.getElementById('modal_confirm');
 
-    modal_title.innerHTML = "Adding a PreAuth key to '"+user_name+"'"
+    modal_title.innerHTML = "Adding a PreAuth key to '" + user_name + "'"
     body_html = `
         <ul class="collection">
             <li class="collection-item avatar">
@@ -354,9 +354,9 @@ function load_modal_add_preauth_key(user_name) {
     modal_body.innerHTML = body_html
 
     // Init the date picker
-    M.Datepicker.init(document.querySelector('.datepicker'), {format:'yyyy-mm-dd'});
+    M.Datepicker.init(document.querySelector('.datepicker'), { format: 'yyyy-mm-dd' });
 
-    modal_confirm.setAttribute('onclick', 'add_preauth_key("'+user_name+'")')
+    modal_confirm.setAttribute('onclick', 'add_preauth_key("' + user_name + '")')
 }
 
 function load_modal_expire_preauth_key(user_name, key) {
@@ -365,9 +365,9 @@ function load_modal_expire_preauth_key(user_name, key) {
     document.getElementById('modal_confirm').className = "red lighten-2 btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Expire"
 
-    modal         = document.getElementById('card_modal');
-    modal_title   = document.getElementById('modal_title');
-    modal_body    = document.getElementById('modal_content');
+    modal = document.getElementById('card_modal');
+    modal_title = document.getElementById('modal_title');
+    modal_body = document.getElementById('modal_content');
     modal_confirm = document.getElementById('modal_confirm');
 
     modal_title.innerHTML = "Expire PreAuth Key?"
@@ -381,7 +381,7 @@ function load_modal_expire_preauth_key(user_name, key) {
     </ul>
     `
     modal_body.innerHTML = body_html
-    modal_confirm.setAttribute('onclick', 'expire_preauth_key("'+user_name+'", "'+key+'")')
+    modal_confirm.setAttribute('onclick', 'expire_preauth_key("' + user_name + '", "' + key + '")')
 }
 
 function load_modal_move_machine(machine_id) {
@@ -390,30 +390,30 @@ function load_modal_move_machine(machine_id) {
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Move"
 
-    var data = {"id": machine_id}
+    var data = { "id": machine_id }
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/machine_information",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(headscale) {
+        success: function (headscale) {
             $.ajax({
-                type: "POST", 
+                type: "POST",
                 url: "api/get_users",
-                success: function(response) {
-                    modal         = document.getElementById('card_modal');
-                    modal_title   = document.getElementById('modal_title');
-                    modal_body    = document.getElementById('modal_content');
+                success: function (response) {
+                    modal = document.getElementById('card_modal');
+                    modal_title = document.getElementById('modal_title');
+                    modal_body = document.getElementById('modal_content');
                     modal_confirm = document.getElementById('modal_confirm');
-        
-                    modal_title.innerHTML = "Move machine '"+headscale.machine.givenName+"'?"
+
+                    modal_title.innerHTML = "Move machine '" + headscale.machine.givenName + "'?"
 
                     select_html = `<h6>Select a User</h6><select id='move-select'>`
-                    for (let i=0; i < response.users.length; i++) {
+                    for (let i = 0; i < response.users.length; i++) {
                         var name = response["users"][i]["name"]
-                        select_html = select_html+`<option value="${name}">${name}</option>`
+                        select_html = select_html + `<option value="${name}">${name}</option>`
                     }
-                    select_html = select_html+`</select>`
+                    select_html = select_html + `</select>`
 
                     body_html = `
                     <ul class="collection">
@@ -423,8 +423,8 @@ function load_modal_move_machine(machine_id) {
                             <p>You are about to move ${headscale.machine.givenName} to a new user.</p>
                         </li>
                     </ul>`
-                    body_html = body_html+select_html
-                    body_html = body_html+`<h6>Machine Information</h6>
+                    body_html = body_html + select_html
+                    body_html = body_html + `<h6>Machine Information</h6>
                     <table class="highlight">
                         <tbody>
                             <tr>
@@ -447,7 +447,7 @@ function load_modal_move_machine(machine_id) {
                     M.FormSelect.init(document.querySelectorAll('select'))
                 }
             })
-            modal_confirm.setAttribute('onclick', 'move_machine('+machine_id+')')
+            modal_confirm.setAttribute('onclick', 'move_machine(' + machine_id + ')')
         }
     })
 }
@@ -458,19 +458,19 @@ function load_modal_delete_machine(machine_id) {
     document.getElementById('modal_confirm').className = "red btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Delete"
 
-    var data = {"id": machine_id}
+    var data = { "id": machine_id }
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/machine_information",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            modal         = document.getElementById('card_modal');
-            modal_title   = document.getElementById('modal_title');
-            modal_body    = document.getElementById('modal_content');
+        success: function (response) {
+            modal = document.getElementById('card_modal');
+            modal_title = document.getElementById('modal_title');
+            modal_body = document.getElementById('modal_content');
             modal_confirm = document.getElementById('modal_confirm');
 
-            modal_title.innerHTML = "Delete machine '"+response.machine.givenName+"'?"
+            modal_title.innerHTML = "Delete machine '" + response.machine.givenName + "'?"
             body_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
@@ -498,7 +498,7 @@ function load_modal_delete_machine(machine_id) {
             </table>
             `
             modal_body.innerHTML = body_html
-            modal_confirm.setAttribute('onclick', 'delete_machine('+machine_id+')')
+            modal_confirm.setAttribute('onclick', 'delete_machine(' + machine_id + ')')
         }
     })
 }
@@ -508,19 +508,19 @@ function load_modal_rename_machine(machine_id) {
     document.getElementById('modal_title').innerHTML = "Loading..."
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Rename"
-    var data = {"id": machine_id}
+    var data = { "id": machine_id }
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/machine_information",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            modal         = document.getElementById('card_modal');
-            modal_title   = document.getElementById('modal_title');
-            modal_body    = document.getElementById('modal_content');
+        success: function (response) {
+            modal = document.getElementById('card_modal');
+            modal_title = document.getElementById('modal_title');
+            modal_body = document.getElementById('modal_content');
             modal_confirm = document.getElementById('modal_confirm');
 
-            modal_title.innerHTML = "Rename machine '"+response.machine.givenName+"'?"
+            modal_title.innerHTML = "Rename machine '" + response.machine.givenName + "'?"
             body_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
@@ -553,16 +553,16 @@ function load_modal_rename_machine(machine_id) {
             </table>
             `
             modal_body.innerHTML = body_html
-            modal_confirm.setAttribute('onclick', 'rename_machine('+machine_id+')')
+            modal_confirm.setAttribute('onclick', 'rename_machine(' + machine_id + ')')
         }
     })
 }
 
 function load_modal_add_machine() {
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/get_users",
-        success: function(response) {
+        success: function (response) {
             modal_body = document.getElementById('default_add_new_machine_modal');
             modal_confirm = document.getElementById('new_machine_modal_confirm');
 
@@ -572,9 +572,9 @@ function load_modal_add_machine() {
                     <i class="material-icons prefix">language</i>
                     <select id='add_machine_user_select'>
                         <option value="" disabled selected>Select a User</option>`
-            for (let i=0; i < response.users.length; i++) {
+            for (let i = 0; i < response.users.length; i++) {
                 var name = response["users"][i]["name"]
-                select_html = select_html+`<option value="${name}">${name}</option>`
+                select_html = select_html + `<option value="${name}">${name}</option>`
             }
             select_html = select_html + `
                         <label>Select a User</label>
@@ -589,13 +589,13 @@ function load_modal_add_machine() {
                     <label for="add_machine_key_field">Machine Registration Key</label>
                 </div>
             </div>`
-            for (let i=0; i < response.users.length; i++) {
+            for (let i = 0; i < response.users.length; i++) {
                 var name = response["users"][i]["name"]
             }
 
             modal_body.innerHTML = select_html
             // Initialize the form and the machine tabs
-            M.FormSelect.init(document.querySelectorAll('select'), {classes: 'add_machine_selector_class'})
+            M.FormSelect.init(document.querySelectorAll('select'), { classes: 'add_machine_selector_class' })
             M.Tabs.init(document.getElementById('new_machine_tabs'));
         }
     })
@@ -611,18 +611,18 @@ function delete_chip(machine_id, chipsData) {
 
     var formattedData = [];
     for (let tag in chipsData) {
-        formattedData[tag] = '"tag:'+chipsData[tag].tag+'"'
+        formattedData[tag] = '"tag:' + chipsData[tag].tag + '"'
     }
     var tags_list = '{"tags": [' + formattedData + ']}'
-    var data = {"id": machine_id, "tags_list": tags_list}
+    var data = { "id": machine_id, "tags_list": tags_list }
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/set_machine_tags",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            M.toast({html: 'Tag removed.'});
+        success: function (response) {
+            M.toast({ html: 'Tag removed.' });
         }
     })
 }
@@ -634,26 +634,26 @@ function add_chip(machine_id, chipsData) {
 
     var formattedData = [];
     for (let tag in chipsData) {
-        formattedData[tag] = '"tag:'+chipsData[tag].tag+'"'
+        formattedData[tag] = '"tag:' + chipsData[tag].tag + '"'
     }
     var tags_list = '{"tags": [' + formattedData + ']}'
-    var data = {"id": machine_id, "tags_list": tags_list}
+    var data = { "id": machine_id, "tags_list": tags_list }
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/set_machine_tags",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            M.toast({html: 'Tag "' + last_chip_fixed + '" added.'});
+        success: function (response) {
+            M.toast({ html: 'Tag "' + last_chip_fixed + '" added.' });
         }
     })
 }
 
 function add_machine() {
-    var key  = document.getElementById('add_machine_key_field').value
+    var key = document.getElementById('add_machine_key_field').value
     var user = document.getElementById('add_machine_user_select').value
-    var data = {"key": key, "user": user}
+    var data = { "key": key, "user": user }
 
     if (user == "") {
         load_modal_generic("error", "User is empty", "Select a user before submitting")
@@ -665,46 +665,50 @@ function add_machine() {
     }
 
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/register_machine",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            alert("Response:  "+response)
+        success: function (response) {
+            if (response.machine) {
+                window.location.reload()
+            }
+            load_modal_generic("error", "Error adding machine", response.message)
+            return
         }
     })
 }
 
 function rename_machine(machine_id) {
     var new_name = document.getElementById('new_name_form').value;
-    var data = {"id": machine_id, "new_name": new_name};
+    var data = { "id": machine_id, "new_name": new_name };
 
     // String to test against
-    var regexIT= /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
-    if (regexIT.test(new_name)) { load_modal_generic("error", "Invalid Name", "Name cannot contain special characters ('"+regexIT+"')") ;return }
+    var regexIT = /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
+    if (regexIT.test(new_name)) { load_modal_generic("error", "Invalid Name", "Name cannot contain special characters ('" + regexIT + "')"); return }
     // If there are characters other than - and alphanumeric, throw an error
-    if (new_name.includes(' ')) { load_modal_generic("error", "Name cannot have spaces", "Allowed characters are dashes (-) and alphanumeric characters"); return } 
+    if (new_name.includes(' ')) { load_modal_generic("error", "Name cannot have spaces", "Allowed characters are dashes (-) and alphanumeric characters"); return }
     // If it is longer than 32 characters, throw an error
     if (new_name.length > 32) { load_modal_generic("error", "Name is too long", "The name name is too long.  Maximum length is 32 characters"); return }
     // If the new_name is empty, throw an error
-    if (!new_name) { load_modal_generic("error", "Name can't be empty", "Please enter a machine name before submitting."); return}
+    if (!new_name) { load_modal_generic("error", "Name can't be empty", "Please enter a machine name before submitting."); return }
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/rename_machine",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
 
             if (response.status == "True") {
                 // Get the modal element and close it
                 modal_element = document.getElementById('card_modal')
                 M.Modal.getInstance(modal_element).close()
 
-                document.getElementById(machine_id+'-name-container').innerHTML = machine_id+". "+ escapeHTML(new_name)
-                M.toast({html: 'Machine '+machine_id+' renamed to '+ escapeHTML(new_name)});
-            } else { 
-                load_modal_generic("error", "Error setting the machine name", "Headscale response:  "+JSON.stringify(response.body.message))
+                document.getElementById(machine_id + '-name-container').innerHTML = machine_id + ". " + escapeHTML(new_name)
+                M.toast({ html: 'Machine ' + machine_id + ' renamed to ' + escapeHTML(new_name) });
+            } else {
+                load_modal_generic("error", "Error setting the machine name", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
@@ -712,98 +716,98 @@ function rename_machine(machine_id) {
 
 function move_machine(machine_id) {
     new_user = document.getElementById('move-select').value
-    var data = {"id": machine_id, "new_user": new_user};
+    var data = { "id": machine_id, "new_user": new_user };
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/move_user",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             // Get the modal element and close it
             modal_element = document.getElementById('card_modal')
             M.Modal.getInstance(modal_element).close()
 
-            document.getElementById(machine_id+'-user-container').innerHTML = response.machine.user.name
-            document.getElementById(machine_id+'-ns-badge').innerHTML = response.machine.user.name
+            document.getElementById(machine_id + '-user-container').innerHTML = response.machine.user.name
+            document.getElementById(machine_id + '-ns-badge').innerHTML = response.machine.user.name
 
             // Get the color and set it
             var user_color = get_color(response.machine.user.id)
-            document.getElementById(machine_id+'-ns-badge').className = "badge ipinfo " + user_color + " white-text hide-on-small-only"
+            document.getElementById(machine_id + '-ns-badge').className = "badge ipinfo " + user_color + " white-text hide-on-small-only"
 
-            M.toast({html:  "'"+response.machine.givenName+"' moved to user "+response.machine.user.name});
+            M.toast({ html: "'" + response.machine.givenName + "' moved to user " + response.machine.user.name });
         }
     })
 }
 
 function delete_machine(machine_id) {
-    var data = {"id": machine_id};
+    var data = { "id": machine_id };
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/delete_machine",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             // Get the modal element and close it
             modal_element = document.getElementById('card_modal')
             M.Modal.getInstance(modal_element).close()
 
             // When the machine is deleted, hide its collapsible:
-            document.getElementById(machine_id+'-main-collapsible').className = "collapsible popout hide";
+            document.getElementById(machine_id + '-main-collapsible').className = "collapsible popout hide";
 
-            M.toast({html: 'Machine deleted.'});
+            M.toast({ html: 'Machine deleted.' });
         }
     })
 }
 
 function toggle_exit(route1, route2, exit_id, current_state, page) {
-    var data1 = {"route_id": route1, "current_state": current_state}
-    var data2 = {"route_id": route2, "current_state": current_state}
+    var data1 = { "route_id": route1, "current_state": current_state }
+    var data2 = { "route_id": route2, "current_state": current_state }
     var element = document.getElementById(exit_id);
 
     var disabledClass = ""
-    var enabledClass  = ""
+    var enabledClass = ""
 
     if (page == "machines") {
         disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+        enabledClass = "waves-effect waves-light btn-small green lighten-2 tooltipped";
     }
     if (page == "routes") {
         disabledClass = "material-icons red-text text-lighten-2 tooltipped";
-        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+        enabledClass = "material-icons green-text text-lighten-2 tooltipped";
     }
 
     var disabledTooltip = "Click to enable"
-    var enabledTooltip  = "Click to disable"
-    var disableState    = "False"
-    var enableState     = "True"
-    var action_taken    = "unchanged.";
+    var enabledTooltip = "Click to disable"
+    var disableState = "False"
+    var enableState = "True"
+    var action_taken = "unchanged.";
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/update_route",
         data: JSON.stringify(data1),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             $.ajax({
-                type:"POST", 
+                type: "POST",
                 url: "api/update_route",
                 data: JSON.stringify(data2),
                 contentType: "application/json",
-                success: function(response) {
+                success: function (response) {
                     // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
                     if (element.className == disabledClass) {
-                        element.className  = enabledClass
-                        action_taken   = "enabled."
+                        element.className = enabledClass
+                        action_taken = "enabled."
                         element.setAttribute('data-tooltip', enabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+enableState+'", "'+page+'")')
+                        element.setAttribute('onclick', 'toggle_exit(' + route1 + ', ' + route2 + ', "' + exit_id + '", "' + enableState + '", "' + page + '")')
                     } else if (element.className == enabledClass) {
-                        element.className    = disabledClass
-                        action_taken     = "disabled."
+                        element.className = disabledClass
+                        action_taken = "disabled."
                         element.setAttribute('data-tooltip', disabledTooltip)
-                        element.setAttribute('onclick', 'toggle_exit('+route1+', '+route2+', "'+exit_id+'", "'+disableState+'", "'+page+'")')
+                        element.setAttribute('onclick', 'toggle_exit(' + route1 + ', ' + route2 + ', "' + exit_id + '", "' + disableState + '", "' + page + '")')
                     }
-                    M.toast({html: 'Exit Route '+action_taken});
+                    M.toast({ html: 'Exit Route ' + action_taken });
                 }
             })
         }
@@ -811,44 +815,44 @@ function toggle_exit(route1, route2, exit_id, current_state, page) {
 }
 
 function toggle_route(route_id, current_state, page) {
-    var data    = {"route_id": route_id, "current_state": current_state}
+    var data = { "route_id": route_id, "current_state": current_state }
     var element = document.getElementById(route_id);
 
     var disabledClass = ""
-    var enabledClass  = ""
+    var enabledClass = ""
 
     if (page == "machines") {
         disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-        enabledClass  = "waves-effect waves-light btn-small green lighten-2 tooltipped";
+        enabledClass = "waves-effect waves-light btn-small green lighten-2 tooltipped";
     }
     if (page == "routes") {
         disabledClass = "material-icons red-text text-lighten-2 tooltipped";
-        enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+        enabledClass = "material-icons green-text text-lighten-2 tooltipped";
     }
 
     var disabledTooltip = "Click to enable"
-    var enabledTooltip  = "Click to disable"
-    var disableState    = "False"
-    var enableState     = "True"
-    var action_taken    = "unchanged.";
+    var enabledTooltip = "Click to disable"
+    var disableState = "False"
+    var enableState = "True"
+    var action_taken = "unchanged.";
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/update_route",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (element.className == disabledClass) {
                 element.className = enabledClass
-                action_taken      = "enabled."
+                action_taken = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+enableState+'", "'+page+'")')
+                element.setAttribute('onclick', 'toggle_route(' + route_id + ', "' + enableState + '", "' + page + '")')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
-                action_taken      = "disabled."
+                action_taken = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_route('+route_id+', "'+disableState+'", "'+page+'")')
+                element.setAttribute('onclick', 'toggle_route(' + route_id + ', "' + disableState + '", "' + page + '")')
             }
-            M.toast({html: 'Route '+action_taken});
+            M.toast({ html: 'Route ' + action_taken });
         }
     })
 }
@@ -858,10 +862,10 @@ function get_routes() {
     var data
     $.ajax({
         async: false,
-        type:"POST", 
+        type: "POST",
         url: "api/get_routes",
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             console.log("Got all routes.")
             data = response
         }
@@ -872,68 +876,68 @@ function get_routes() {
 function toggle_failover_route_routespage(routeid, current_state, prefix, route_id_list) {
     // First, toggle the route:
     // toggle_route(route_id, current_state, page)
-    var data    = {"route_id": routeid, "current_state": current_state}
-    console.log("Data:  "+JSON.stringify(data))
-    console.log("Passed in:  "+routeid+", "+current_state+", "+prefix+", "+route_id_list)
+    var data = { "route_id": routeid, "current_state": current_state }
+    console.log("Data:  " + JSON.stringify(data))
+    console.log("Passed in:  " + routeid + ", " + current_state + ", " + prefix + ", " + route_id_list)
     var element = document.getElementById(routeid);
 
     var disabledClass = "material-icons red-text text-lighten-2 tooltipped";
-    var enabledClass  = "material-icons green-text text-lighten-2 tooltipped";
+    var enabledClass = "material-icons green-text text-lighten-2 tooltipped";
     var failover_disabledClass = "material-icons small left red-text text-lighten-2"
-    var failover_enabledClass  = "material-icons small left green-text text-lighten-2"
+    var failover_enabledClass = "material-icons small left green-text text-lighten-2"
 
     var disabledTooltip = "Click to enable"
-    var enabledTooltip  = "Click to disable"
-    var disableState    = "False"
-    var enableState     = "True"
-    var action_taken    = "unchanged."
+    var enabledTooltip = "Click to disable"
+    var disableState = "False"
+    var enableState = "True"
+    var action_taken = "unchanged."
 
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/update_route",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
-            console.log("Success:  Route ID:  "+routeid)
-            console.log("Success: route_id_list:  "+route_id_list)
+        success: function (response) {
+            console.log("Success:  Route ID:  " + routeid)
+            console.log("Success: route_id_list:  " + route_id_list)
             if (element.className == disabledClass) {
                 element.className = enabledClass
-                action_taken      = "enabled."
+                action_taken = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+enableState+'", "'+prefix+'", ['+route_id_list+'])')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage(' + routeid + ', "' + enableState + '", "' + prefix + '", [' + route_id_list + '])')
             } else if (element.className == enabledClass) {
                 element.className = disabledClass
-                action_taken      = "disabled."
+                action_taken = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route_routespage('+routeid+', "'+disableState+'", "'+prefix+'", ['+route_id_list+'])')
+                element.setAttribute('onclick', 'toggle_failover_route_routespage(' + routeid + ', "' + disableState + '", "' + prefix + '", [' + route_id_list + '])')
             }
-            M.toast({html: 'Route '+action_taken});
+            M.toast({ html: 'Route ' + action_taken });
 
             // Get all route info:
-            console.log("Getting info for prefix "+prefix)
+            console.log("Getting info for prefix " + prefix)
             var routes = get_routes()
             var failover_enabled = false
 
             // Get the primary and enabled displays for the prefix:
-            for (let i=0; i < route_id_list.length; i++) {
-                console.log("route_id_list["+i+"]: "+route_id_list[i])
+            for (let i = 0; i < route_id_list.length; i++) {
+                console.log("route_id_list[" + i + "]: " + route_id_list[i])
                 var route_id = route_id_list[i]
-                var route_index = route_id-1
-                console.log("Looking for route "+route_id+" at index "+route_index)
-                console.log("isPrimary:  "+routes["routes"][route_index]["isPrimary"])
+                var route_index = route_id - 1
+                console.log("Looking for route " + route_id + " at index " + route_index)
+                console.log("isPrimary:  " + routes["routes"][route_index]["isPrimary"])
 
                 // Set the Primary class:
-                var primary_element = document.getElementById(route_id+"-primary")
-                var primary_status  = routes["routes"][route_index]["isPrimary"]
-                var enabled_status  = routes["routes"][route_index]["enabled"]
+                var primary_element = document.getElementById(route_id + "-primary")
+                var primary_status = routes["routes"][route_index]["isPrimary"]
+                var enabled_status = routes["routes"][route_index]["enabled"]
 
-                console.log("enabled_status:  "+enabled_status)
+                console.log("enabled_status:  " + enabled_status)
 
                 if (enabled_status == true) {
                     failover_enabled = true
                 }
-                
-                console.log("Setting primary class '"+route_id+"-primary':  "+primary_status)
+
+                console.log("Setting primary class '" + route_id + "-primary':  " + primary_status)
                 if (primary_status == true) {
                     console.log("Detected this route is primary.  Setting the class")
                     primary_element.className = enabledClass
@@ -945,7 +949,7 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
             // if any route is enabled, set the prefix enable icon to enabled:
             var failover_element = document.getElementById(prefix)
-            console.log("Failover enabled:  "+failover_enabled)
+            console.log("Failover enabled:  " + failover_enabled)
             if (failover_enabled == true) {
                 failover_element.className = failover_enabledClass
             }
@@ -957,38 +961,38 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 }
 
 function toggle_failover_route(route_id, current_state, color) {
-    var data = {"route_id": route_id, "current_state": current_state}
+    var data = { "route_id": route_id, "current_state": current_state }
     $.ajax({
-        type:"POST", 
+        type: "POST",
         url: "api/update_route",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             // Response is a JSON object containing the Headscale API response of /v1/api/machines/<id>/route
-            var element         = document.getElementById(route_id);
-            var disabledClass   = "waves-effect waves-light btn-small red lighten-2 tooltipped";
-            var enabledClass    = "waves-effect waves-light btn-small "+color+" lighten-2 tooltipped";
+            var element = document.getElementById(route_id);
+            var disabledClass = "waves-effect waves-light btn-small red lighten-2 tooltipped";
+            var enabledClass = "waves-effect waves-light btn-small " + color + " lighten-2 tooltipped";
             var disabledTooltip = "Click to enable (Failover Pair)"
-            var enabledTooltip  = "Click to disable (Failover Pair)"
-            var disableState    = "False"
-            var enableState     = "True"
-            var action_taken    = "unchanged.";
-            
+            var enabledTooltip = "Click to disable (Failover Pair)"
+            var disableState = "False"
+            var enableState = "True"
+            var action_taken = "unchanged.";
+
             if (element.className == disabledClass) {
                 // 1.  Change the class to change the color of the icon
                 // 2.  Change the "action taken" for the M.toast popup
                 // 3.  Change the tooltip to say "Click to enable/disable"
-                element.className  = enabledClass
-                var action_taken   = "enabled."
+                element.className = enabledClass
+                var action_taken = "enabled."
                 element.setAttribute('data-tooltip', enabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+enableState+'", "'+color+'")')
+                element.setAttribute('onclick', 'toggle_failover_route(' + route_id + ', "' + enableState + '", "' + color + '")')
             } else if (element.className == enabledClass) {
-                element.className    = disabledClass
-                var action_taken     = "disabled."
+                element.className = disabledClass
+                var action_taken = "disabled."
                 element.setAttribute('data-tooltip', disabledTooltip)
-                element.setAttribute('onclick', 'toggle_failover_route('+route_id+', "'+disableState+'", "'+color+'")')
+                element.setAttribute('onclick', 'toggle_failover_route(' + route_id + ', "' + disableState + '", "' + color + '")')
             }
-            M.toast({html: 'Route '+action_taken});
+            M.toast({ html: 'Route ' + action_taken });
         }
     })
 }
@@ -997,8 +1001,8 @@ function toggle_failover_route(route_id, current_state, color) {
 // Machine Page Helpers
 //-----------------------------------------------------------
 function btn_toggle(state) {
-    if (state == "show" ) { document.getElementById('new_machine_modal_confirm').className = 'green btn-flat white-text'      }
-    else                  { document.getElementById('new_machine_modal_confirm').className = 'green btn-flat white-text hide' }
+    if (state == "show") { document.getElementById('new_machine_modal_confirm').className = 'green btn-flat white-text' }
+    else { document.getElementById('new_machine_modal_confirm').className = 'green btn-flat white-text hide' }
 }
 
 //-----------------------------------------------------------
@@ -1006,67 +1010,67 @@ function btn_toggle(state) {
 //-----------------------------------------------------------
 function rename_user(user_id, old_name) {
     var new_name = document.getElementById('new_user_name_form').value;
-    var data = {"old_name": old_name, "new_name": new_name}
+    var data = { "old_name": old_name, "new_name": new_name }
 
     // String to test against
-    var regexIT= /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
-    if (regexIT.test(new_name)) { load_modal_generic("error", "Invalid Name", "Name cannot contain special characters ('"+regexIT+"')") ;return }
+    var regexIT = /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
+    if (regexIT.test(new_name)) { load_modal_generic("error", "Invalid Name", "Name cannot contain special characters ('" + regexIT + "')"); return }
     // If there are characters other than - and alphanumeric, throw an error
-    if (new_name.includes(' ')) { load_modal_generic("error", "Name cannot have spaces", "Allowed characters are dashes (-) and alphanumeric characters"); return } 
+    if (new_name.includes(' ')) { load_modal_generic("error", "Name cannot have spaces", "Allowed characters are dashes (-) and alphanumeric characters"); return }
     // If it is longer than 32 characters, throw an error
     if (new_name.length > 32) { load_modal_generic("error", "Name is too long", "The user name is too long.  Maximum length is 32 characters"); return }
     // If the new_name is empty, throw an error
-    if (!new_name) { load_modal_generic("error", "Name can't be empty", "The user name cannot be empty."); return}
+    if (!new_name) { load_modal_generic("error", "Name can't be empty", "The user name cannot be empty."); return }
 
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/rename_user",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (response.status == "True") {
                 // Get the modal element and close it
                 modal_element = document.getElementById('card_modal')
                 M.Modal.getInstance(modal_element).close()
-                
+
                 // Rename the user on the page:
-                document.getElementById(user_id+'-name-span').innerHTML = escapeHTML(new_name)
+                document.getElementById(user_id + '-name-span').innerHTML = escapeHTML(new_name)
 
                 // Set the button to use the NEW name as the OLD name for both buttons
-                var rename_button_sm = document.getElementById(user_id+'-rename-user-sm')
-                rename_button_sm.setAttribute('onclick', 'load_modal_rename_user('+user_id+', "'+new_name+'")')
-                var rename_button_lg = document.getElementById(user_id+'-rename-user-lg')
-                rename_button_lg.setAttribute('onclick', 'load_modal_rename_user('+user_id+', "'+new_name+'")')
+                var rename_button_sm = document.getElementById(user_id + '-rename-user-sm')
+                rename_button_sm.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
+                var rename_button_lg = document.getElementById(user_id + '-rename-user-lg')
+                rename_button_lg.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
 
                 // Send the completion toast
-                M.toast({html: "User '"+old_name+"' renamed to '"+new_name+"'."})
-            } else { 
-                load_modal_generic("error", "Error setting user name", "Headscale response:  "+JSON.stringify(response.body.message))
+                M.toast({ html: "User '" + old_name + "' renamed to '" + new_name + "'." })
+            } else {
+                load_modal_generic("error", "Error setting user name", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
 }
 
 function delete_user(user_id, user_name) {
-    var data = {"name": user_name};
+    var data = { "name": user_name };
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/delete_user",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (response.status == "True") {
                 // Get the modal element and close it
                 modal_element = document.getElementById('card_modal')
                 M.Modal.getInstance(modal_element).close()
 
                 // When the machine is deleted, hide its collapsible:
-                document.getElementById(user_id+'-main-collapsible').className = "collapsible popout hide";
+                document.getElementById(user_id + '-main-collapsible').className = "collapsible popout hide";
 
-                M.toast({html: 'User deleted.'});
-            } else { 
+                M.toast({ html: 'User deleted.' });
+            } else {
                 // We errored.  Decipher the error Headscale sent us and display it:
-                load_modal_generic("error", "Error deleting user", "Headscale response:  "+JSON.stringify(response.body.message))
+                load_modal_generic("error", "Error deleting user", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
@@ -1074,57 +1078,57 @@ function delete_user(user_id, user_name) {
 
 function add_user() {
     var user_name = document.getElementById('add_user_name_field').value
-    var data = {"name": user_name}
+    var data = { "name": user_name }
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/add_user",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (response.status == "True") {
                 // Get the modal element and close it
                 modal_element = document.getElementById('card_modal')
                 M.Modal.getInstance(modal_element).close()
 
                 // Send the completion toast
-                M.toast({html: "User '"+user_name+"' added to Headscale.  Refreshing..."})
+                M.toast({ html: "User '" + user_name + "' added to Headscale.  Refreshing..." })
                 window.location.reload()
-            } else { 
+            } else {
                 // We errored.  Decipher the error Headscale sent us and display it:
-                load_modal_generic("error", "Error adding  user", "Headscale response:  "+JSON.stringify(response.body.message))
+                load_modal_generic("error", "Error adding  user", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
 }
 
 function add_preauth_key(user_name) {
-    var date       = document.getElementById('preauth_key_expiration_date').value
-    var ephemeral  = document.getElementById('checkbox-ephemeral').checked
-    var reusable   = document.getElementById('checkbox-reusable').checked
-    var expiration = date+"T00:00:00.000Z" // Headscale format.
+    var date = document.getElementById('preauth_key_expiration_date').value
+    var ephemeral = document.getElementById('checkbox-ephemeral').checked
+    var reusable = document.getElementById('checkbox-reusable').checked
+    var expiration = date + "T00:00:00.000Z" // Headscale format.
 
     // If there is no date, error:
-    if (!date) {load_modal_generic("error", "Invalid Date", "Please enter a valid date"); return}
-    var data = {"user": user_name, "reusable": reusable, "ephemeral": ephemeral, "expiration": expiration}
+    if (!date) { load_modal_generic("error", "Invalid Date", "Please enter a valid date"); return }
+    var data = { "user": user_name, "reusable": reusable, "ephemeral": ephemeral, "expiration": expiration }
 
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/add_preauth_key",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (response.status == "True") {
                 // Send the completion toast
-                M.toast({html: 'PreAuth key created in user '+user_name})
+                M.toast({ html: 'PreAuth key created in user ' + user_name })
                 // If this is successfull, we should reload the table and close the modal:
-                var user_data = {"name": user_name}
+                var user_data = { "name": user_name }
                 $.ajax({
-                    type: "POST", 
+                    type: "POST",
                     url: "api/build_preauthkey_table",
                     data: JSON.stringify(user_data),
                     contentType: "application/json",
-                    success: function(table_data) {
-                        table = document.getElementById(user_name+'-preauth-keys-collection')
+                    success: function (table_data) {
+                        table = document.getElementById(user_name + '-preauth-keys-collection')
                         table.innerHTML = table_data
                         // The tooltips need to be re-initialized afterwards:
                         M.Tooltip.init(document.querySelectorAll('.tooltipped'))
@@ -1137,34 +1141,34 @@ function add_preauth_key(user_name) {
                 // The tooltips need to be re-initialized afterwards:
                 M.Tooltip.init(document.querySelectorAll('.tooltipped'))
 
-            } else { 
-                load_modal_generic("error", "Error adding a pre-auth key", "Headscale response:  "+JSON.stringify(response.body.message))
+            } else {
+                load_modal_generic("error", "Error adding a pre-auth key", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
 }
 
 function expire_preauth_key(user_name, key) {
-    var data = {"user": user_name, "key": key}
+    var data = { "user": user_name, "key": key }
 
     $.ajax({
-        type: "POST", 
+        type: "POST",
         url: "api/expire_preauth_key",
         data: JSON.stringify(data),
         contentType: "application/json",
-        success: function(response) {
+        success: function (response) {
             if (response.status == "True") {
                 // Send the completion toast
-                M.toast({html: 'PreAuth expired in '+user_name})
+                M.toast({ html: 'PreAuth expired in ' + user_name })
                 // If this is successfull, we should reload the table and close the modal:
-                var user_data = {"name": user_name}
+                var user_data = { "name": user_name }
                 $.ajax({
-                    type: "POST", 
+                    type: "POST",
                     url: "api/build_preauthkey_table",
                     data: JSON.stringify(user_data),
                     contentType: "application/json",
-                    success: function(table_data) {
-                        table = document.getElementById(user_name+'-preauth-keys-collection')
+                    success: function (table_data) {
+                        table = document.getElementById(user_name + '-preauth-keys-collection')
                         table.innerHTML = table_data
                         // The tooltips need to be re-initialized afterwards:
                         M.Tooltip.init(document.querySelectorAll('.tooltipped'))
@@ -1177,8 +1181,8 @@ function expire_preauth_key(user_name, key) {
                 // The tooltips need to be re-initialized afterwards:
                 M.Tooltip.init(document.querySelectorAll('.tooltipped'))
 
-            } else { 
-                load_modal_generic("error", "Error expiring a pre-auth key", "Headscale response:  "+JSON.stringify(response.body.message))
+            } else {
+                load_modal_generic("error", "Error expiring a pre-auth key", "Headscale response:  " + JSON.stringify(response.body.message))
             }
         }
     })
@@ -1190,7 +1194,7 @@ function expire_preauth_key(user_name, key) {
 // Toggle expired items on the Users PreAuth section:
 function toggle_expired() {
     var toggle_hide = document.getElementsByClassName('expired-row');
-    var hidden  = document.getElementsByClassName('expired-row hide');
+    var hidden = document.getElementsByClassName('expired-row hide');
 
     if (hidden.length == 0) {
         for (var i = 0; i < toggle_hide.length; i++) {
@@ -1206,5 +1210,5 @@ function toggle_expired() {
 // Copy a PreAuth Key to the clipboard.  Show only the Prefix by default
 function copy_preauth_key(key) {
     navigator.clipboard.writeText(key);
-    M.toast({html: 'PreAuth key copied to clipboard.'})
+    M.toast({ html: 'PreAuth key copied to clipboard.' })
 }
