@@ -23,7 +23,7 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <!-- CSS and Icons -->
-        <link href="static/css/materialize.min.css" type="text/css" rel="stylesheet"/> 
+        <link href="static/css/materialize.min.css" type="text/css" rel="stylesheet"/>
         <link href="static/css/overrides.css"   type="text/css" rel="stylesheet"/>
         <style>
          /* fallback */
@@ -33,7 +33,7 @@
                font-weight: 400;
                src: url(static/fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
             }
-            
+
             .material-icons {
                font-family: 'Material Icons';
                font-weight: normal;
@@ -54,7 +54,7 @@
      </head>
      <body>
         <nav>
-         <div class="nav-wrapper {{ COLOR_NAV }}">
+         <div class="nav-wrapper {{ color_nav }}">
            <div id="nav-search" class="nav-search hidden">
             <form>
                <div class="input-field">
@@ -76,7 +76,7 @@
              </a>
             <a href="#!" data-target="mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul class="right hide-on-med-and-down">
-                {% block INPAGE_SEARCH %}{% endblock %}
+                {% block inpage_search %}{% endblock %}
                 <li role="menu-item" class="tooltipped {{ overview_active   }}" data-position="bottom" data-tooltip="Overview">
                    <a href="overview"><i class="material-icons">map</i></a>
                 </li>
@@ -92,7 +92,7 @@
                 <li role="menu-item" class="tooltipped {{ settings_active   }}" data-position="bottom" data-tooltip="Settings">
                    <a href="settings"><i class="material-icons">settings</i></a>
                 </li>
-                {% block OIDC_NAV_DROPDOWN %}{% endblock %}
+                {% block oidc_nav_dropdown %}{% endblock %}
              </ul>
            </div>
          </div>
@@ -103,7 +103,7 @@
          <li><a href="machines"><i class="material-icons left">devices</i>Machines</a></li>
          <li><a href="users"><i class="material-icons left">people</i>Users</a></li>
          <li><a href="settings"><i class="material-icons left">settings</i>Settings</a></li>
-         {% block OIDC_NAV_MOBILE %}{% endblock %}
+         {% block oidc_nav_mobile %}{% endblock %}
       </ul>
       <div class="container">
          {% block content %} {% endblock %}
@@ -121,10 +121,10 @@
    </body>
    <!-- JavaScript / jQuery -->
     <script type="text/javascript" src="static/js/jquery-2.2.4.min.js"></script>
-    <script type="text/javascript" src="static/js/materialize.min.js"></script> 
+    <script type="text/javascript" src="static/js/materialize.min.js"></script>
    <script>M.AutoInit();</script>
    <!-- Prevent the collapsibles on the Users and Machines pages from collapsing when another element is clicked -->
-   <script> 
+   <script>
       var elem = document.querySelector('.collapsible.expandable');
       var instance = M.Collapsible.init(elem, {
       accordion: false

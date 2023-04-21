@@ -5,9 +5,9 @@
 {% block title  %} {{ page }} {% endblock %}
 {% block header %} {{ page }} {% endblock %}
 
-{% block OIDC_NAV_DROPDOWN %} {{ OIDC_NAV_DROPDOWN}} {% endblock %}
-{% block OIDC_NAV_MOBILE %}   {{ OIDC_NAV_MOBILE  }} {% endblock %}
-{% block INPAGE_SEARCH%}      {{ INPAGE_SEARCH    }} {% endblock %}
+{% block oidc_nav_dropdown %} {{ oidc_nav_dropdown}} {% endblock %}
+{% block oidc_nav_mobile %}   {{ oidc_nav_mobile  }} {% endblock %}
+{% block inpage_search%}      {{ inpage_search    }} {% endblock %}
 
 
 {% block content %}
@@ -84,12 +84,12 @@
 </div>
 <!-- FAB for adding new machines -->
 <div class="fixed-action-btn">
-    <a href="#new_machine_card_modal" 
-       onclick='load_modal_add_machine()' 
-       class="modal-trigger waves-effect waves-light btn-floating btn-large tooltipped {{ COLOR_BTN }}"
+    <a href="#new_machine_card_modal"
+       onclick='load_modal_add_machine()'
+       class="modal-trigger waves-effect waves-light btn-floating btn-large tooltipped {{ color_btn }}"
        data-tooltip="Add a new machine to the Tailnet" data-position="left">
         <i class="large material-icons">add</i>
     </a>
 </div>
-        
+
 {% endblock %}

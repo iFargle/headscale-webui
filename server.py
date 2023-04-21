@@ -1,614 +1,399 @@
-import json
-import logging
-import os
-import secrets
-from datetime import datetime
-from functools import wraps
+"""Headscale WebUI Flask server."""
 
-import pytz
-import requests
-from dateutil import parser
-from flask import Flask, Markup, escape, redirect, render_template, request, url_for
-from flask_executor import Executor
+import asyncio
+import atexit
+import datetime
+import functools
+from multiprocessing import Lock
+from typing import Awaitable, Callable, Type, TypeVar
+
+import headscale_api.schema.headscale.v1 as schema
+from aiohttp import ClientConnectionError
+from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
+from betterproto import Message
+from flask import Flask, redirect, render_template, url_for
+from flask_pydantic.core import validate
+from headscale_api.headscale import UnauthorizedError
+from markupsafe import Markup
+from pydantic import BaseModel, Field
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-import headscale
-import helper
 import renderer
+from auth import AuthManager
+from config import Config, InitCheckError
+from headscale import HeadscaleApi
 
-# Global vars
-# Colors:  https://materializecss.com/color.html
-COLOR = os.environ["COLOR"].replace('"', "").lower()
-COLOR_NAV = COLOR + " darken-1"
-COLOR_BTN = COLOR + " darken-3"
-AUTH_TYPE = os.environ["AUTH_TYPE"].replace('"', "").lower()
-LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', "").upper()
-# If LOG_LEVEL is DEBUG, enable Flask debugging:
-DEBUG_STATE = True if LOG_LEVEL == "DEBUG" else False
 
-# Initiate the Flask application and logging:
-app = Flask(__name__, static_url_path="/static")
-match LOG_LEVEL:
-    case "DEBUG":
-        app.logger.setLevel(logging.DEBUG)
-    case "INFO":
-        app.logger.setLevel(logging.INFO)
-    case "WARNING":
-        app.logger.setLevel(logging.WARNING)
-    case "ERROR":
-        app.logger.setLevel(logging.ERROR)
-    case "CRITICAL":
-        app.logger.setLevel(logging.CRITICAL)
-
-executor = Executor(app)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-app.logger.info(
-    "Headscale-WebUI Version:  "
-    + os.environ["APP_VERSION"]
-    + " / "
-    + os.environ["GIT_BRANCH"]
-)
-app.logger.info("LOG LEVEL SET TO %s", str(LOG_LEVEL))
-app.logger.info("DEBUG STATE:  %s", str(DEBUG_STATE))
-
-########################################################################################
-# Set Authentication type.  Currently "OIDC" and "BASIC"
-########################################################################################
-if AUTH_TYPE == "oidc":
-    # Currently using: flask-providers-oidc - https://pypi.org/project/flask-providers-oidc/
-    #
-    # https://gist.github.com/thomasdarimont/145dc9aa857b831ff2eff221b79d179a/
-    # https://www.authelia.com/integration/openid-connect/introduction/
-    # https://github.com/steinarvk/flask_oidc_demo
-    app.logger.info("Loading OIDC libraries and configuring app...")
-
-    DOMAIN_NAME = os.environ["DOMAIN_NAME"]
-    BASE_PATH = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
-    OIDC_SECRET = os.environ["OIDC_CLIENT_SECRET"]
-    OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]
-    OIDC_AUTH_URL = os.environ["OIDC_AUTH_URL"]
-
-    # Construct client_secrets.json:
-    response = requests.get(str(OIDC_AUTH_URL))
-    oidc_info = response.json()
-    app.logger.debug("JSON Dumps for OIDC_INFO:  " + json.dumps(oidc_info))
-
-    client_secrets = json.dumps(
-        {
-            "web": {
-                "issuer": oidc_info["issuer"],
-                "auth_uri": oidc_info["authorization_endpoint"],
-                "client_id": OIDC_CLIENT_ID,
-                "client_secret": OIDC_SECRET,
-                "redirect_uris": [DOMAIN_NAME + BASE_PATH + "/oidc_callback"],
-                "userinfo_uri": oidc_info["userinfo_endpoint"],
-                "token_uri": oidc_info["token_endpoint"],
-            }
-        }
+def create_tainted_app(app: Flask, error: InitCheckError) -> Flask:
+    """Run tainted version of the Headscale WebUI after encountering an error."""
+    app.logger.error(
+        "Encountered error when trying to run initialization checks. Running in "
+        "tainted mode (only the error page is available). Correct all errors and "
+        "restart the server."
     )
 
-    with open("/app/instance/secrets.json", "w+") as secrets_json:
-        secrets_json.write(client_secrets)
-    app.logger.debug("Client Secrets:  ")
-    with open("/app/instance/secrets.json", "r+") as secrets_json:
-        app.logger.debug("/app/instances/secrets.json:")
-        app.logger.debug(secrets_json.read())
+    @app.route("/<path:path>")
+    def catchall_redirect(path: str):  # pylint: disable=unused-argument
+        return redirect(url_for("error_page"))
 
-    app.config.update(
-        {
-            "SECRET_KEY": secrets.token_urlsafe(32),
-            "TESTING": DEBUG_STATE,
-            "DEBUG": DEBUG_STATE,
-            "OIDC_CLIENT_SECRETS": "/app/instance/secrets.json",
-            "OIDC_ID_TOKEN_COOKIE_SECURE": True,
-            "OIDC_REQUIRE_VERIFIED_EMAIL": False,
-            "OIDC_USER_INFO_ENABLED": True,
-            "OIDC_OPENID_REALM": "Headscale-WebUI",
-            "OIDC_SCOPES": ["openid", "profile", "email"],
-            "OIDC_INTROSPECTION_AUTH_METHOD": "client_secret_post",
-        }
+    @app.route("/error")
+    async def error_page():
+        return render_template(
+            "error.html",
+            error_message=Markup(
+                "".join(sub_error.format_message() for sub_error in error)
+            ),
+        )
+
+    return app
+
+
+async def create_app() -> Flask:
+    """Run Headscale WebUI Flask application.
+
+    For arguments refer to `Flask.run()` function.
+    """
+    app = Flask(__name__, static_url_path="/static")
+    app.wsgi_app = ProxyFix(  # type: ignore[method-assign]
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1  # type: ignore
     )
-    from flask_oidc import OpenIDConnect
+    try:
+        # Try to initialize configuration from environment.
+        config = Config()  # type: ignore
 
-    oidc = OpenIDConnect(app)
+        with app.app_context():
+            # Try to create authentication handler (including loading auth config).
+            auth = AuthManager(config)
 
-elif AUTH_TYPE == "basic":
-    # https://flask-basicauth.readthedocs.io/en/latest/
-    app.logger.info("Loading basic auth libraries and configuring app...")
-    from flask_basicauth import BasicAuth
+            # Try to create Headscale API interface.
+            headscale = HeadscaleApi(config)
 
-    app.config["BASIC_AUTH_USERNAME"] = os.environ["BASIC_AUTH_USER"].replace('"', "")
-    app.config["BASIC_AUTH_PASSWORD"] = os.environ["BASIC_AUTH_PASS"]
-    app.config["BASIC_AUTH_FORCE"] = True
+        # Check health of Headscale API.
+        if not await headscale.health_check():
+            raise ClientConnectionError(f"Health check failed on {headscale.base_url}")
+    except Exception as error:  # pylint: disable=broad-exception-caught
+        # We want to catch broad exception to ensure no errors whatsoever went through
+        # the environment init.
+        with app.app_context():
+            check_error = InitCheckError.from_exception(error)
+        return create_tainted_app(app, check_error)
 
-    basic_auth = BasicAuth(app)
+    app.logger.setLevel(config.log_level)
+    app.logger.info(
+        "Headscale-WebUI Version: %s / %s", config.app_version, config.git_branch
+    )
+    app.logger.info("Logger level set to %s.", config.log_level)
+    app.logger.info("Debug state: %s", config.debug_mode)
 
-    ########################################################################################
-    # Set Authentication type - Dynamically load function decorators
-    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi
-    ########################################################################################
-    # Make a fake decorator for oidc.require_login
-    # If anyone knows a better way of doing this, please let me know.
-    class OpenIDConnect:
-        def require_login(self, view_func):
-            @wraps(view_func)
-            def decorated(*args, **kwargs):
-                return view_func(*args, **kwargs)
+    register_pages(app, headscale, auth)
+    register_api_endpoints(app, headscale, auth)
+    register_scheduler(app, headscale)
 
-            return decorated
-
-    oidc = OpenIDConnect()
-
-else:
-    ########################################################################################
-    # Set Authentication type - Dynamically load function decorators
-    # https://stackoverflow.com/questions/17256602/assertionerror-view-function-mapping-is-overwriting-an-existing-endpoint-functi
-    ########################################################################################
-    # Make a fake decorator for oidc.require_login
-    # If anyone knows a better way of doing this, please let me know.
-    class OpenIDConnect:
-        def require_login(self, view_func):
-            @wraps(view_func)
-            def decorated(*args, **kwargs):
-                return view_func(*args, **kwargs)
-
-            return decorated
-
-    oidc = OpenIDConnect()
+    return app
 
 
-########################################################################################
-# / pages - User-facing pages
-########################################################################################
-@app.route("/")
-@app.route("/overview")
-@oidc.require_login
-def overview_page():
-    # Some basic sanity checks:
-    pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass":
-        return redirect(url_for(pass_checks))
+def register_pages(app: Flask, headscale: HeadscaleApi, auth: AuthManager):
+    """Register user-facing pages."""
+    config = headscale.app_config
 
-    # Check if OIDC is enabled.  If it is, display the buttons:
-    OIDC_NAV_DROPDOWN = Markup("")
-    OIDC_NAV_MOBILE = Markup("")
-    if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getfield("email")
-        user_name = oidc.user_getfield("preferred_username")
-        name = oidc.user_getfield("name")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
-        OIDC_NAV_MOBILE = renderer.oidc_nav_mobile(user_name, email_address, name)
-
-    return render_template(
-        "overview.html",
-        render_page=renderer.render_overview(),
-        COLOR_NAV=COLOR_NAV,
-        COLOR_BTN=COLOR_BTN,
-        OIDC_NAV_DROPDOWN=OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE=OIDC_NAV_MOBILE,
+    # Convenience short for render_defaults
+    render_defaults = functools.partial(
+        renderer.render_defaults, config, auth.oidc_handler
     )
 
+    @app.route("/")
+    @app.route("/overview")
+    @auth.require_login
+    @headscale.key_check_guard
+    async def overview_page():
+        return render_template(
+            "overview.html",
+            render_page=await renderer.render_overview(headscale),
+            **render_defaults(),
+        )
 
-@app.route("/routes", methods=("GET", "POST"))
-@oidc.require_login
-def routes_page():
-    # Some basic sanity checks:
-    pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass":
-        return redirect(url_for(pass_checks))
+    @app.route("/routes", methods=("GET", "POST"))
+    @auth.require_login
+    @headscale.key_check_guard
+    async def routes_page():
+        return render_template(
+            "routes.html",
+            render_page=await renderer.render_routes(headscale),
+            **render_defaults(),
+        )
 
-    # Check if OIDC is enabled.  If it is, display the buttons:
-    OIDC_NAV_DROPDOWN = Markup("")
-    OIDC_NAV_MOBILE = Markup("")
-    INPAGE_SEARCH = Markup(renderer.render_search())
-    if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getfield("email")
-        user_name = oidc.user_getfield("preferred_username")
-        name = oidc.user_getfield("name")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
-        OIDC_NAV_MOBILE = renderer.oidc_nav_mobile(user_name, email_address, name)
+    @app.route("/machines", methods=("GET", "POST"))
+    @auth.require_login
+    @headscale.key_check_guard
+    async def machines_page():
+        return render_template(
+            "machines.html",
+            cards=await renderer.render_machines_cards(headscale),
+            headscale_server=config.hs_server,
+            inpage_search=renderer.render_search(),
+            **render_defaults(),
+        )
 
-    return render_template(
-        "routes.html",
-        render_page=renderer.render_routes(),
-        COLOR_NAV=COLOR_NAV,
-        COLOR_BTN=COLOR_BTN,
-        OIDC_NAV_DROPDOWN=OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE=OIDC_NAV_MOBILE,
-    )
+    @app.route("/users", methods=("GET", "POST"))
+    @auth.require_login
+    @headscale.key_check_guard
+    async def users_page():
+        return render_template(
+            "users.html",
+            cards=await renderer.render_users_cards(headscale),
+            inpage_search=renderer.render_search(),
+        )
 
+    @app.route("/settings", methods=("GET", "POST"))
+    @auth.require_login
+    async def settings_page():
+        return render_template(
+            "settings.html",
+            url=headscale.base_url,
+            BUILD_DATE=config.build_date,
+            APP_VERSION=config.app_version,
+            GIT_REPO_URL=config.git_repo_url,
+            GIT_COMMIT=config.git_commit,
+            GIT_BRANCH=config.git_branch,
+            HS_VERSION=config.hs_version,
+            **render_defaults(),
+        )
 
-@app.route("/machines", methods=("GET", "POST"))
-@oidc.require_login
-def machines_page():
-    # Some basic sanity checks:
-    pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass":
-        return redirect(url_for(pass_checks))
+    @app.route("/error")
+    async def error_page():
+        """Error page redirect.
 
-    # Check if OIDC is enabled.  If it is, display the buttons:
-    OIDC_NAV_DROPDOWN = Markup("")
-    OIDC_NAV_MOBILE = Markup("")
-    INPAGE_SEARCH = Markup(renderer.render_search())
-    if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getfield("email")
-        user_name = oidc.user_getfield("preferred_username")
-        name = oidc.user_getfield("name")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
-        OIDC_NAV_MOBILE = renderer.oidc_nav_mobile(user_name, email_address, name)
-
-    cards = renderer.render_machines_cards()
-    return render_template(
-        "machines.html",
-        cards=cards,
-        headscale_server=headscale.get_url(True),
-        COLOR_NAV=COLOR_NAV,
-        COLOR_BTN=COLOR_BTN,
-        OIDC_NAV_DROPDOWN=OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE=OIDC_NAV_MOBILE,
-        INPAGE_SEARCH=INPAGE_SEARCH,
-    )
-
-
-@app.route("/users", methods=("GET", "POST"))
-@oidc.require_login
-def users_page():
-    # Some basic sanity checks:
-    pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass":
-        return redirect(url_for(pass_checks))
-
-    # Check if OIDC is enabled.  If it is, display the buttons:
-    OIDC_NAV_DROPDOWN = Markup("")
-    OIDC_NAV_MOBILE = Markup("")
-    INPAGE_SEARCH = Markup(renderer.render_search())
-    if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getfield("email")
-        user_name = oidc.user_getfield("preferred_username")
-        name = oidc.user_getfield("name")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
-        OIDC_NAV_MOBILE = renderer.oidc_nav_mobile(user_name, email_address, name)
-
-    cards = renderer.render_users_cards()
-    return render_template(
-        "users.html",
-        cards=cards,
-        COLOR_NAV=COLOR_NAV,
-        COLOR_BTN=COLOR_BTN,
-        OIDC_NAV_DROPDOWN=OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE=OIDC_NAV_MOBILE,
-        INPAGE_SEARCH=INPAGE_SEARCH,
-    )
-
-
-@app.route("/settings", methods=("GET", "POST"))
-@oidc.require_login
-def settings_page():
-    # Some basic sanity checks:
-    pass_checks = str(helper.load_checks())
-    if pass_checks != "Pass" and pass_checks != "settings_page":
-        return redirect(url_for(pass_checks))
-
-    # Check if OIDC is enabled.  If it is, display the buttons:
-    OIDC_NAV_DROPDOWN = Markup("")
-    OIDC_NAV_MOBILE = Markup("")
-    if AUTH_TYPE == "oidc":
-        email_address = oidc.user_getfield("email")
-        user_name = oidc.user_getfield("preferred_username")
-        name = oidc.user_getfield("name")
-        OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
-        OIDC_NAV_MOBILE = renderer.oidc_nav_mobile(user_name, email_address, name)
-
-    GIT_COMMIT_LINK = Markup(
-        "<a href='https://github.com/iFargle/headscale-webui/commit/"
-        + os.environ["GIT_COMMIT"]
-        + "'>"
-        + str(os.environ["GIT_COMMIT"])[0:7]
-        + "</a>"
-    )
-
-    return render_template(
-        "settings.html",
-        url=headscale.get_url(),
-        COLOR_NAV=COLOR_NAV,
-        COLOR_BTN=COLOR_BTN,
-        OIDC_NAV_DROPDOWN=OIDC_NAV_DROPDOWN,
-        OIDC_NAV_MOBILE=OIDC_NAV_MOBILE,
-        BUILD_DATE=os.environ["BUILD_DATE"],
-        APP_VERSION=os.environ["APP_VERSION"],
-        GIT_COMMIT=GIT_COMMIT_LINK,
-        GIT_BRANCH=os.environ["GIT_BRANCH"],
-        HS_VERSION=os.environ["HS_VERSION"],
-    )
-
-
-@app.route("/error")
-@oidc.require_login
-def error_page():
-    if helper.access_checks() == "Pass":
+        Once we get out of tainted mode, we want to still have this route active so that
+        users refreshing the page get redirected to the overview page.
+        """
         return redirect(url_for("overview_page"))
 
-    return render_template("error.html", ERROR_MESSAGE=Markup(helper.access_checks()))
+    @app.route("/logout")
+    @auth.require_login
+    @headscale.key_check_guard
+    async def logout_page():
+        logout_url = auth.logout()
+        if logout_url is not None:
+            return redirect(logout_url)
+        return redirect(url_for("overview_page"))
 
 
-@app.route("/logout")
-def logout_page():
-    if AUTH_TYPE == "oidc":
-        oidc.logout()
-    return redirect(url_for("overview_page"))
+def register_api_endpoints(app: Flask, headscale: HeadscaleApi, auth: AuthManager):
+    """Register Headscale WebUI API endpoints."""
+    RequestT = TypeVar("RequestT", bound=Message)
+    ResponseT = TypeVar("ResponseT", bound=Message)
 
+    def api_passthrough(
+        route: str,
+        request_type: Type[RequestT],
+        api_method: Callable[[RequestT], Awaitable[ResponseT | str]],
+    ):
+        """Passthrough the Headscale API in a concise form.
 
-########################################################################################
-# /api pages
-########################################################################################
+        Arguments:
+            route -- Flask route to the API endpoint.
+            request_type -- request model (from headscale_api.schema).
+            api_method -- backend method to pass through the Flask request.
+        """
 
-########################################################################################
-# Headscale API Key Endpoints
-########################################################################################
+        async def api_passthrough_page(body: RequestT) -> ResponseT | str:
+            return await api_method(body)  # type: ignore
 
+        api_passthrough_page.__name__ = route.replace("/", "_")
+        api_passthrough_page.__annotations__ = {"body": request_type}
 
-@app.route("/api/test_key", methods=("GET", "POST"))
-@oidc.require_login
-def test_key_page():
-    api_key = headscale.get_api_key()
-    url = headscale.get_url()
+        return app.route(route, methods=["POST"])(
+            auth.require_login(
+                headscale.key_check_guard(
+                    validate()(api_passthrough_page)  # type: ignore
+                )
+            )
+        )
 
-    # Test the API key.  If the test fails, return a failure.
-    status = headscale.test_api_key(url, api_key)
-    if status != 200:
-        return "Unauthenticated"
+    class TestKeyRequest(BaseModel):
+        """/api/test_key request."""
 
-    renewed = headscale.renew_api_key(url, api_key)
-    app.logger.warning("The below statement will be TRUE if the key has been renewed, ")
-    app.logger.warning("or DOES NOT need renewal.  False in all other cases")
-    app.logger.warning("Renewed:  " + str(renewed))
-    # The key works, let's renew it if it needs it.  If it does, re-read the api_key from the file:
-    if renewed:
-        api_key = headscale.get_api_key()
+        api_key: str | None = Field(
+            None, description="API key to test. If None test the current key."
+        )
 
-    key_info = headscale.get_api_key_info(url, api_key)
+    @app.route("/api/test_key", methods=("GET", "POST"))
+    @auth.require_login
+    @validate()
+    async def test_key_page(body: TestKeyRequest):
+        if body.api_key == "":
+            body.api_key = None
 
-    # Set the current timezone and local time
-    timezone = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
-    local_time = timezone.localize(datetime.now())
+        async with headscale.session:
+            if not await headscale.test_api_key(body.api_key):
+                return "Unauthenticated", 401
 
-    # Format the dates for easy readability
-    creation_parse = parser.parse(key_info["createdAt"])
-    creation_local = creation_parse.astimezone(timezone)
-    creation_delta = local_time - creation_local
-    creation_print = helper.pretty_print_duration(creation_delta)
-    creation_time = (
-        str(creation_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-        + " "
-        + str(timezone)
-        + " ("
-        + str(creation_print)
-        + ")"
+            ret = await headscale.renew_api_key()
+            match ret:
+                case None:
+                    return "Unauthenticated", 401
+                case schema.ApiKey():
+                    return ret
+                case _:
+                    new_key_info = await headscale.get_api_key_info()
+                    if new_key_info is None:
+                        return "Unauthenticated", 401
+                    return new_key_info
+
+    class SaveKeyRequest(BaseModel):
+        """/api/save_key request."""
+
+        api_key: str
+
+    @app.route("/api/save_key", methods=["POST"])
+    @auth.require_login
+    @validate()
+    async def save_key_page(body: SaveKeyRequest):
+        async with headscale.session:
+            # Test the new API key.
+            if not await headscale.test_api_key(body.api_key):
+                return "Key failed testing. Check your key.", 401
+
+            try:
+                headscale.api_key = body.api_key
+            except OSError:
+                return "Key did not save properly. Check logs.", 500
+
+            key_info = await headscale.get_api_key_info()
+
+        if key_info is None:
+            return "Key saved but error occurred on key info retrieval."
+
+        return (
+            f'Key saved and tested: Key: "{key_info.prefix}", '
+            f"expiration: {key_info.expiration}"
+        )
+
+    ####################################################################################
+    # Machine API Endpoints
+    ####################################################################################
+
+    class UpdateRoutePageRequest(BaseModel):
+        """/api/update_route request."""
+
+        route_id: int
+        current_state: bool
+
+    @app.route("/api/update_route", methods=["POST"])
+    @auth.require_login
+    @validate()
+    async def update_route_page(body: UpdateRoutePageRequest):
+        if body.current_state:
+            return await headscale.disable_route(
+                schema.DisableRouteRequest(body.route_id)
+            )
+        return await headscale.enable_route(schema.EnableRouteRequest(body.route_id))
+
+    api_passthrough(
+        "/api/machine_information",
+        schema.GetMachineRequest,
+        headscale.get_machine,
+    )
+    api_passthrough(
+        "/api/delete_machine",
+        schema.DeleteMachineRequest,
+        headscale.delete_machine,
+    )
+    api_passthrough(
+        "/api/rename_machine",
+        schema.RenameMachineRequest,
+        headscale.rename_machine,
+    )
+    api_passthrough(
+        "/api/move_user",
+        schema.MoveMachineRequest,
+        headscale.move_machine,
+    )
+    api_passthrough("/api/set_machine_tags", schema.SetTagsRequest, headscale.set_tags)
+    api_passthrough(
+        "/api/register_machine",
+        schema.RegisterMachineRequest,
+        headscale.register_machine,
     )
 
-    expiration_parse = parser.parse(key_info["expiration"])
-    expiration_local = expiration_parse.astimezone(timezone)
-    expiration_delta = expiration_local - local_time
-    expiration_print = helper.pretty_print_duration(expiration_delta, "expiry")
-    expiration_time = (
-        str(expiration_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-        + " "
-        + str(timezone)
-        + " ("
-        + str(expiration_print)
-        + ")"
+    ####################################################################################
+    # User API Endpoints
+    ####################################################################################
+
+    api_passthrough("/api/rename_user", schema.RenameUserRequest, headscale.rename_user)
+    api_passthrough("/api/add_user", schema.CreateUserRequest, headscale.create_user)
+    api_passthrough("/api/delete_user", schema.DeleteUserRequest, headscale.delete_user)
+    api_passthrough("/api/get_users", schema.ListUsersRequest, headscale.list_users)
+
+    ####################################################################################
+    # Pre-Auth Key API Endpoints
+    ####################################################################################
+
+    api_passthrough(
+        "/api/add_preauth_key",
+        schema.CreatePreAuthKeyRequest,
+        headscale.create_pre_auth_key,
+    )
+    api_passthrough(
+        "/api/expire_preauth_key",
+        schema.ExpirePreAuthKeyRequest,
+        headscale.expire_pre_auth_key,
+    )
+    api_passthrough(
+        "/api/build_preauthkey_table",
+        schema.ListPreAuthKeysRequest,
+        functools.partial(renderer.build_preauth_key_table, headscale),
     )
 
-    key_info["expiration"] = expiration_time
-    key_info["createdAt"] = creation_time
+    ####################################################################################
+    # Route API Endpoints
+    ####################################################################################
 
-    message = json.dumps(key_info)
-    return message
-
-
-@app.route("/api/save_key", methods=["POST"])
-@oidc.require_login
-def save_key_page():
-    json_response = request.get_json()
-    api_key = json_response["api_key"]
-    url = headscale.get_url()
-    file_written = headscale.set_api_key(api_key)
-    message = ""
-
-    if file_written:
-        # Re-read the file and get the new API key and test it
-        api_key = headscale.get_api_key()
-        test_status = headscale.test_api_key(url, api_key)
-        if test_status == 200:
-            key_info = headscale.get_api_key_info(url, api_key)
-            expiration = key_info["expiration"]
-            message = "Key:  '" + api_key + "', Expiration:  " + expiration
-            # If the key was saved successfully, test it:
-            return "Key saved and tested:  " + message
-        else:
-            return "Key failed testing.  Check your key"
-    else:
-        return "Key did not save properly.  Check logs"
+    api_passthrough("/api/get_routes", schema.GetRoutesRequest, headscale.get_routes)
 
 
-########################################################################################
-# Machine API Endpoints
-########################################################################################
-@app.route("/api/update_route", methods=["POST"])
-@oidc.require_login
-def update_route_page():
-    json_response = request.get_json()
-    route_id = escape(json_response["route_id"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-    current_state = json_response["current_state"]
-
-    return headscale.update_route(url, api_key, route_id, current_state)
+scheduler_registered: bool = False
+scheduler_lock = Lock()
 
 
-@app.route("/api/machine_information", methods=["POST"])
-@oidc.require_login
-def machine_information_page():
-    json_response = request.get_json()
-    machine_id = escape(json_response["id"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
+def register_scheduler(app: Flask, headscale: HeadscaleApi):
+    """Register background scheduler."""
+    global scheduler_registered  # pylint: disable=global-statement
 
-    return headscale.get_machine_info(url, api_key, machine_id)
+    with scheduler_lock:
+        if scheduler_registered:
+            # For multi-worker set-up, only a single scheduler needs to be enabled.
+            return
 
+        scheduler = BackgroundScheduler(
+            logger=app.logger, timezone=headscale.app_config.timezone
+        )
+        scheduler.start()  # type: ignore
 
-@app.route("/api/delete_machine", methods=["POST"])
-@oidc.require_login
-def delete_machine_page():
-    json_response = request.get_json()
-    machine_id = escape(json_response["id"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
+        def renew_api_key():
+            """Renew API key in a background job."""
+            app.logger.info("Key renewal schedule triggered...")
+            try:
+                if app.ensure_sync(headscale.renew_api_key)() is None:  # type: ignore
+                    app.logger.error("Failed to renew the key. Check configuration.")
+            except UnauthorizedError:
+                app.logger.error("Current key is invalid. Check configuration.")
 
-    return headscale.delete_machine(url, api_key, machine_id)
+        scheduler.add_job(  # type: ignore
+            renew_api_key,
+            "interval",
+            hours=1,
+            id="renew_api_key",
+            max_instances=1,
+            next_run_time=datetime.datetime.now(),
+        )
 
+        atexit.register(scheduler.shutdown)  # type: ignore
 
-@app.route("/api/rename_machine", methods=["POST"])
-@oidc.require_login
-def rename_machine_page():
-    json_response = request.get_json()
-    machine_id = escape(json_response["id"])
-    new_name = escape(json_response["new_name"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.rename_machine(url, api_key, machine_id, new_name)
-
-
-@app.route("/api/move_user", methods=["POST"])
-@oidc.require_login
-def move_user_page():
-    json_response = request.get_json()
-    machine_id = escape(json_response["id"])
-    new_user = escape(json_response["new_user"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.move_user(url, api_key, machine_id, new_user)
+        scheduler_registered = True
 
 
-@app.route("/api/set_machine_tags", methods=["POST"])
-@oidc.require_login
-def set_machine_tags():
-    json_response = request.get_json()
-    machine_id = escape(json_response["id"])
-    machine_tags = json_response["tags_list"]
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
+headscale_webui = asyncio.run(create_app())
 
-    return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
-
-
-@app.route("/api/register_machine", methods=["POST"])
-@oidc.require_login
-def register_machine():
-    json_response = request.get_json()
-    machine_key = escape(json_response["key"])
-    user = escape(json_response["user"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.register_machine(url, api_key, machine_key, user)
-
-
-########################################################################################
-# User API Endpoints
-########################################################################################
-@app.route("/api/rename_user", methods=["POST"])
-@oidc.require_login
-def rename_user_page():
-    json_response = request.get_json()
-    old_name = escape(json_response["old_name"])
-    new_name = escape(json_response["new_name"])
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.rename_user(url, api_key, old_name, new_name)
-
-
-@app.route("/api/add_user", methods=["POST"])
-@oidc.require_login
-def add_user():
-    json_response = request.get_json()
-    user_name = str(escape(json_response["name"]))
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-    json_string = '{"name": "' + user_name + '"}'
-
-    return headscale.add_user(url, api_key, json_string)
-
-
-@app.route("/api/delete_user", methods=["POST"])
-@oidc.require_login
-def delete_user():
-    json_response = request.get_json()
-    user_name = str(escape(json_response["name"]))
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.delete_user(url, api_key, user_name)
-
-
-@app.route("/api/get_users", methods=["POST"])
-@oidc.require_login
-def get_users_page():
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.get_users(url, api_key)
-
-
-########################################################################################
-# Pre-Auth Key API Endpoints
-########################################################################################
-@app.route("/api/add_preauth_key", methods=["POST"])
-@oidc.require_login
-def add_preauth_key():
-    json_response = json.dumps(request.get_json())
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.add_preauth_key(url, api_key, json_response)
-
-
-@app.route("/api/expire_preauth_key", methods=["POST"])
-@oidc.require_login
-def expire_preauth_key():
-    json_response = json.dumps(request.get_json())
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.expire_preauth_key(url, api_key, json_response)
-
-
-@app.route("/api/build_preauthkey_table", methods=["POST"])
-@oidc.require_login
-def build_preauth_key_table():
-    json_response = request.get_json()
-    user_name = str(escape(json_response["name"]))
-
-    return renderer.build_preauth_key_table(user_name)
-
-
-########################################################################################
-# Route API Endpoints
-########################################################################################
-@app.route("/api/get_routes", methods=["POST"])
-@oidc.require_login
-def get_route_info():
-    url = headscale.get_url()
-    api_key = headscale.get_api_key()
-
-    return headscale.get_routes(url, api_key)
-
-
-########################################################################################
-# Main thread
-########################################################################################
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=DEBUG_STATE)
+    headscale_webui.run(host="0.0.0.0")
