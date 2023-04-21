@@ -36,4 +36,4 @@ jobs:
       - name: Install dependencies
         run: poetry install --only main,dev
       - name: Run formatter
-        run: poetry run ${{ matrix.tool }} headscale_api/ tests/
+        run: poetry run ${{ matrix.tool }} *.py
