@@ -1,0 +1,39 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Server",
+            "type": "python",
+            "request": "launch",
+            "module": "server",
+            "justMyCode": false,
+            "env": {
+                "APP_DATA_DIR": "${workspaceFolder}/data",
+                "KEY": "CHANGEME",
+                "AUTH_TYPE": "basic",
+                "BASIC_AUTH_USER": "headscale",
+                "BASIC_AUTH_PASS": "headscale",
+                "OIDC_LOGOUT_REDIRECT_URI": "http://localhost:5000/overview",
+            }
+        },
+        {
+            "name": "Python: Server with coverage",
+            "type": "python",
+            "request": "launch",
+            "module": "coverage",
+            "args": ["run", "--omit", ".venv/**", "-m", "server"],
+            "justMyCode": false,
+            "env": {
+                "APP_DATA_DIR": "${workspaceFolder}/data",
+                "KEY": "CHANGEME",
+                "AUTH_TYPE": "basic",
+                "BASIC_AUTH_USER": "headscale",
+                "BASIC_AUTH_PASS": "headscale",
+                "OIDC_LOGOUT_REDIRECT_URI": "http://localhost:5000/overview",
+            }
+        }
+    ]
+}

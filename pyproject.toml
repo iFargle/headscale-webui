@@ -4,26 +4,47 @@ version = "v0.6.1"
 description = "A simple web UI for small-scale Headscale deployments."
 authors = ["Albert Copeland <albert@sysctl.io>"]
 license = "AGPL"
+packages = [
+    { include = "*.py" }
+]
+readme = "README.md"
+repository = "https://github.com/iFargle/headscale-webui"
 
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.28.2"
-Flask = "^2.2.2"
+Flask = {extras = ["async"], version = "^2.2.3"}
 cryptography = "^39.0.0"
-python-dateutil = "^2.8.2"
-pytz = "^2022.7.1"
-Flask-Executor = "^1.0.0"
-PyYAML = "^6.0"
 pyuwsgi = "^2.0.21"
 gunicorn = "^20.1.0"
 flask-basicauth = "^0.2.0"
 flask-providers-oidc = "^1.2.1"
-
-[tool.poetry.dev-dependencies]
+flask-pydantic = {git = "https://github.com/MarekPikula/flask-pydantic.git", rev = "dictable_models"}
+headscale-api = {git = "https://github.com/MarekPikula/python-headscale-api.git"}
+betterproto = {git = "https://github.com/MarekPikula/python-betterproto.git", rev = "classmethod_from_dict"}
+apscheduler = "^3.10.1"
+tzdata = "^2023.3"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.0"
-autopep8 = "^2.0.2"
+black = "^23.3.0"
+isort = "^5.12.0"
+ruff = "^0.0.260"
+pre-commit = "^3.2.1"
+mypy = "^1.1.1"
+pydocstyle = "^6.3.0"
+pylint-pydantic = "^0.1.8"
+types-requests = "^2.28.11.17"
+coverage = "^7.2.3"
+gitpython = "^3.1.31"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.main]
+extension-pkg-whitelist = ["pydantic"]
+load-plugins = ["pylint_pydantic"]
+generated-members = "app.logger.debug,\napp.logger.info,\napp.logger.warning,\napp.logger.error,\napp.logger.critical,\napp.logger.exception,\napp.logger.setLevel"
