@@ -439,7 +439,7 @@ def register_machine():
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return str(headscale.register_machine(url, api_key, machine_key, user))
+    return headscale.register_machine(url, api_key, machine_key, user)
 
 ########################################################################################
 # User API Endpoints
