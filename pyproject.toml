@@ -4,9 +4,6 @@ version = "v0.7.0"
 description = "A simple web UI for small-scale Headscale deployments."
 authors = ["Albert Copeland <albert@sysctl.io>"]
 license = "AGPL"
-packages = [
-    { include = "*.py" }
-]
 readme = "README.md"
 repository = "https://github.com/iFargle/headscale-webui"
 
