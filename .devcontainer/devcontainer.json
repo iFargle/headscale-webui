@@ -21,13 +21,24 @@
 		"vscode": {
 			"extensions": [
 				"bungcip.better-toml",
-				"github.vscode-github-actions"
+				"charliermarsh.ruff",
+				"github.vscode-github-actions",
 				"GitHub.vscode-pull-request-github",
 				"mhutchie.git-graph",
 				"ms-azuretools.vscode-docker",
 				"njpwerner.autodocstring",
 				"redhat.vscode-yaml",
-			]
+				"streetsidesoftware.code-spell-checker"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+				"python.venvPath": "${workspaceFolder}/.venv",
+				"python.formatting.blackPath": "${workspaceFolder}/.venv/bin/black",
+				"python.linting.mypyPath": "${workspaceFolder}/.venv/bin/mypy",
+				"python.linting.mypyEnabled": true,
+				"python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
+				"python.linting.pylintEnabled": true,
+			}
 		}
 	}
 
