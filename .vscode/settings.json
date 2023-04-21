@@ -1,0 +1,8 @@
+{
+    "python.analysis.extraPaths": [
+        ".venv/src/flask-pydantic/flask_pydantic"
+    ],
+    "files.associations": {
+        "*.html": "jinja"
+    },
+}
