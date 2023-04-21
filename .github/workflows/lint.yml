@@ -21,7 +21,7 @@ jobs:
           - "black --check --diff"
           - "isort --check --diff"
           - "pydocstyle"
-          - "pylint"
+          - "pylint --disable=fixme"
           - "ruff"
           - "mypy"
     steps:
