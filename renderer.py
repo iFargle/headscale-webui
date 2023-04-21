@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """Page rendering functions.
 
 TODO: Move some parts to Jinja templates.
@@ -17,7 +18,7 @@ from config import Config
 from headscale import HeadscaleApi
 
 
-async def render_overview(headscale: HeadscaleApi):
+async def render_overview(headscale: HeadscaleApi):  # pylint: disable=too-many-locals
     """Render the overview page."""
     current_app.logger.info("Rendering the Overview page")
 
@@ -281,7 +282,7 @@ async def render_overview(headscale: HeadscaleApi):
     )
 
 
-async def thread_machine_content(
+async def thread_machine_content(  # pylint: disable=all
     headscale: HeadscaleApi,
     machine: schema.Machine,
     idx: int,
@@ -318,7 +319,7 @@ async def thread_machine_content(
     ha_enabled = False
 
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
-    if len(pulled_routes.routes) > 0:
+    if len(pulled_routes.routes) > 0:  # pylint: disable=too-many-nested-blocks
         # First, check if there are any routes that are both enabled and advertised If
         # that is true, we will output the collection-item for routes.  Otherwise, it
         # will not be displayed.
@@ -688,7 +689,7 @@ async def build_user_card(headscale: HeadscaleApi, user: schema.User):
 
 async def build_preauth_key_table(
     headscale: HeadscaleApi, request: schema.ListPreAuthKeysRequest
-):
+):  # pylint: disable=too-many-locals
     """Build PreAuth key table for a user."""
     current_app.logger.info(
         "Building the PreAuth key table for User:  %s", request.user
@@ -878,7 +879,9 @@ def render_search():
     )
 
 
-async def render_routes(headscale: HeadscaleApi):
+async def render_routes(
+    headscale: HeadscaleApi,
+):  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
     """Render routes page."""
     current_app.logger.info("Rendering Routes page")
     all_routes = await headscale.get_routes(schema.GetRoutesRequest())
