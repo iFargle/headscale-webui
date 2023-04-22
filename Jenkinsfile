@@ -25,8 +25,8 @@ pipeline {
         stage('Build ENV') {
             steps {
 
-                script { BUILD_DATE = java.time.DateTimeFormatter.ISO_DATE_TIME.format(java.time.OffsetDateTime.now()) }
                 sh 'printenv'
+                script { BUILD_DATE = java.time.LocalDate.now() }
                 sh """
                     # Create the builder:
                     docker buildx create --name $BUILDER_NAME --driver-opt=image=moby/buildkit
