@@ -61,8 +61,12 @@ class BasicAuthConfig(BaseSettings):
     Used only if "AUTH_TYPE" environment variable is set to "basic".
     """
 
-    username: str = Field(env="BASIC_AUTH_USER", description="Username for basic auth.")
-    password: str = Field(env="BASIC_AUTH_PASS", description="Password for basic auth.")
+    username: str = Field(
+        "headscale", env="BASIC_AUTH_USER", description="Username for basic auth."
+    )
+    password: str = Field(
+        "headscale", env="BASIC_AUTH_PASS", description="Password for basic auth."
+    )
 
 
 class AuthType(StrEnum):
@@ -156,7 +160,7 @@ class InitCheckError(RuntimeError):
                 "  %s with type %s: %s",
                 field.field_info.extra["env"],
                 field.type_.__name__,
-                sub_pydantic_error["type"],
+                sub_pydantic_error["msg"],
             )
 
             new_error.append_error(
@@ -317,8 +321,8 @@ class Config(BaseSettings):
         env="APP_VERSION",
         description="Application version. Should be set by Docker.",
     )
-    build_date: str = Field(
-        default_factory=str(datetime.now),
+    build_date: datetime = Field(
+        default_factory=datetime.now,
         env="BUILD_DATE",
         description="Application build date. Should be set by Docker.",
     )
@@ -383,6 +387,15 @@ class Config(BaseSettings):
         description="Application data path.",
     )
 
+    @validator("auth_type", pre=True)
+    @classmethod
+    def validate_auth_type(cls, value: Any):
+        """Validate AUTH_TYPE so that it accepts more valid values."""
+        value = str(value).lower()
+        if value == "":
+            return AuthType.BASIC
+        return AuthType(value)
+
     @validator("log_level_name")
     @classmethod
     def validate_log_level_name(cls, value: Any):
@@ -408,6 +421,23 @@ class Config(BaseSettings):
             return ZoneInfo(value)
         except ZoneInfoNotFoundError as error:
             raise ValueError(f"Timezone {value} is invalid: {error}") from error
+
+    @validator("build_date", pre=True)
+    @classmethod
+    def validate_build_date(cls, value: Any):
+        """Validate build date and accept more values."""
+        if isinstance(value, datetime):
+            return value
+        assert isinstance(value, str), "BUILD_DATE needs to be a string."
+        if value == "":
+            return datetime.now()
+        try:
+            return datetime.fromisoformat(value)
+        except ValueError as error:
+            current_app.logger.warning(
+                "BUILD_DATE in wrong format. Expected ISO format. Error: %s", str(error)
+            )
+            return datetime.now()
 
     @validator("hs_config_path", pre=True)
     @classmethod

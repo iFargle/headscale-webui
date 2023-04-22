@@ -9,14 +9,14 @@ ARG WORKDIR
 ENV PYTHONUNBUFFERED=1
 # Don't create `.pyc` files:
 ENV PYTHONDONTWRITEBYTECODE=1
-# https://github.com/rust-lang/cargo/issues/2808 
+# https://github.com/rust-lang/cargo/issues/2808
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 # For building CFFI / Crypgotraphy (needed on ARM builds):
 RUN apk add gcc make musl-dev libffi-dev rust cargo git openssl-dev
 
 RUN pip install poetry
-RUN poetry config virtualenvs.in-project true 
+RUN poetry config virtualenvs.in-project true
 
 WORKDIR ${WORKDIR}
 
@@ -45,7 +45,7 @@ ENV HS_SERVER=http://localhost/
 ENV KEY=""
 # ENV SCRIPT_NAME=/
 ENV DOMAIN_NAME=http://localhost
-ENV AUTH_TYPE="None"
+ENV AUTH_TYPE=""
 ENV LOG_LEVEL="Info"
 
 # BasicAuth variables
@@ -61,7 +61,7 @@ ENV OIDC_CLIENT_SECRET=secret
 ARG GIT_COMMIT_ARG=""
 ARG GIT_BRANCH_ARG=""
 ARG APP_VERSION_ARG=""
-ARG BUILD_DATE_ARG="NOT SET"
+ARG BUILD_DATE_ARG=""
 ARG HS_VERSION_ARG=""
 
 # About section on the Settings page
