@@ -26,7 +26,7 @@ pipeline {
             steps {
 
                 sh 'printenv'
-                script { BUILD_DATE = java.time.LocalDate.now() }
+                script { BUILD_DATE = java.time.DateTimeFormatter.ISO_DATE_TIME.format(java.time.OffsetDateTime.now()) }
                 sh """
                     # Create the builder:
                     docker buildx create --name $BUILDER_NAME --driver-opt=image=moby/buildkit
@@ -62,7 +62,7 @@ pipeline {
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
                                 --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
                                 --push
-                        """ 
+                        """
                     } else { // If I'm just testing, I don't need to build for ARM
                         sh """
                             docker buildx build . \
@@ -98,10 +98,10 @@ pipeline {
                     }
                     else {
                         sh """
-                            docker pull git.sysctl.io/albert/headscale-webui:testing 
-                            docker pull ghcr.io/ifargle/headscale-webui:testing 
-                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} 
-                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} 
+                            docker pull git.sysctl.io/albert/headscale-webui:testing
+                            docker pull ghcr.io/ifargle/headscale-webui:testing
+                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}
+                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME}
                         """
                     }
                 }
