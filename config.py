@@ -61,8 +61,12 @@ class BasicAuthConfig(BaseSettings):
     Used only if "AUTH_TYPE" environment variable is set to "basic".
     """
 
-    username: str = Field(env="BASIC_AUTH_USER", description="Username for basic auth.")
-    password: str = Field(env="BASIC_AUTH_PASS", description="Password for basic auth.")
+    username: str = Field(
+        "headscale", env="BASIC_AUTH_USER", description="Username for basic auth."
+    )
+    password: str = Field(
+        "headscale", env="BASIC_AUTH_PASS", description="Password for basic auth."
+    )
 
 
 class AuthType(StrEnum):
@@ -382,6 +386,15 @@ class Config(BaseSettings):
         env="APP_DATA_DIR",
         description="Application data path.",
     )
+
+    @validator("auth_type", pre=True)
+    @classmethod
+    def validate_auth_type(cls, value: Any):
+        """Validate AUTH_TYPE so that it accepts more valid values."""
+        value = str(value).lower()
+        if value == "":
+            return AuthType.BASIC
+        return AuthType(value)
 
     @validator("log_level_name")
     @classmethod
