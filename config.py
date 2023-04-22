@@ -160,7 +160,7 @@ class InitCheckError(RuntimeError):
                 "  %s with type %s: %s",
                 field.field_info.extra["env"],
                 field.type_.__name__,
-                sub_pydantic_error["type"],
+                sub_pydantic_error["msg"],
             )
 
             new_error.append_error(
