@@ -60,6 +60,7 @@ class OpenIdProviderMetadata(BaseModel):
             "code id_token",
             "code token",
             "code id_token token",
+            "none",
         ]
     ]
     response_modes_supported: list[Literal["query", "fragment"]] | None

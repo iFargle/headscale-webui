@@ -8,7 +8,6 @@ pipeline {
         BUILD_DATE     = ''
         BUILDER_NAME   = "multiarch-${env.BUILD_TAG}"
 
-
         DOCKERHUB_CRED = credentials('dockerhub-ifargle-pat')
 
         GHCR_URL       = "https://ghcr.io/"
