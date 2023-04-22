@@ -55,15 +55,18 @@ class OpenIdProviderMetadata(BaseModel):
     response_types_supported: list[
         Literal[
             "code",
+            "token",
             "id_token",
             "id_token token",
+            "token id_token",
             "code id_token",
             "code token",
             "code id_token token",
+            "code token id_token",
             "none",
         ]
     ]
-    response_modes_supported: list[Literal["query", "fragment"]] | None
+    response_modes_supported: list[Literal["query", "fragment", "form_post"]] | None
     grant_types_supported: list[str] | None
     acr_values_supported: list[str] | None
     subject_types_supported: list[str]
