@@ -218,6 +218,11 @@ def _get_version_from_package():
     return importlib.metadata.version("headscale-webui")
 
 
+def _get_default_build_date():
+    """Get a default build date is none is provided."""
+    return str(datetime.now())
+
+
 # Functions to get git-related information in development scenario, where no relevant
 # environment variables are set. If not in git repository fall back to unknown values.
 # GitPython is added as dev dependency, thus we need to have fallback in case of
@@ -321,8 +326,8 @@ class Config(BaseSettings):
         env="APP_VERSION",
         description="Application version. Should be set by Docker.",
     )
-    build_date: datetime = Field(
-        default_factory=datetime.now,
+    build_date: str = Field(
+        default_factory=_get_default_build_date,
         env="BUILD_DATE",
         description="Application build date. Should be set by Docker.",
     )
@@ -421,23 +426,6 @@ class Config(BaseSettings):
             return ZoneInfo(value)
         except ZoneInfoNotFoundError as error:
             raise ValueError(f"Timezone {value} is invalid: {error}") from error
-
-    @validator("build_date", pre=True)
-    @classmethod
-    def validate_build_date(cls, value: Any):
-        """Validate build date and accept more values."""
-        if isinstance(value, datetime):
-            return value
-        assert isinstance(value, str), "BUILD_DATE needs to be a string."
-        if value == "":
-            return datetime.now()
-        try:
-            return datetime.fromisoformat(value)
-        except ValueError as error:
-            current_app.logger.warning(
-                "BUILD_DATE in wrong format. Expected ISO format. Error: %s", str(error)
-            )
-            return datetime.now()
 
     @validator("hs_config_path", pre=True)
     @classmethod
