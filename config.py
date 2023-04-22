@@ -317,8 +317,8 @@ class Config(BaseSettings):
         env="APP_VERSION",
         description="Application version. Should be set by Docker.",
     )
-    build_date: datetime = Field(
-        default_factory=datetime.now,
+    build_date: str = Field(
+        default_factory=str(datetime.now),
         env="BUILD_DATE",
         description="Application build date. Should be set by Docker.",
     )
