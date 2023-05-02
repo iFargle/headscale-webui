@@ -672,6 +672,7 @@ function add_machine() {
         success: function (response) {
             if (response.machine) {
                 window.location.reload()
+                return
             }
             load_modal_generic("error", "Error adding machine", response.message)
             return
