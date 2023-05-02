@@ -33,6 +33,9 @@ WORKDIR ${WORKDIR}
 # For FlaskOIDC library
 RUN mkdir /app/instance && chown 1000:1000 /app/instance
 
+RUN mkdir /data
+RUN chown 1000:1000 /data 
+
 RUN adduser app -DHh ${WORKDIR} -u 1000
 USER 1000
 
@@ -70,9 +73,6 @@ ENV GIT_BRANCH=$GIT_BRANCH_ARG
 ENV APP_VERSION=$APP_VERSION_ARG
 ENV BUILD_DATE=$BUILD_DATE_ARG
 ENV HS_VERSION=$HS_VERSION_ARG
-
-RUN mkdir /data
-RUN chown 1000:1000 /data 
 
 VOLUME /etc/headscale
 VOLUME /data
