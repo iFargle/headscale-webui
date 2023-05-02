@@ -1,269 +1,224 @@
-# pylint: disable=too-many-lines
-"""Page rendering functions.
+# pylint: disable=line-too-long, wrong-import-order
 
-TODO: Move some parts to Jinja templates.
-"""
+import headscale, helper, pytz, os, yaml, logging, json
+from flask              import Flask, Markup, render_template
+from datetime           import datetime
+from dateutil           import parser
+from concurrent.futures import ALL_COMPLETED, wait
+from flask_executor     import Executor
 
+LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+# Initiate the Flask application and logging:
+app = Flask(__name__, static_url_path="/static")
+match LOG_LEVEL:
+    case "DEBUG"   : app.logger.setLevel(logging.DEBUG)
+    case "INFO"    : app.logger.setLevel(logging.INFO)
+    case "WARNING" : app.logger.setLevel(logging.WARNING)
+    case "ERROR"   : app.logger.setLevel(logging.ERROR)
+    case "CRITICAL": app.logger.setLevel(logging.CRITICAL)
+executor = Executor(app)
 
-import asyncio
-import datetime
+def render_overview():
+    app.logger.info("Rendering the Overview page")
+    url           = headscale.get_url()
+    api_key       = headscale.get_api_key()
 
-from flask import current_app, render_template
-from flask_oidc import OpenIDConnect  # type: ignore
-from headscale_api.schema.headscale import v1 as schema
-from markupsafe import Markup
+    timezone         = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time       = timezone.localize(datetime.now())
+    
+    # Overview page will just read static information from the config file and display it
+    # Open the config.yaml and parse it.
+    config_file = ""
+    try:    
+        config_file = open("/etc/headscale/config.yml",  "r")
+        app.logger.info("Opening /etc/headscale/config.yml")
+    except: 
+        config_file = open("/etc/headscale/config.yaml", "r")
+        app.logger.info("Opening /etc/headscale/config.yaml")
+    config_yaml = yaml.safe_load(config_file)
 
-import helper
-from config import Config
-from headscale import HeadscaleApi
-
-
-async def render_overview(headscale: HeadscaleApi):  # pylint: disable=too-many-locals
-    """Render the overview page."""
-    current_app.logger.info("Rendering the Overview page")
-
-    local_time = datetime.datetime.now(headscale.app_config.timezone)
-
-    # Get and display overview of the following information:
-    #   server's machines, users, preauth keys, API key expiration, server version
-
-    async with headscale.session:
-        machines, routes, users = await asyncio.gather(
-            headscale.list_machines(schema.ListMachinesRequest("")),
-            headscale.get_routes(schema.GetRoutesRequest()),
-            headscale.list_users(schema.ListUsersRequest()),
-        )
-        user_preauth_keys: list[schema.ListPreAuthKeysResponse] = await asyncio.gather(
-            *[
-                headscale.list_pre_auth_keys(schema.ListPreAuthKeysRequest(user.name))
-                for user in users.users
-            ]
-        )
+    # Get and display the following information:
+    # Overview of the server's machines, users, preauth keys, API key expiration, server version
+    
+    # Get all machines:
+    machines = headscale.get_machines(url, api_key)
+    machines_count = len(machines["machines"])
 
     # Need to check if routes are attached to an active machine:
-    # ISSUE:  https://github.com/iFargle/headscale-webui/issues/36
-    # ISSUE:  https://github.com/juanfont/headscale/issues/1228
+    # ISSUE:  https://github.com/iFargle/headscale-webui/issues/36 
+    # ISSUE:  https://github.com/juanfont/headscale/issues/1228 
 
     # Get all routes:
-    total_routes = sum(route.machine.id != 0 for route in routes.routes)
-    enabled_routes = sum(
-        route.enabled and route.advertised and route.machine.id != 0
-        for route in routes.routes
-    )
+    routes = headscale.get_routes(url,api_key)
+
+    total_routes = 0
+    for route in routes["routes"]:
+        if int(route['machine']['id']) != 0: 
+            total_routes += 1
+
+    enabled_routes = 0
+    for route in routes["routes"]:
+        if route["enabled"] and route['advertised'] and int(route['machine']['id']) != 0: 
+            enabled_routes += 1
 
     # Get a count of all enabled exit routes
     exits_count = 0
     exits_enabled_count = 0
-    for route in routes.routes:
-        if route.advertised and route.machine.id != 0:
-            if route.prefix in ("0.0.0.0/0", "::/0"):
-                exits_count += 1
-                if route.enabled:
+    for route in routes["routes"]:
+        if route['advertised'] and int(route['machine']['id']) != 0:
+            if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                exits_count +=1
+                if route["enabled"]:
                     exits_enabled_count += 1
 
     # Get User and PreAuth Key counts
-    usable_keys_count = sum(
-        sum(
-            (key.reusable or (not key.reusable and not key.used))
-            and not key.expiration < local_time
-            for key in preauth_keys.pre_auth_keys
-        )
-        for preauth_keys in user_preauth_keys
-    )
+    user_count        = 0
+    usable_keys_count = 0
+    users = headscale.get_users(url, api_key)
+    for user in users["users"]:
+        user_count +=1
+        preauth_keys = headscale.get_preauth_keys(url, api_key, user["name"])
+        for key in preauth_keys["preAuthKeys"]:
+            expiration_parse = parser.parse(key["expiration"])
+            key_expired = True if expiration_parse < local_time else False
+            if key["reusable"] and not key_expired: usable_keys_count += 1
+            if not key["reusable"] and not key["used"] and not key_expired: usable_keys_count += 1
 
-    # Start putting the content together
-    overview_content = f"""
-        <div class="row">
-            <div class="col s1"></div>
-            <div class="col s10">
-                <ul class="collection with-header z-depth-1">
-                    <li class="collection-header"><h4>Server Statistics</h4></li>
-                    <li class="collection-item"><div>Machines Added
-                        <div class="secondary-content overview-page">
-                            {len(machines.machines)}</div></div></li>
-                    <li class="collection-item"><div>Users Added
-                        <div class="secondary-content overview-page">
-                            {len(users.users)}</div></div></li>
-                    <li class="collection-item"><div>Usable Preauth Keys
-                        <div class="secondary-content overview-page">
-                            {usable_keys_count}</div></div></li>
-                    <li class="collection-item"><div>Enabled/Total Routes
-                        <div class="secondary-content overview-page">
-                            {enabled_routes}/{total_routes}</div></div></li>
-                    <li class="collection-item"><div>Enabled/Total Exits
-                        <div class="secondary-content overview-page">
-                            {exits_enabled_count}/{exits_count}</div></div></li>
-                </ul>
-            </div>
-            <div class="col s1"></div>
-        </div>
-        """
+    # General Content variables:
+    ip_prefixes, server_url, disable_check_updates, ephemeral_node_inactivity_timeout, node_update_check_interval = "N/A", "N/A", "N/A", "N/A", "N/A"
+    if "ip_prefixes"                       in config_yaml:  ip_prefixes                       = str(config_yaml["ip_prefixes"])
+    if "server_url"                        in config_yaml:  server_url                        = str(config_yaml["server_url"])
+    if "disable_check_updates"             in config_yaml:  disable_check_updates             = str(config_yaml["disable_check_updates"])
+    if "ephemeral_node_inactivity_timeout" in config_yaml:  ephemeral_node_inactivity_timeout = str(config_yaml["ephemeral_node_inactivity_timeout"])
+    if "node_update_check_interval"        in config_yaml:  node_update_check_interval        = str(config_yaml["node_update_check_interval"])
 
-    # Overview page will just read static information from the config file and display
-    # it Open the config.yaml and parse it.
-    config_yaml = headscale.hs_config
-
-    if config_yaml is None:
-        return Markup(
-            f"""<br>{overview_content}
-                <div class='row'>
-                    <div class="col s1"></div>
-                    <div class="col s10">
-                        <ul class="collection with-header z-depth-1">
-                            <li class="collection-header"><h4>General</h4></li>
-                            <li class="collection-item">
-                            Headscale configuration is invalid or unavailable.
-                            Please check logs.</li>
-                        </ul>
-                    </div>
-                    <div class="col s1"></div>
-                </div>
-            """
-        )
-
-    general_content = f"""
-        <div class="row">
-            <div class="col s1"></div>
-            <div class="col s10">
-                <ul class="collection with-header z-depth-1">
-                    <li class="collection-header"><h4>General</h4></li>
-                    <li class="collection-item"><div>IP Prefixes
-                        <div class="secondary-content overview-page">
-                            {config_yaml.ip_prefixes or 'N/A'}</div></div></li>
-                    <li class="collection-item"><div>Server URL
-                        <div class="secondary-content overview-page">
-                            {config_yaml.server_url}</div></div></li>
-                    <li class="collection-item"><div>Updates Disabled
-                        <div class="secondary-content overview-page">
-                            {config_yaml.disable_check_updates or 'N/A'}
-                        </div></div></li>
-                    <li class="collection-item"><div>Ephemeral Node Inactivity Timeout
-                        <div class="secondary-content overview-page">
-                            {config_yaml.ephemeral_node_inactivity_timeout or 'N/A'}
-                        </div></div></li>
-                    <li class="collection-item"><div>Node Update Check Interval
-                        <div class="secondary-content overview-page">
-                            {config_yaml.node_update_check_interval or 'N/A'}
-                        </div></div></li>
-                </ul>
-            </div>
-            <div class="col s1"></div>
-        </div>
-        """
-
-    # OIDC Content:
-    oidc = config_yaml.oidc
-    oidc_content = (
-        (
-            f"""
-            <div class="row">
-                <div class="col s1"></div>
-                <div class="col s10">
-                    <ul class="collection with-header z-depth-1">
-                        <li class="collection-header"><h4>Headscale OIDC</h4></li>
-                        <li class="collection-item"><div>Issuer
-                            <div class="secondary-content overview-page">
-                                {oidc.issuer or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Client ID
-                            <div class="secondary-content overview-page">
-                                {oidc.client_id or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Scope
-                            <div class="secondary-content overview-page">
-                                {oidc.scope or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Use OIDC Token Expiry
-                            <div class="secondary-content overview-page">
-                                {oidc.use_expiry_from_token or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Expiry
-                            <div class="secondary-content overview-page">
-                                {oidc.expiry or 'N/A'}</div></div></li>
-                    </ul>
-                </div>
-                <div class="col s1"></div>
-            </div>
-            """
-        )
-        if oidc is not None
-        else ""
-    )
+    # OIDC Content variables:
+    issuer, client_id, scope, use_expiry_from_token, expiry = "N/A", "N/A", "N/A", "N/A", "N/A"
+    if "oidc" in config_yaml:
+        if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])                
+        if "client_id"             in config_yaml["oidc"] : client_id             = str(config_yaml["oidc"]["client_id"])             
+        if "scope"                 in config_yaml["oidc"] : scope                 = str(config_yaml["oidc"]["scope"])                 
+        if "use_expiry_from_token" in config_yaml["oidc"] : use_expiry_from_token = str(config_yaml["oidc"]["use_expiry_from_token"]) 
+        if "expiry"                in config_yaml["oidc"] : expiry                = str(config_yaml["oidc"]["expiry"])   
 
     # Embedded DERP server information.
-    derp = config_yaml.derp
-    derp_content = (
-        (
-            f"""
-            <div class="row">
-                <div class="col s1"></div>
-                <div class="col s10">
-                    <ul class="collection with-header z-depth-1">
-                        <li class="collection-header"><h4>Embedded DERP</h4></li>
-                        <li class="collection-item"><div>Enabled
-                            <div class="secondary-content overview-page">
-                            {derp.server.enabled}</div></div></li>
-                        <li class="collection-item"><div>Region ID
-                            <div class="secondary-content overview-page">
-                            {derp.server.region_id or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Region Code
-                            <div class="secondary-content overview-page">
-                            {derp.server.region_code or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Region Name
-                            <div class="secondary-content overview-page">
-                            {derp.server.region_name or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>STUN Address
-                            <div class="secondary-content overview-page">
-                            {derp.server.stun_listen_addr or 'N/A'}</div></div></li>
-                    </ul>
-                </div>
-                <div class="col s1"></div>
-            </div>
-            """
-        )
-        if derp is not None and derp.server is not None and derp.server.enabled
-        else ""
-    )
+    enabled, region_id, region_code, region_name, stun_listen_addr = "N/A", "N/A", "N/A", "N/A", "N/A"
+    if "derp" in config_yaml:
+        if "server" in config_yaml["derp"] and config_yaml["derp"]["server"]["enabled"]:
+            if "enabled"          in config_yaml["derp"]["server"]: enabled          = str(config_yaml["derp"]["server"]["enabled"])          
+            if "region_id"        in config_yaml["derp"]["server"]: region_id        = str(config_yaml["derp"]["server"]["region_id"])        
+            if "region_code"      in config_yaml["derp"]["server"]: region_code      = str(config_yaml["derp"]["server"]["region_code"])      
+            if "region_name"      in config_yaml["derp"]["server"]: region_name      = str(config_yaml["derp"]["server"]["region_name"])      
+            if "stun_listen_addr" in config_yaml["derp"]["server"]: stun_listen_addr = str(config_yaml["derp"]["server"]["stun_listen_addr"]) 
+    
+    nameservers, magic_dns, domains, base_domain = "N/A", "N/A", "N/A", "N/A"
+    if "dns_config" in config_yaml:
+        if "nameservers" in config_yaml["dns_config"]: nameservers = str(config_yaml["dns_config"]["nameservers"]) 
+        if "magic_dns"   in config_yaml["dns_config"]: magic_dns   = str(config_yaml["dns_config"]["magic_dns"])   
+        if "domains"     in config_yaml["dns_config"]: domains     = str(config_yaml["dns_config"]["domains"])     
+        if "base_domain" in config_yaml["dns_config"]: base_domain = str(config_yaml["dns_config"]["base_domain"]) 
 
-    dns_config = config_yaml.dns_config
-    dns_content = (
-        (
-            f"""
-            <div class="row">
-                <div class="col s1"></div>
-                <div class="col s10">
-                    <ul class="collection with-header z-depth-1">
-                        <li class="collection-header"><h4>DNS</h4></li>
-                        <li class="collection-item"><div>DNS Nameservers
-                            <div class="secondary-content overview-page">
-                            {dns_config.nameservers or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>MagicDNS
-                            <div class="secondary-content overview-page">
-                            {dns_config.magic_dns or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Search Domains
-                            <div class="secondary-content overview-page">
-                            {dns_config.domains or 'N/A'}</div></div></li>
-                        <li class="collection-item"><div>Base Domain
-                            <div class="secondary-content overview-page">
-                            {dns_config.base_domain or 'N/A'}</div></div></li>
-                    </ul>
-                </div>
-                <div class="col s1"></div>
-            </div>
-            """
-        )
-        if dns_config is not None
-        else ""
-    )
+    # Start putting the content together
+    overview_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Server Statistics</h4></li>
+                <li class="collection-item"><div>Machines Added       <div class="secondary-content overview-page">"""+ str(machines_count)                               +"""</div></div></li>
+                <li class="collection-item"><div>Users Added          <div class="secondary-content overview-page">"""+ str(user_count)                                   +"""</div></div></li>
+                <li class="collection-item"><div>Usable Preauth Keys  <div class="secondary-content overview-page">"""+ str(usable_keys_count)                            +"""</div></div></li>
+                <li class="collection-item"><div>Enabled/Total Routes <div class="secondary-content overview-page">"""+ str(enabled_routes) +"""/"""+str(total_routes)    +"""</div></div></li>
+                <li class="collection-item"><div>Enabled/Total Exits  <div class="secondary-content overview-page">"""+ str(exits_enabled_count) +"""/"""+str(exits_count)+"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    general_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>General</h4></li>
+                <li class="collection-item"><div>IP Prefixes                       <div class="secondary-content overview-page">"""+ ip_prefixes                       +"""</div></div></li>
+                <li class="collection-item"><div>Server URL                        <div class="secondary-content overview-page">"""+ server_url                        +"""</div></div></li>
+                <li class="collection-item"><div>Updates Disabled                  <div class="secondary-content overview-page">"""+ disable_check_updates             +"""</div></div></li>
+                <li class="collection-item"><div>Ephemeral Node Inactivity Timeout <div class="secondary-content overview-page">"""+ ephemeral_node_inactivity_timeout +"""</div></div></li>
+                <li class="collection-item"><div>Node Update Check Interval        <div class="secondary-content overview-page">"""+ node_update_check_interval        +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    oidc_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Headscale OIDC</h4></li>
+                <li class="collection-item"><div>Issuer                <div class="secondary-content overview-page">"""+ issuer                +"""</div></div></li>
+                <li class="collection-item"><div>Client ID             <div class="secondary-content overview-page">"""+ client_id             +"""</div></div></li>
+                <li class="collection-item"><div>Scope                 <div class="secondary-content overview-page">"""+ scope                 +"""</div></div></li>
+                <li class="collection-item"><div>Use OIDC Token Expiry <div class="secondary-content overview-page">"""+ use_expiry_from_token +"""</div></div></li>
+                <li class="collection-item"><div>Expiry                <div class="secondary-content overview-page">"""+ expiry                +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    derp_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>Embedded DERP</h4></li>
+                <li class="collection-item"><div>Enabled     <div class="secondary-content overview-page">"""+ enabled          +"""</div></div></li>
+                <li class="collection-item"><div>Region ID   <div class="secondary-content overview-page">"""+ region_id        +"""</div></div></li>
+                <li class="collection-item"><div>Region Code <div class="secondary-content overview-page">"""+ region_code      +"""</div></div></li>
+                <li class="collection-item"><div>Region Name <div class="secondary-content overview-page">"""+ region_name      +"""</div></div></li>
+                <li class="collection-item"><div>STUN Address<div class="secondary-content overview-page">"""+ stun_listen_addr +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
+    dns_content = """
+    <div class="row">
+        <div class="col s1"></div>
+        <div class="col s10">
+            <ul class="collection with-header z-depth-1">
+                <li class="collection-header"><h4>DNS</h4></li>
+                <li class="collection-item"><div>DNS Nameservers <div class="secondary-content overview-page">"""+  nameservers  +"""</div></div></li>
+                <li class="collection-item"><div>MagicDNS        <div class="secondary-content overview-page">"""+  magic_dns    +"""</div></div></li>
+                <li class="collection-item"><div>Search Domains  <div class="secondary-content overview-page">"""+  domains      +"""</div></div></li>
+                <li class="collection-item"><div>Base Domain     <div class="secondary-content overview-page">"""+  base_domain  +"""</div></div></li>
+            </ul>
+        </div>
+        <div class="col s1"></div>
+    </div>
+    """
 
-    # TODO:
+    # Remove content that isn't needed:
+    # Remove OIDC if it isn't available:
+    if "oidc" not in config_yaml: oidc_content = ""
+    # Remove DERP if it isn't available or isn't enabled
+    if "derp" not in config_yaml:  derp_content = ""
+    if "derp" in config_yaml:
+        if "server" in config_yaml["derp"]:
+            if str(config_yaml["derp"]["server"]["enabled"]) == "False":
+                derp_content = ""
+
+    # TODO:  
     #     Whether there are custom DERP servers
-    #         If there are custom DERP servers, get the file location from the config
-    #         file.  Assume mapping is the same.
-    #     Whether the built-in DERP server is enabled
+    #         If there are custom DERP servers, get the file location from the config file.  Assume mapping is the same.
+    #     Whether the built-in DERP server is enabled 
     #     The IP prefixes
     #     The DNS config
 
-    # if derp is not None and derp.paths is not None:
-    #     pass
+    if config_yaml["derp"]["paths"]: pass
     #   # open the path:
-    #   derp_file =
+    #   derp_file = 
     #   config_file = open("/etc/headscale/config.yaml", "r")
     #   config_yaml = yaml.safe_load(config_file)
     #     The ACME config, if not empty
@@ -272,44 +227,27 @@ async def render_overview(headscale: HeadscaleApi):  # pylint: disable=too-many-
     #     The log level
     #     What kind of Database is being used to drive headscale
 
-    return Markup(
-        "<br>"
-        + overview_content
-        + general_content
-        + derp_content
-        + oidc_content
-        + dns_content
-    )
+    content = "<br>" + overview_content + general_content + derp_content + oidc_content + dns_content + ""
+    return Markup(content)
 
-
-async def thread_machine_content(  # pylint: disable=all
-    headscale: HeadscaleApi,
-    machine: schema.Machine,
-    idx: int,
-    all_routes: schema.GetRoutesResponse,
-) -> str:
-    """Render a single machine."""
+def thread_machine_content(machine, machine_content, idx, all_routes, failover_pair_prefixes):
     # machine      = passed in machine information
     # content      = place to write the content
 
-    failover_pair_prefixes: list[str] = []
-    current_app.logger.debug("Machine Information =================")
-    current_app.logger.debug(
-        "Name: %s, ID: %i, User: %s, givenName: %s",
-        machine.name,
-        machine.id,
-        machine.user.name,
-        machine.given_name,
-    )
+    # app.logger.debug("Machine Information")
+    # app.logger.debug(str(machine))
+    app.logger.debug("Machine Information =================")
+    app.logger.debug("Name:  %s, ID:  %s, User:  %s, givenName: %s, ", str(machine["name"]), str(machine["id"]), str(machine["user"]["name"]), str(machine["givenName"]))
+
+    url           = headscale.get_url()
+    api_key       = headscale.get_api_key()
 
     # Set the current timezone and local time
-    timezone = headscale.app_config.timezone
-    local_time = datetime.datetime.now(timezone)
+    timezone   = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+    local_time = timezone.localize(datetime.now())
 
     # Get the machines routes
-    pulled_routes = await headscale.get_machine_routes(
-        schema.GetMachineRoutesRequest(machine.id)
-    )
+    pulled_routes = headscale.get_machine_routes(url, api_key, machine["id"])
     routes = ""
 
     # Test if the machine is an exit node:
@@ -319,594 +257,445 @@ async def thread_machine_content(  # pylint: disable=all
     ha_enabled = False
 
     # If the length of "routes" is NULL/0, there are no routes, enabled or disabled:
-    if len(pulled_routes.routes) > 0:  # pylint: disable=too-many-nested-blocks
-        # First, check if there are any routes that are both enabled and advertised If
-        # that is true, we will output the collection-item for routes.  Otherwise, it
-        # will not be displayed.
-        advertised_routes = any(route.advertised for route in pulled_routes.routes)
+    if len(pulled_routes["routes"]) > 0:
+        advertised_routes = False
 
+        # First, check if there are any routes that are both enabled and advertised
+        # If that is true, we will output the collection-item for routes.  Otherwise, it will not be displayed.
+        for route in pulled_routes["routes"]:
+            if route["advertised"]: 
+                advertised_routes = True
         if advertised_routes:
             routes = """
                 <li class="collection-item avatar">
                     <i class="material-icons circle">directions</i>
                     <span class="title">Routes</span>
                     <p>
-                """
-            # current_app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
-            # current_app.logger.debug("All    Routes Dump:  "+str(all_routes))
+            """
+            # app.logger.debug("Pulled Routes Dump:  "+str(pulled_routes))
+            # app.logger.debug("All    Routes Dump:  "+str(all_routes))
 
             # Find all exits and put their ID's into the exit_routes array
-            exit_routes: list[int] = []
+            exit_routes  = []
             exit_enabled_color = "red"
             exit_tooltip = "enable"
             exit_route_enabled = False
-
-            for route in pulled_routes.routes:
-                if route.prefix in ("0.0.0.0/0", "::/0"):
-                    exit_routes.append(route.id)
+            
+            for route in pulled_routes["routes"]:
+                if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                    exit_routes.append(route["id"])
                     exit_route_found = True
                     # Test if it is enabled:
-                    if route.enabled:
+                    if route["enabled"]:
                         exit_enabled_color = "green"
-                        exit_tooltip = "disable"
+                        exit_tooltip       = 'disable'
                         exit_route_enabled = True
-                    current_app.logger.debug("Found exit route ID's: %s", exit_routes)
-                    current_app.logger.debug(
-                        "Exit Route Information: ID: %i | Enabled: %r | "
-                        "exit_route_enabled: %r / Found: %r",
-                        route.id,
-                        route.enabled,
-                        exit_route_enabled,
-                        exit_route_found,
-                    )
+                    app.logger.debug("Found exit route ID's:  "+str(exit_routes))
+                    app.logger.debug("Exit Route Information:  ID:  %s | Enabled:  %s | exit_route_enabled:  %s / Found:  %s", str(route["id"]), str(route["enabled"]), str(exit_route_enabled), str(exit_route_found))
 
             # Print the button for the Exit routes:
             if exit_route_found:
-                routes += (
-                    f"<p class='waves-effect waves-light btn-small "
-                    f"{exit_enabled_color} lighten-2 tooltipped' data-position='top' "
-                    f"data-tooltip='Click to {exit_tooltip}' id='{machine.id}-exit' "
-                    f'onclick="toggle_exit({exit_routes[0]}, {exit_routes[1]}, '
-                    f"{machine.id}-exit', '{exit_route_enabled}', 'machines')\">"
-                    "Exit Route</p>"
-                )
+                routes = routes+""" <p 
+                    class='waves-effect waves-light btn-small """+exit_enabled_color+""" lighten-2 tooltipped'
+                    data-position='top' data-tooltip='Click to """+exit_tooltip+"""'
+                    id='"""+machine["id"]+"""-exit'
+                    onclick="toggle_exit("""+exit_routes[0]+""", """+exit_routes[1]+""", '"""+machine["id"]+"""-exit', '"""+str(exit_route_enabled)+"""', 'machines')">
+                    Exit Route
+                </p>
+                """
 
-            # Check if the route has another enabled identical route.
+            # Check if the route has another enabled identical route.  
             # Check all routes from the current machine...
-            for route in pulled_routes.routes:
+            for route in pulled_routes["routes"]:
                 # ... against all routes from all machines ....
-                for route_info in all_routes.routes:
-                    current_app.logger.debug(
-                        "Comparing routes %s and %s", route.prefix, route_info.prefix
-                    )
-                    # ... If the route prefixes match and are not exit nodes ...
-                    if route_info.prefix == route.prefix and (
-                        route.prefix not in ("0.0.0.0/0", "::/0")
-                    ):
-                        # Check if the route ID's match.  If they don't ...
-                        current_app.logger.debug(
-                            "Found a match: %s and %s", route.prefix, route_info.prefix
-                        )
-                        if route_info.id != route.id:
-                            current_app.logger.debug(
-                                "Route ID's don't match. They're on different nodes."
-                            )
+                for route_info in all_routes["routes"]:
+                    app.logger.debug("Comparing routes %s and %s", str(route["prefix"]), str(route_info["prefix"]))
+                    # ... If the route prefixes match and are not exit nodes ... 
+                    if str(route_info["prefix"]) == str(route["prefix"]) and (route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0"):
+                        # Check if the route ID's match.  If they don't ... 
+                        app.logger.debug("Found a match:  %s and %s", str(route["prefix"]), str(route_info["prefix"]))
+                        if route_info["id"] != route["id"]:
+                            app.logger.debug("Route ID's don't match.  They're on different nodes.")
                             # ... Check if the routes prefix is already in the array...
-                            if route.prefix not in failover_pair_prefixes:
+                            if route["prefix"] not in failover_pair_prefixes:
                                 #  IF it isn't, add it.
-                                current_app.logger.info(
-                                    "New HA pair found: %s", route.prefix
-                                )
-                                failover_pair_prefixes.append(route.prefix)
-                            if route.enabled and route_info.enabled:
+                                app.logger.info("New HA pair found:  %s", str(route["prefix"]))
+                                failover_pair_prefixes.append(str(route["prefix"]))
+                            if route["enabled"] and route_info["enabled"]:
                                 # If it is already in the array. . .
                                 # Show as HA only if both routes are enabled:
-                                current_app.logger.debug(
-                                    "Both routes are enabled. Setting as HA [%s] (%s) ",
-                                    machine.name,
-                                    route.prefix,
-                                )
+                                app.logger.debug("Both routes are enabled.  Setting as HA [%s] (%s) ", str(machine["name"]), str(route["prefix"]))
                                 ha_enabled = True
-                # If the route is an exit node and already counted as a failover route,
-                # it IS a failover route, so display it.
-                if (
-                    route.prefix not in ("0.0.0.0/0", "::/0")
-                    and route.prefix in failover_pair_prefixes
-                ):
+                # If the route is an exit node and already counted as a failover route, it IS a failover route, so display it.
+                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] in failover_pair_prefixes:
                     route_enabled = "red"
-                    route_tooltip = "enable"
-                    color_index = failover_pair_prefixes.index(route.prefix)
+                    route_tooltip = 'enable'
+                    color_index   = failover_pair_prefixes.index(str(route["prefix"]))
                     route_enabled_color = helper.get_color(color_index, "failover")
-                    if route.enabled:
-                        color_index = failover_pair_prefixes.index(route.prefix)
+                    if route["enabled"]:
+                        color_index   = failover_pair_prefixes.index(str(route["prefix"]))
                         route_enabled = helper.get_color(color_index, "failover")
-                        route_tooltip = "disable"
-                    routes += (
-                        f"<p class='waves-effect waves-light btn-small {route_enabled} "
-                        "lighten-2  tooltipped' data-position='top' "
-                        f"data-tooltip='Click to {route_tooltip} (Failover Pair)' "
-                        f"id='{route.id}' onclick=\"toggle_failover_route({route.id}, "
-                        f"'{route.enabled}', '{route_enabled_color}')\">"
-                        f"{route.prefix}</p>"
-                    )
-
+                        route_tooltip = 'disable'
+                    routes = routes+""" <p 
+                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
+                        data-position='top' data-tooltip='Click to """+route_tooltip+""" (Failover Pair)'
+                        id='"""+route['id']+"""'
+                        onclick="toggle_failover_route("""+route['id']+""", '"""+str(route['enabled'])+"""', '"""+str(route_enabled_color)+"""')">
+                        """+route['prefix']+"""
+                    </p>
+                    """
+                    
             # Get the remaining routes:
-            for route in pulled_routes.routes:
+            for route in pulled_routes["routes"]:
                 # Get the remaining routes - No exits or failover pairs
-                if (
-                    route.prefix not in ("0.0.0.0/0", "::/0")
-                    and route.prefix not in failover_pair_prefixes
-                ):
-                    current_app.logger.debug(
-                        "Route:  [%s] id: %i / prefix: %s enabled?:  %r",
-                        route.machine.name,
-                        route.id,
-                        route.prefix,
-                        route.enabled,
-                    )
+                if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] not in failover_pair_prefixes:
+                    app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                     route_enabled = "red"
-                    route_tooltip = "enable"
-                    if route.enabled:
+                    route_tooltip = 'enable'
+                    if route["enabled"]:
                         route_enabled = "green"
-                        route_tooltip = "disable"
-                    routes += (
-                        f"<p class='waves-effect waves-light btn-small {route_enabled} "
-                        "lighten-2 tooltipped' data-position='top' data-tooltip='Click "
-                        f"to {route_tooltip}' id='{route.id}' "
-                        f"onclick=\"toggle_route({route.id}, '{route.enabled}', "
-                        f"'machines')\">{route.prefix}</p>"
-                    )
-            routes += "</p></li>"
+                        route_tooltip = 'disable'
+                    routes = routes+""" <p 
+                        class='waves-effect waves-light btn-small """+route_enabled+""" lighten-2 tooltipped'
+                        data-position='top' data-tooltip='Click to """+route_tooltip+"""'
+                        id='"""+route['id']+"""'
+                        onclick="toggle_route("""+route['id']+""", '"""+str(route['enabled'])+"""', 'machines')">
+                        """+route['prefix']+"""
+                    </p>
+                    """
+            routes = routes+"</p></li>"
 
     # Get machine tags
-    tag_array = ", ".join(f"{{tag: '{tag[4:]}'}}" for tag in machine.forced_tags)
-    tags = f"""
+    tag_array = ""
+    for tag in machine["forcedTags"]: 
+        tag_array = tag_array+"{tag: '"+tag[4:]+"'}, "
+    tags = """
         <li class="collection-item avatar">
-            <i class="material-icons circle tooltipped" data-position="right"
-                data-tooltip="Spaces will be replaced with a dash (-)
-                upon page refresh">label</i>
+            <i class="material-icons circle tooltipped" data-position="right" data-tooltip="Spaces will be replaced with a dash (-) upon page refresh">label</i>
             <span class="title">Tags</span>
-            <p><div style='margin: 0px' class='chips' id='{machine.id}-tags'></div></p>
+            <p><div style='margin: 0px' class='chips' id='"""+machine["id"]+"""-tags'></div></p>
         </li>
         <script>
-            window.addEventListener('load', function() {{
-                var instances = M.Chips.init (
-                    document.getElementById('{machine.id}-tags'),  ({{
-                        data:[{tag_array}],
-                        onChipDelete() {{ delete_chip({machine.id}, this.chipsData) }},
-                        onChipAdd()    {{ add_chip({machine.id},    this.chipsData) }}
-                    }})
-                );
-            }}, false
+            window.addEventListener('load', 
+                function() { 
+                    var instances = M.Chips.init ( 
+                        document.getElementById('"""+machine['id']+"""-tags'),  ({
+                            data:["""+tag_array+"""], 
+                            onChipDelete() { delete_chip("""+machine["id"]+""", this.chipsData) }, 
+                            onChipAdd()    { add_chip("""+machine["id"]+""",    this.chipsData) }
+                        }) 
+                    );
+                }, false
             )
         </script>
         """
 
     # Get the machine IP's
-    machine_ips = (
-        "<ul>"
-        + "".join(f"<li>{ip_address}</li>" for ip_address in machine.ip_addresses)
-        + "</ul>"
-    )
+    machine_ips = "<ul>"
+    for ip_address in machine["ipAddresses"]:
+        machine_ips = machine_ips+"<li>"+ip_address+"</li>"
+    machine_ips = machine_ips+"</ul>"
 
     # Format the dates for easy readability
-    last_seen_local = machine.last_seen.astimezone(timezone)
-    last_seen_delta = local_time - last_seen_local
-    last_seen_print = helper.pretty_print_duration(last_seen_delta)
-    last_seen_time = (
-        str(last_seen_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-        + f" {timezone} ({last_seen_print})"
-    )
+    last_seen_parse   = parser.parse(machine["lastSeen"])
+    last_seen_local   = last_seen_parse.astimezone(timezone)
+    last_seen_delta   = local_time - last_seen_local
+    last_seen_print   = helper.pretty_print_duration(last_seen_delta)
+    last_seen_time    = str(last_seen_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(last_seen_print)+")"
+    
+    last_update_parse = local_time if machine["lastSuccessfulUpdate"] is None else parser.parse(machine["lastSuccessfulUpdate"])
+    last_update_local = last_update_parse.astimezone(timezone)
+    last_update_delta = local_time - last_update_local
+    last_update_print = helper.pretty_print_duration(last_update_delta)
+    last_update_time  = str(last_update_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(last_update_print)+")"
 
-    if machine.last_successful_update is not None:
-        last_update_local = machine.last_successful_update.astimezone(timezone)
-        last_update_delta = local_time - last_update_local
-        last_update_print = helper.pretty_print_duration(last_update_delta)
-        last_update_time = (
-            str(last_update_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-            + f" {timezone} ({last_update_print})"
-        )
-    else:
-        last_update_print = None
-        last_update_time = None
-
-    created_local = machine.created_at.astimezone(timezone)
-    created_delta = local_time - created_local
-    created_print = helper.pretty_print_duration(created_delta)
-    created_time = (
-        str(created_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-        + f" {timezone} ({created_print})"
-    )
+    created_parse     = parser.parse(machine["createdAt"])
+    created_local     = created_parse.astimezone(timezone)
+    created_delta     = local_time - created_local
+    created_print     = helper.pretty_print_duration(created_delta)
+    created_time      = str(created_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(created_print)+")"
 
     # If there is no expiration date, we don't need to do any calculations:
-    if machine.expiry != datetime.datetime(1, 1, 1, 0, 0, tzinfo=datetime.timezone.utc):
-        expiry_local = machine.expiry.astimezone(timezone)
-        expiry_delta = expiry_local - local_time
-        expiry_print = helper.pretty_print_duration(expiry_delta, "expiry")
-        if str(expiry_local.strftime("%Y")) in ("0001", "9999", "0000"):
-            expiry_time = "No expiration date."
-        elif int(expiry_local.strftime("%Y")) > int(expiry_local.strftime("%Y")) + 2:
-            expiry_time = (
-                str(expiry_local.strftime("%m/%Y")) + f" {timezone} ({expiry_print})"
-            )
-        else:
-            expiry_time = (
-                str(expiry_local.strftime("%A %m/%d/%Y, %H:%M:%S"))
-                + f" {timezone} ({expiry_print})"
-            )
+    if machine["expiry"] != "0001-01-01T00:00:00Z":
+        expiry_parse     = parser.parse(machine["expiry"])
+        expiry_local     = expiry_parse.astimezone(timezone)
+        expiry_delta     = expiry_local - local_time
+        expiry_print     = helper.pretty_print_duration(expiry_delta, "expiry")
+        if str(expiry_local.strftime('%Y')) in ("0001",  "9999", "0000"):
+            expiry_time  = "No expiration date."
+        elif int(expiry_local.strftime('%Y')) > int(expiry_local.strftime('%Y'))+2:
+            expiry_time  = str(expiry_local.strftime('%m/%Y'))+" "+str(timezone)+" ("+str(expiry_print)+")"
+        else: 
+            expiry_time  = str(expiry_local.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)+" ("+str(expiry_print)+")"
 
-        expiring_soon = int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0
-        current_app.logger.debug(
-            "Machine: %s expires: %s / %i",
-            machine.name,
-            expiry_local.strftime("%Y"),
-            expiry_delta.days,
-        )
+        expiring_soon = True if int(expiry_delta.days) < 14 and int(expiry_delta.days) > 0 else False
+        app.logger.debug("Machine:  "+machine["name"]+" expires:  "+str(expiry_local.strftime('%Y'))+" / "+str(expiry_delta.days))
     else:
-        expiry_time = "No expiration date."
+        expiry_time  = "No expiration date."
         expiring_soon = False
-        current_app.logger.debug("Machine: %s has no expiration date", machine.name)
+        app.logger.debug("Machine:  "+machine["name"]+" has no expiration date")
+
 
     # Get the first 10 characters of the PreAuth Key:
-    if machine.pre_auth_key is not None:
-        preauth_key = machine.pre_auth_key.key[0:10]
-    else:
-        preauth_key = "None"
+    if machine["preAuthKey"]:
+        preauth_key = str(machine["preAuthKey"]["key"])[0:10]
+    else: preauth_key = "None"
 
     # Set the status and user badge color:
     text_color = helper.text_color_duration(last_seen_delta)
-    user_color = helper.get_color(int(machine.user.id))
+    user_color = helper.get_color(int(machine["user"]["id"]))
 
     # Generate the various badges:
-    status_badge = (
-        f"<i class='material-icons left tooltipped {text_color}' data-position='top' "
-        f"data-tooltip='Last Seen: {last_seen_print}' id='{machine.id}-status'>"
-        "fiber_manual_record</i>"
-    )
-    user_badge = (
-        f"<span class='badge ipinfo {user_color} white-text hide-on-small-only' "
-        f"id='{machine.id}-ns-badge'>{machine.user.name}</span>"
-    )
-    exit_node_badge = (
-        ""
-        if not exit_route_enabled
-        else (
-            "<span class='badge grey white-text text-lighten-4 tooltipped' "
-            "data-position='left' data-tooltip='This machine has an enabled exit "
-            "route.'>Exit</span>"
-        )
-    )
-    ha_route_badge = (
-        ""
-        if not ha_enabled
-        else (
-            "<span class='badge blue-grey white-text text-lighten-4 tooltipped' "
-            "data-position='left' data-tooltip='This machine has an enabled High "
-            "Availability (Failover) route.'>HA</span>"
-        )
-    )
-    expiration_badge = (
-        ""
-        if not expiring_soon
-        else (
-            "<span class='badge red white-text text-lighten-4 tooltipped' "
-            "data-position='left' data-tooltip='This machine expires soon.'>"
-            "Expiring!</span>"
-        )
-    )
+    status_badge      = "<i class='material-icons left tooltipped " + text_color + "' data-position='top' data-tooltip='Last Seen:  "+last_seen_print+"' id='"+machine["id"]+"-status'>fiber_manual_record</i>"
+    user_badge        = "<span class='badge ipinfo " + user_color + " white-text hide-on-small-only' id='"+machine["id"]+"-ns-badge'>"+machine["user"]["name"]+"</span>"
+    exit_node_badge   = "" if not exit_route_enabled else "<span class='badge grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled exit route.'>Exit</span>"
+    ha_route_badge    = "" if not ha_enabled         else "<span class='badge blue-grey white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine has an enabled High Availabiilty (Failover) route.'>HA</span>"
+    expiration_badge  = "" if not expiring_soon      else "<span class='badge red white-text text-lighten-4 tooltipped' data-position='left' data-tooltip='This machine expires soon.'>Expiring!</span>"
 
-    current_app.logger.info(
-        "Finished thread for machine %s index %i", machine.given_name, idx
-    )
-    return render_template(
-        "machines_card.html",
-        given_name=machine.given_name,
-        machine_id=machine.id,
-        hostname=machine.name,
-        ns_name=machine.user.name,
-        ns_id=machine.user.id,
-        ns_created=machine.user.created_at,
-        last_seen=str(last_seen_print),
-        last_update=str(last_update_print),
-        machine_ips=Markup(machine_ips),
-        advertised_routes=Markup(routes),
-        exit_node_badge=Markup(exit_node_badge),
-        ha_route_badge=Markup(ha_route_badge),
-        status_badge=Markup(status_badge),
-        user_badge=Markup(user_badge),
-        last_update_time=str(last_update_time),
-        last_seen_time=str(last_seen_time),
-        created_time=str(created_time),
-        expiry_time=str(expiry_time),
-        preauth_key=str(preauth_key),
-        expiration_badge=Markup(expiration_badge),
-        machine_tags=Markup(tags),
-        taglist=machine.forced_tags,
-    )
+    machine_content[idx] = (str(render_template(
+        'machines_card.html', 
+        given_name        = machine["givenName"],
+        machine_id        = machine["id"],
+        hostname          = machine["name"],
+        ns_name           = machine["user"]["name"],
+        ns_id             = machine["user"]["id"],
+        ns_created        = machine["user"]["createdAt"],
+        last_seen         = str(last_seen_print),
+        last_update       = str(last_update_print),
+        machine_ips       = Markup(machine_ips),
+        advertised_routes = Markup(routes),
+        exit_node_badge   = Markup(exit_node_badge),
+        ha_route_badge    = Markup(ha_route_badge),
+        status_badge      = Markup(status_badge),
+        user_badge        = Markup(user_badge),
+        last_update_time  = str(last_update_time),
+        last_seen_time    = str(last_seen_time),
+        created_time      = str(created_time),
+        expiry_time       = str(expiry_time),
+        preauth_key       = str(preauth_key),
+        expiration_badge  = Markup(expiration_badge),
+        machine_tags      = Markup(tags),
+        taglist           = machine["forcedTags"]
+    )))
+    app.logger.info("Finished thread for machine "+machine["givenName"]+" index "+str(idx))
 
+def render_machines_cards():
+    app.logger.info("Rendering machine cards")
+    url           = headscale.get_url()
+    api_key       = headscale.get_api_key()
+    machines_list = headscale.get_machines(url, api_key)
 
-async def render_machines_cards(headscale: HeadscaleApi):
-    """Render machine cards."""
-    current_app.logger.info("Rendering machine cards")
+    #########################################
+    # Thread this entire thing.  
+    num_threads = len(machines_list["machines"])
+    iterable = []
+    machine_content = {}
+    failover_pair_prefixes = []
+    for i in range (0, num_threads):
+        app.logger.debug("Appending iterable:  "+str(i))
+        iterable.append(i)
+    # Flask-Executor Method:
 
-    async with headscale.session:
-        # Execute concurrent machine info requests and sort them by machine_id.
-        routes = await headscale.get_routes(schema.GetRoutesRequest())
-        content = await asyncio.gather(
-            *[
-                thread_machine_content(headscale, machine, idx, routes)
-                for idx, machine in enumerate(
-                    (
-                        await headscale.list_machines(schema.ListMachinesRequest(""))
-                    ).machines
-                )
-            ]
-        )
-    return Markup("<ul class='collapsible expandable'>" + "".join(content) + "</ul>")
+    # Get all routes
+    all_routes = headscale.get_routes(url, api_key)
+    # app.logger.debug("All found routes")
+    # app.logger.debug(str(all_routes))
 
+    if LOG_LEVEL == "DEBUG":
+        # DEBUG:  Do in a forloop:
+        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
+    else:
+        app.logger.info("Starting futures")
+        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
+        # Wait for the executor to finish all jobs:
+        wait(futures, return_when=ALL_COMPLETED)
+        app.logger.info("Finished futures")
 
-async def render_users_cards(headscale: HeadscaleApi):
-    """Render users cards."""
-    current_app.logger.info("Rendering Users cards")
+    # Sort the content by machine_id:
+    sorted_machines = {key: val for key, val in sorted(machine_content.items(), key = lambda ele: ele[0])}
 
-    async with headscale.session:
-        content = await asyncio.gather(
-            *[
-                build_user_card(headscale, user)
-                for user in (
-                    await headscale.list_users(schema.ListUsersRequest())
-                ).users
-            ]
-        )
+    content = "<ul class='collapsible expandable'>"
+    # Print the content
 
-    return Markup("<ul class='collapsible expandable'>" + "".join(content) + "</ul>")
+    for index in range(0, num_threads):
+        content = content+str(sorted_machines[index])
 
+    content = content+"</ul>"
 
-async def build_user_card(headscale: HeadscaleApi, user: schema.User):
-    """Build a user card."""
-    # Get all preAuth Keys in the user, only display if one exists:
-    preauth_keys_collection = await build_preauth_key_table(
-        headscale, schema.ListPreAuthKeysRequest(user.name)
-    )
+    return Markup(content)
 
-    # Set the user badge color:
-    user_color = helper.get_color(int(user.id), "text")
+def render_users_cards():
+    app.logger.info("Rendering Users cards")
+    url       = headscale.get_url()
+    api_key   = headscale.get_api_key()
+    user_list = headscale.get_users(url, api_key)
 
-    # Generate the various badges:
-    status_badge = (
-        f"<i class='material-icons left {user_color}' id='{user.id}-status'>"
-        "fiber_manual_record</i>"
-    )
+    content = "<ul class='collapsible expandable'>"
+    for user in user_list["users"]:
+        # Get all preAuth Keys in the user, only display if one exists:
+        preauth_keys_collection = build_preauth_key_table(user["name"])
 
-    return render_template(
-        "users_card.html",
-        status_badge=Markup(status_badge),
-        user_name=user.name,
-        user_id=user.id,
-        preauth_keys_collection=Markup(preauth_keys_collection),
-    )
+        # Set the user badge color:
+        user_color = helper.get_color(int(user["id"]), "text")
 
+        # Generate the various badges:
+        status_badge      = "<i class='material-icons left "+user_color+"' id='"+user["id"]+"-status'>fiber_manual_record</i>"
 
-async def build_preauth_key_table(
-    headscale: HeadscaleApi, request: schema.ListPreAuthKeysRequest
-):  # pylint: disable=too-many-locals
-    """Build PreAuth key table for a user."""
-    current_app.logger.info(
-        "Building the PreAuth key table for User:  %s", request.user
-    )
+        content = content + render_template(
+            'users_card.html', 
+            status_badge            = Markup(status_badge),
+            user_name               = user["name"],
+            user_id                 = user["id"],
+            preauth_keys_collection = Markup(preauth_keys_collection)
+        ) 
+    content = content+"</ul>"
+    return Markup(content)
 
-    preauth_keys = await headscale.list_pre_auth_keys(request)
-    preauth_keys_collection = f"""
-        <li class="collection-item avatar">
+def build_preauth_key_table(user_name):
+    app.logger.info("Building the PreAuth key table for User:  %s", str(user_name))
+    url            = headscale.get_url()
+    api_key        = headscale.get_api_key()
+
+    preauth_keys = headscale.get_preauth_keys(url, api_key, user_name)
+    preauth_keys_collection = """<li class="collection-item avatar">
             <span
-                class='badge grey lighten-2 btn-small'
+                class='badge grey lighten-2 btn-small' 
                 onclick='toggle_expired()'
             >Toggle Expired</span>
-            <span
-                href="#card_modal"
-                class='badge grey lighten-2 btn-small modal-trigger'
-                onclick="load_modal_add_preauth_key('{request.user}')"
+            <span 
+                href="#card_modal" 
+                class='badge grey lighten-2 btn-small modal-trigger' 
+                onclick="load_modal_add_preauth_key('"""+user_name+"""')"
             >Add PreAuth Key</span>
             <i class="material-icons circle">vpn_key</i>
             <span class="title">PreAuth Keys</span>
-        """
-    if len(preauth_keys.pre_auth_keys) == 0:
-        preauth_keys_collection += "<p>No keys defined for this user</p>"
-    else:
-        preauth_keys_collection += f"""
-            <table class="responsive-table striped"
-            id='{request.user}-preauthkey-table'>
-                <thead><tr>
-                    <td>ID</td>
-                    <td class='tooltipped' data-tooltip='Click an Auth Key Prefix to
-                        copy it to the clipboard'>Key Prefix</td>
-                    <td><center>Reusable</center></td>
-                    <td><center>Used</center></td>
-                    <td><center>Ephemeral</center></td>
-                    <td><center>Usable</center></td>
-                    <td><center>Actions</center></td>
-                </tr></thead>
             """
-    for key in preauth_keys.pre_auth_keys:
+    if len(preauth_keys["preAuthKeys"]) == 0: preauth_keys_collection += "<p>No keys defined for this user</p>"
+    if len(preauth_keys["preAuthKeys"]) > 0:
+        preauth_keys_collection += """
+                <table class="responsive-table striped" id='"""+user_name+"""-preauthkey-table'>
+                    <thead>
+                        <tr>
+                            <td>ID</td>
+                            <td class='tooltipped' data-tooltip='Click an Auth Key Prefix to copy it to the clipboard'>Key Prefix</td>
+                            <td><center>Reusable</center></td>
+                            <td><center>Used</center></td>
+                            <td><center>Ephemeral</center></td>
+                            <td><center>Usable</center></td>
+                            <td><center>Actions</center></td>
+                        </tr>
+                    </thead>
+                """
+    for key in preauth_keys["preAuthKeys"]:
         # Get the key expiration date and compare it to now to check if it's expired:
         # Set the current timezone and local time
-        timezone = headscale.app_config.timezone
-        local_time = datetime.datetime.now(timezone)
-        key_expired = key.expiration < local_time
-        expiration_time = (
-            key.expiration.strftime("%A %m/%d/%Y, %H:%M:%S") + f" {timezone}"
-        )
+        timezone         = pytz.timezone(os.environ["TZ"] if os.environ["TZ"] else "UTC")
+        local_time       = timezone.localize(datetime.now())
+        expiration_parse = parser.parse(key["expiration"])
+        key_expired = True if expiration_parse < local_time else False
+        expiration_time  = str(expiration_parse.strftime('%A %m/%d/%Y, %H:%M:%S'))+" "+str(timezone)
 
-        key_usable = (key.reusable and not key_expired) or (
-            not key.reusable and not key.used and not key_expired
-        )
-
+        key_usable = False
+        if key["reusable"] and not key_expired: key_usable = True
+        if not key["reusable"] and not key["used"] and not key_expired: key_usable = True
+        
         # Class for the javascript function to look for to toggle the hide function
         hide_expired = "expired-row" if not key_usable else ""
 
-        btn_reusable = (
-            "<i class='pulse material-icons tiny blue-text text-darken-1'>"
-            "::"
-            "fiber_manual_record</i>"
-            if key.reusable
-            else ""
-        )
-        btn_ephemeral = (
-            "<i class='pulse material-icons tiny red-text text-darken-1'>"
-            "fiber_manual_record</i>"
-            if key.ephemeral
-            else ""
-        )
-        btn_used = (
-            "<i class='pulse material-icons tiny yellow-text text-darken-1'>"
-            "fiber_manual_record</i>"
-            if key.used
-            else ""
-        )
-        btn_usable = (
-            "<i class='pulse material-icons tiny green-text text-darken-1'>"
-            "fiber_manual_record</i>"
-            if key_usable
-            else ""
-        )
+        btn_reusable  = "<i class='pulse material-icons tiny blue-text text-darken-1'>fiber_manual_record</i>"   if key["reusable"]  else ""
+        btn_ephemeral = "<i class='pulse material-icons tiny red-text text-darken-1'>fiber_manual_record</i>"    if key["ephemeral"] else ""
+        btn_used      = "<i class='pulse material-icons tiny yellow-text text-darken-1'>fiber_manual_record</i>" if key["used"]      else ""
+        btn_usable    = "<i class='pulse material-icons tiny green-text text-darken-1'>fiber_manual_record</i>"  if key_usable       else ""
 
         # Other buttons:
-        btn_delete = (
-            "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' "
-            "class='btn-small modal-trigger badge tooltipped white-text red' onclick='"
-            f'load_modal_expire_preauth_key("{request.user}", "{key.key}")\'>'
-            "Expire</span>"
-            if key_usable
-            else ""
-        )
-        tooltip_data = f"Expiration: {expiration_time}"
+        btn_delete    = "<span href='#card_modal' data-tooltip='Expire this PreAuth Key' class='btn-small modal-trigger badge tooltipped white-text red' onclick='load_modal_expire_preauth_key(\""+user_name+"\", \""+str(key["key"])+"\")'>Expire</span>" if key_usable else ""
+        tooltip_data  = "Expiration:  "+expiration_time
 
         # TR ID will look like "1-albert-tr"
-        preauth_keys_collection += f"""
-            <tr id='{key.id}-{request.user}-tr' class='{hide_expired}'>
-                <td>{key.id}</td>
-                <td onclick=copy_preauth_key('{key.key}') class='tooltipped'
-                    data-tooltip='{tooltip_data}'>{key.key[0:10]}</td>
-                <td><center>{btn_reusable}</center></td>
-                <td><center>{btn_used}</center></td>
-                <td><center>{btn_ephemeral}</center></td>
-                <td><center>{btn_usable}</center></td>
-                <td><center>{btn_delete}</center></td>
+        preauth_keys_collection = preauth_keys_collection+"""
+            <tr id='"""+key["id"]+"""-"""+user_name+"""-tr' class='"""+hide_expired+"""'>
+                <td>"""+str(key["id"])+"""</td>
+                <td  onclick=copy_preauth_key('"""+str(key["key"])+"""') class='tooltipped' data-tooltip='"""+tooltip_data+"""'>"""+str(key["key"])[0:10]+"""</td>
+                <td><center>"""+btn_reusable+"""</center></td>
+                <td><center>"""+btn_used+"""</center></td>
+                <td><center>"""+btn_ephemeral+"""</center></td>
+                <td><center>"""+btn_usable+"""</center></td>
+                <td><center>"""+btn_delete+"""</center></td>
             </tr>
-            """
+        """
 
-    return preauth_keys_collection + "</table></li>"
+    preauth_keys_collection = preauth_keys_collection+"""</table>
+        </li>
+        """
+    return preauth_keys_collection
 
-
-def oidc_nav_dropdown(user_name: str, email_address: str, name: str) -> Markup:
-    """Render desktop navigation for OIDC."""
-    current_app.logger.debug("OIDC is enabled. Building the OIDC nav dropdown")
-    html_payload = f"""
+def oidc_nav_dropdown(user_name, email_address, name):
+    app.logger.info("OIDC is enabled.  Building the OIDC nav dropdown")
+    html_payload = """
         <!-- OIDC Dropdown Structure -->
         <ul id="dropdown1" class="dropdown-content dropdown-oidc">
             <ul class="collection dropdown-oidc-collection">
                 <li class="collection-item dropdown-oidc-avatar avatar">
                     <i class="material-icons circle">email</i>
                     <span class="dropdown-oidc-title title">Email</span>
-                    <p>{email_address}</p>
+                    <p>"""+email_address+"""</p>
                 </li>
                 <li class="collection-item dropdown-oidc-avatar avatar">
                     <i class="material-icons circle">person_outline</i>
                     <span class="dropdown-oidc-title title">Username</span>
-                    <p>{user_name}</p>
+                    <p>"""+user_name+"""</p>
                 </li>
             </ul>
         <li class="divider"></li>
-            <li><a href="logout">
-                <i class="material-icons left">exit_to_app</i> Logout</a></li>
+            <li><a href="logout"><i class="material-icons left">exit_to_app</i> Logout</a></li>
         </ul>
         <li>
             <a class="dropdown-trigger" href="#!" data-target="dropdown1">
-                {name} <i class="material-icons right">account_circle</i>
+                """+name+""" <i class="material-icons right">account_circle</i>
             </a>
         </li>
-        """
+    """
     return Markup(html_payload)
 
-
-def oidc_nav_mobile():
-    """Render mobile navigation for OIDC."""
-    return Markup(
-        '<li><hr><a href="logout"><i class="material-icons left">'
-        "exit_to_app</i>Logout</a></li>"
-    )
-
-
-def render_defaults(
-    config: Config, oidc_handler: OpenIDConnect | None
-) -> dict[str, Markup | str]:
-    """Render the default elements.
-
-    TODO: Think about caching the results.
+def oidc_nav_mobile(user_name, email_address, name):
+    html_payload = """
+         <li><hr><a href="logout"><i class="material-icons left">exit_to_app</i>Logout</a></li>
     """
-    colors = {
-        "color_nav": config.color_nav,
-        "color_btn": config.color_btn,
-    }
-
-    if oidc_handler is None:
-        return colors
-
-    # If OIDC is enabled, display the buttons:
-    email_address: str = oidc_handler.user_getfield("email")  # type: ignore
-    assert isinstance(email_address, str)
-    user_name: str = oidc_handler.user_getfield("preferred_username")  # type: ignore
-    assert isinstance(user_name, str)
-    name: str = oidc_handler.user_getfield("name")  # type: ignore
-    assert isinstance(name, str)
-
-    return {
-        "oidc_nav_dropdown": oidc_nav_dropdown(user_name, email_address, name),
-        "oidc_nav_mobile": oidc_nav_mobile(),
-        **colors,
-    }
-
+    return Markup(html_payload)
 
 def render_search():
-    """Render search bar."""
-    return Markup(
-        """
-        <li role="menu-item" class="tooltipped" data-position="bottom"
-            data-tooltip="Search" onclick="show_search()">
-                <a href="#"><i class="material-icons">search</i></a>
-        </li>
-        """
-    )
+    html_payload = """
+    <li role="menu-item" class="tooltipped" data-position="bottom" data-tooltip="Search" onclick="show_search()">
+        <a href="#"><i class="material-icons">search</i></a>
+    </li>
+    """
+    return Markup(html_payload)
 
-
-async def render_routes(
-    headscale: HeadscaleApi,
-):  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
-    """Render routes page."""
-    current_app.logger.info("Rendering Routes page")
-    all_routes = await headscale.get_routes(schema.GetRoutesRequest())
+def render_routes():
+    app.logger.info("Rendering Routes page")
+    url           = headscale.get_url()
+    api_key       = headscale.get_api_key()
+    all_routes    = headscale.get_routes(url, api_key)
 
     # If there are no routes, just exit:
-    if len(all_routes.routes) == 0:
-        return Markup("<br><br><br><center>There are no routes to display!</center>")
+    if len(all_routes) == 0: return Markup("<br><br><br><center>There are no routes to display!</center>")
     # Get a list of all Route ID's to iterate through:
-    all_routes_id_list: list[int] = []
-    for route in all_routes.routes:
-        all_routes_id_list.append(route.id)
-        if route.machine.name:
-            current_app.logger.info(
-                "Found route %i / machine: %s", route.id, route.machine.name
-            )
-        else:
-            current_app.logger.info("Route id %i has no machine associated.", route.id)
+    all_routes_id_list = []
+    for route in all_routes["routes"]:
+        all_routes_id_list.append(route["id"])
+        if route["machine"]["name"]:
+            app.logger.info("Found route %s / machine: %s", str(route["id"]), route["machine"]["name"])
+        else: 
+            app.logger.info("Route id %s has no machine associated.", str(route["id"]))
 
-    route_content = ""
+
+    route_content    = ""
     failover_content = ""
-    exit_content = ""
+    exit_content     = ""
 
-    route_title = '<span class="card-title">Routes</span>'
-    failover_title = '<span class="card-title">Failover Routes</span>'
-    exit_title = '<span class="card-title">Exit Routes</span>'
+    route_title='<span class="card-title">Routes</span>'
+    failover_title='<span class="card-title">Failover Routes</span>'
+    exit_title='<span class="card-title">Exit Routes</span>'
 
     markup_pre = """
     <div class="row">
@@ -915,7 +704,7 @@ async def render_routes(
             <div class="card">
                 <div class="card-content">
     """
-    markup_post = """
+    markup_post = """ 
                 </div>
             </div>
         </div>
@@ -925,193 +714,146 @@ async def render_routes(
 
     ##############################################################################################
     # Step 1:  Get all non-exit and non-failover routes:
-    route_content = (
-        markup_pre
-        + route_title
-        + """
-            <p><table>
-            <thead>
-                <tr>
-                    <th>ID       </th>
-                    <th>Machine  </th>
-                    <th>Route    </th>
-                    <th width="60px">Enabled</th>
-                </tr>
-            </thead>
-            <tbody>
-        """
-    )
-    for route in all_routes.routes:
+    route_content = markup_pre+route_title
+    route_content += """<p><table>
+    <thead>
+        <tr>
+            <th>ID       </th>
+            <th>Machine  </th>
+            <th>Route    </th>
+            <th width="60px">Enabled</th>
+        </tr>
+    </thead>
+    <tbody>
+    """
+    for route in all_routes["routes"]:
         # Get relevant info:
-        machine = route.machine.given_name
-        prefix = route.prefix
-        is_enabled = route.enabled
-        is_primary = route.is_primary
+        route_id    = route["id"]
+        machine     = route["machine"]["givenName"]
+        prefix      = route["prefix"]
+        is_enabled  = route["enabled"]
+        is_primary  = route["isPrimary"]
         is_failover = False
-        is_exit = False
+        is_exit     = False 
 
-        enabled = (
-            f"<i id='{route.id}' onclick='toggle_route({route.id}, \"True\", "
-            "\"routes\")' class='material-icons green-text text-lighten-2 tooltipped' "
-            "data-tooltip='Click to disable'>fiber_manual_record</i>"
-        )
-        disabled = (
-            f"<i id='{route.id}' onclick='toggle_route({route.id}, \"False\", "
-            "\"routes\")' class='material-icons red-text text-lighten-2 tooltipped' "
-            "data-tooltip='Click to enable' >fiber_manual_record</i>"
-        )
+        enabled  = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"True\", \"routes\")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+        disabled = "<i id='"+route["id"]+"' onclick='toggle_route("+route["id"]+", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
 
         # Set the displays:
-        enabled_display = disabled
+        enabled_display  = disabled
 
-        if is_enabled:
-            enabled_display = enabled
+        if is_enabled:  enabled_display = enabled
         # Check if a prefix is an Exit route:
-        if prefix in ("0.0.0.0/0", "::/0"):
-            is_exit = True
+        if prefix == "0.0.0.0/0" or prefix == "::/0":  is_exit = True
         # Check if a prefix is part of a failover pair:
-        for route_check in all_routes.routes:
-            if (
-                not is_exit
-                and route.prefix == route_check.prefix
-                and route.id != route_check.id
-            ):
-                is_failover = True
+        for route_check in all_routes["routes"]:
+            if not is_exit:
+                if route["prefix"] == route_check["prefix"]:
+                    if route["id"] != route_check["id"]:
+                        is_failover = True
 
         if not is_exit and not is_failover and machine != "":
-            # Build a simple table for all non-exit routes:
-            route_content += f"""<tr>
-                <td>{route.id}</td>
-                <td>{machine}</td>
-                <td>{prefix}</td>
-                <td><center>{enabled_display}</center></td>
-            </tr>"""
-    route_content += "</tbody></table></p>" + markup_post
+        # Build a simple table for all non-exit routes:
+            route_content += """
+            <tr>
+                <td>"""+str(route_id         )+"""</td>
+                <td>"""+str(machine          )+"""</td>
+                <td>"""+str(prefix           )+"""</td>
+                <td><center>"""+str(enabled_display  )+"""</center></td>
+            </tr>
+            """
+    route_content += "</tbody></table></p>"+markup_post
 
     ##############################################################################################
     # Step 2:  Get all failover routes only.  Add a separate table per failover prefix
+    failover_route_prefix = []
+    failover_available = False
 
-    # Get a set of all prefixes for all routes:
-    # - that  aren't exit routes
-    # - the current route matches any prefix of any other route
-    # - the route ID's are different
-    failover_route_prefix = set(
-        route.prefix
-        for route_check in all_routes.routes
-        for route in all_routes.routes
-        if (
-            route.prefix not in ("0.0.0.0/0", "::/0")
-            and route.prefix == route.prefix
-            and route.id != route_check.id
-        )
-    )
+    for route in all_routes["routes"]:
+        # Get a list of all prefixes for all routes...
+        for route_check in all_routes["routes"]:
+            # ... that  aren't exit routes... 
+            if route["prefix"] !="0.0.0.0/0" and route["prefix"] != "::/0":
+                # if the curren route matches any prefix of any other route...
+                if route["prefix"] == route_check["prefix"]:
+                    # and the route ID's are different ...
+                    if route["id"] != route_check["id"]:
+                        # ... and the prefix is not already in the list...
+                        if route["prefix"] not in failover_route_prefix:
+                            # append the prefix to the failover_route_prefix list
+                            failover_route_prefix.append(route["prefix"])
+                            failover_available = True
 
-    if len(failover_route_prefix) > 0:
+    if failover_available:
         # Set up the display code:
-        enabled = (
-            "<i class='material-icons green-text text-lighten-2'>"
-            "fiber_manual_record</i>"
-        )
-        disabled = (
-            "<i class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
-        )
+        enabled  = "<i class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+        disabled = "<i class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
 
-        failover_content = markup_pre + failover_title
+        failover_content = markup_pre+failover_title
         # Build the display for failover routes:
         for route_prefix in failover_route_prefix:
             # Get all route ID's associated with the route_prefix:
-            route_id_list = [
-                route.id for route in all_routes.routes if route.prefix == route_prefix
-            ]
+            route_id_list = []
+            for route in all_routes["routes"]:
+                if route["prefix"] == route_prefix:
+                    route_id_list.append(route["id"])
 
             # Set up the display code:
-            failover_enabled = (
-                f"<i id='{route_prefix}' class='material-icons small left green-text "
-                "text-lighten-2'>fiber_manual_record</i>"
-            )
-            failover_disabled = (
-                f"<i id='{route_prefix}' class='material-icons small left red-text "
-                "text-lighten-2'>fiber_manual_record</i>"
-            )
+            failover_enabled  = "<i id='"+str(route_prefix)+"' class='material-icons small left green-text text-lighten-2'>fiber_manual_record</i>"
+            failover_disabled = "<i id='"+str(route_prefix)+"' class='material-icons small left red-text text-lighten-2'>fiber_manual_record</i>"
 
             failover_display = failover_disabled
             for route_id in route_id_list:
                 # Get the routes index:
                 current_route_index = all_routes_id_list.index(route_id)
-                if all_routes.routes[current_route_index].enabled:
-                    failover_display = failover_enabled
+                if all_routes["routes"][current_route_index]["enabled"]: failover_display = failover_enabled
+
 
             # Get all route_id's associated with the route prefix:
-            failover_content += f"""<p>
-                <h5>{failover_display}</h5><h5>{route_prefix}</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Machine</th>
-                            <th width="60px">Enabled</th>
-                            <th width="60px">Primary</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                """
+            failover_content += """<p>
+            <h5>"""+failover_display+"""</h5><h5>"""+str(route_prefix)+"""</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Machine</th>
+                        <th width="60px">Enabled</th>
+                        <th width="60px">Primary</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
 
             # Build the display:
             for route_id in route_id_list:
                 idx = all_routes_id_list.index(route_id)
 
-                machine = all_routes.routes[idx].machine.given_name
-                machine_id = all_routes.routes[idx].machine.id
-                is_primary = all_routes.routes[idx].is_primary
-                is_enabled = all_routes.routes[idx].enabled
+                machine    = all_routes["routes"][idx]["machine"]["givenName"]
+                machine_id = all_routes["routes"][idx]["machine"]["id"]
+                is_primary = all_routes["routes"][idx]["isPrimary"]
+                is_enabled = all_routes["routes"][idx]["enabled"]
 
-                payload = route_id_list.copy()
-
-                current_app.logger.debug(
-                    "[%i] Machine:  [%i]  %s : %r / %r",
-                    route_id,
-                    machine_id,
-                    machine,
-                    is_enabled,
-                    is_primary,
-                )
-                current_app.logger.debug(str(all_routes.routes[idx]))
+                payload = []
+                for item in route_id_list: payload.append(int(item))
+                 
+                app.logger.debug("[%s] Machine:  [%s]  %s : %s / %s", str(route_id), str(machine_id), str(machine), str(is_enabled), str(is_primary))
+                app.logger.debug(str(all_routes["routes"][idx]))
 
                 # Set up the display code:
-                enabled_display_enabled = (
-                    f"<i id='{route_id}' onclick='toggle_failover_route_routespage("
-                    f'{route_id}, "True", "{route_prefix}", {payload})\'  '
-                    "class='material-icons green-text text-lighten-2 tooltipped' "
-                    "data-tooltip='Click to disable'>fiber_manual_record</i>"
-                )
-                enabled_display_disabled = (
-                    f"<i id='{route_id}' onclick='toggle_failover_route_routespage("
-                    f'{route_id}, "False", "{route_prefix}", {payload})\' '
-                    "class='material-icons red-text text-lighten-2 tooltipped' "
-                    "data-tooltip='Click to enable'>fiber_manual_record</i>"
-                )
-                primary_display_enabled = (
-                    f"<i id='{route_id}-primary' class='material-icons "
-                    "green-text text-lighten-2'>fiber_manual_record</i>"
-                )
-                primary_display_disabled = (
-                    f"<i id='{route_id}-primary' class='material-icons "
-                    "red-text text-lighten-2'>fiber_manual_record</i>"
-                )
-
+                enabled_display_enabled  = "<i id='"+str(route_id)+"' onclick='toggle_failover_route_routespage("+str(route_id)+", \"True\", \""+str(route_prefix)+"\", "+str(payload)+")'  class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+                enabled_display_disabled = "<i id='"+str(route_id)+"' onclick='toggle_failover_route_routespage("+str(route_id)+", \"False\", \""+str(route_prefix)+"\", "+str(payload)+")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable'>fiber_manual_record</i>"
+                primary_display_enabled  = "<i id='"+str(route_id)+"-primary' class='material-icons green-text text-lighten-2'>fiber_manual_record</i>"
+                primary_display_disabled = "<i id='"+str(route_id)+"-primary' class='material-icons red-text text-lighten-2'>fiber_manual_record</i>"
+                
                 # Set displays:
-                enabled_display = (
-                    enabled_display_enabled if is_enabled else enabled_display_disabled
-                )
-                primary_display = (
-                    primary_display_enabled if is_primary else primary_display_disabled
-                )
+                enabled_display = enabled_display_enabled if is_enabled else enabled_display_disabled
+                primary_display = primary_display_enabled if is_primary else primary_display_disabled
 
                 # Build a simple table for all non-exit routes:
-                failover_content += f"""
+                failover_content += """
                     <tr>
-                        <td>{machine}</td>
-                        <td><center>{enabled_display}</center></td>
-                        <td><center>{primary_display}</center></td>
+                        <td>"""+str(machine)+"""</td>
+                        <td><center>"""+str(enabled_display)+"""</center></td>
+                        <td><center>"""+str(primary_display)+"""</center></td>
                     </tr>
                     """
             failover_content += "</tbody></table></p>"
@@ -1119,72 +861,55 @@ async def render_routes(
 
     ##############################################################################################
     # Step 3:  Get exit nodes only:
-    # Get a set of nodes with exit routes:
-    exit_node_list = set(
-        route.machine.given_name
-        for route in all_routes.routes
-        if route.prefix in ("0.0.0.0/0", "::/0")
-    )
+    exit_node_list = []
+    # Get a list of nodes with exit routes:
+    for route in all_routes["routes"]:
+        # For every exit route found, store the machine name in an array:
+        if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+            if route["machine"]["givenName"] not in exit_node_list: 
+                exit_node_list.append(route["machine"]["givenName"])
 
     # Exit node display building:
     # Display by machine, not by route
-    exit_content = (
-        markup_pre
-        + exit_title
-        + """
-        <p><table>
-            <thead>
-                <tr>
-                    <th>Machine</th>
-                    <th>Enabled</th>
-                </tr>
-            </thead>
-        <tbody>
-        """
-    )
-    # Get exit route ID's for each node in the list:
+    exit_content = markup_pre+exit_title
+    exit_content += """<p><table>
+    <thead>
+        <tr>
+            <th>Machine</th>
+            <th>Enabled</th>
+        </tr>
+    </thead>
+    <tbody>
+    """
+    # Get exit route ID's for each node in the list: 
     for node in exit_node_list:
-        node_exit_route_ids: list[int] = []
+        node_exit_route_ids = []
         exit_enabled = False
         exit_available = False
         machine_id = 0
-        for route in all_routes.routes:
-            if (
-                route.prefix in ("0.0.0.0/0", "::/0")
-                and route.machine.given_name == node
-            ):
-                node_exit_route_ids.append(route.id)
-                machine_id = route.machine.id
-                exit_available = True
-                if route.enabled:
-                    exit_enabled = True
+        for route in all_routes["routes"]:
+            if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
+                if route["machine"]["givenName"] == node:
+                    node_exit_route_ids.append(route["id"])
+                    machine_id = route["machine"]["id"]
+                    exit_available = True
+                    if route["enabled"]:
+                        exit_enabled = True
 
         if exit_available:
             # Set up the display code:
-            enabled = (
-                f"<i id='{machine_id}-exit' onclick='toggle_exit("
-                f"{node_exit_route_ids[0]}, {node_exit_route_ids[1]}, "
-                '"{machine_id}-exit", "True",  "routes")\' '
-                "class='material-icons green-text text-lighten-2 tooltipped' "
-                "data-tooltip='Click to disable'>fiber_manual_record</i>"
-            )
-            disabled = (
-                f"<i id='{machine_id}-exit' onclick='toggle_exit("
-                f"{node_exit_route_ids[0]}, {node_exit_route_ids[1]}, "
-                '"{machine_id}-exit", "False", "routes")\' '
-                "class='material-icons red-text text-lighten-2 tooltipped' "
-                "data-tooltip='Click to enable' >fiber_manual_record</i>"
-            )
+            enabled  = "<i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"True\",  \"routes\")' class='material-icons green-text text-lighten-2 tooltipped' data-tooltip='Click to disable'>fiber_manual_record</i>"
+            disabled = "<i id='"+machine_id+"-exit' onclick='toggle_exit("+node_exit_route_ids[0]+", "+node_exit_route_ids[1]+", \""+machine_id+"-exit\", \"False\", \"routes\")' class='material-icons red-text text-lighten-2 tooltipped' data-tooltip='Click to enable' >fiber_manual_record</i>"
             # Set the displays:
             enabled_display = enabled if exit_enabled else disabled
 
-            exit_content += f"""
-                <tr>
-                    <td>{node}</td>
-                    <td width="60px"><center>{enabled_display}</center></td>
-                </tr>
-                """
-    exit_content += "</tbody></table></p>" + markup_post
+            exit_content += """
+            <tr>
+                <td>"""+str(node)+"""</td>
+                <td width="60px"><center>"""+str(enabled_display)+"""</center></td>
+            </tr>
+            """
+    exit_content += "</tbody></table></p>"+markup_post
 
     content = route_content + failover_content + exit_content
     return Markup(content)

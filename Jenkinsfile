@@ -3,10 +3,11 @@ pipeline {
         label 'linux-x64'
     }
     environment {
-        APP_VERSION    = 'v0.7.0'
+        APP_VERSION    = 'v0.6.1'
         HS_VERSION     = "v0.21.0" // Version of Headscale this is compatible with
         BUILD_DATE     = ''
         BUILDER_NAME   = "multiarch-${env.BUILD_TAG}"
+
 
         DOCKERHUB_CRED = credentials('dockerhub-ifargle-pat')
 
@@ -61,7 +62,7 @@ pipeline {
                                 --label \"GIT_COMMIT=${env.GIT_COMMIT}\" \
                                 --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
                                 --push
-                        """
+                        """ 
                     } else { // If I'm just testing, I don't need to build for ARM
                         sh """
                             docker buildx build . \
@@ -97,10 +98,10 @@ pipeline {
                     }
                     else {
                         sh """
-                            docker pull git.sysctl.io/albert/headscale-webui:testing
-                            docker pull ghcr.io/ifargle/headscale-webui:testing
-                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME}
-                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME}
+                            docker pull git.sysctl.io/albert/headscale-webui:testing 
+                            docker pull ghcr.io/ifargle/headscale-webui:testing 
+                            docker pull git.sysctl.io/albert/headscale-webui:${env.BRANCH_NAME} 
+                            docker pull ghcr.io/ifargle/headscale-webui:${env.BRANCH_NAME} 
                         """
                     }
                 }
