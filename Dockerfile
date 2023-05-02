@@ -74,10 +74,11 @@ ENV HS_VERSION=$HS_VERSION_ARG
 VOLUME /etc/headscale
 VOLUME /data
 
+RUN mkdir /data
 RUN chown 1000:1000 /data 
 
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Temporarily reduce to 1 worker
+# Temporarily reduce to 1 workerd
 CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app
