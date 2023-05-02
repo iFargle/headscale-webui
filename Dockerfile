@@ -74,6 +74,8 @@ ENV HS_VERSION=$HS_VERSION_ARG
 VOLUME /etc/headscale
 VOLUME /data
 
+RUN chown 1000:1000 /data 
+
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
 
