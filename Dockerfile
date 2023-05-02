@@ -71,11 +71,11 @@ ENV APP_VERSION=$APP_VERSION_ARG
 ENV BUILD_DATE=$BUILD_DATE_ARG
 ENV HS_VERSION=$HS_VERSION_ARG
 
-VOLUME /etc/headscale
-VOLUME /data
-
 RUN mkdir /data
 RUN chown 1000:1000 /data 
+
+VOLUME /etc/headscale
+VOLUME /data
 
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
