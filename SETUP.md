@@ -26,7 +26,7 @@ poetry install --only main
 3. Run server
 
 ```bash
-poetry run gunicorn -b 0.0.0.0:5000 server:app
+poetry run gunicorn -b 0.0.0.0:5000 server:headscale_webui
 ```
 
 That's it. Cheers.

@@ -32,6 +32,12 @@ class OidcAuthConfig(BaseSettings):
     Used only if "AUTH_TYPE" environment variable is set to "oidc".
     """
 
+    class Config:
+        """Enable dotenv support."""
+
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
     auth_url: str = Field(
         ...,
         env="OIDC_AUTH_URL",
@@ -60,6 +66,12 @@ class BasicAuthConfig(BaseSettings):
 
     Used only if "AUTH_TYPE" environment variable is set to "basic".
     """
+
+    class Config:
+        """Enable dotenv support."""
+
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
     username: str = Field(
         "headscale", env="BASIC_AUTH_USER", description="Username for basic auth."
@@ -278,6 +290,12 @@ class Config(BaseSettings):
 
     `env` arg means what is the environment variable called.
     """
+
+    class Config:
+        """Enable dotenv support."""
+
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
     color: _LowerConstr = Field(
         "red",
