@@ -7,7 +7,9 @@ from flask                         import Flask, escape, Markup, redirect, rende
 from dateutil                      import parser
 from flask_executor                import Executor
 from werkzeug.middleware.proxy_fix import ProxyFix
+from dotenv                        import load_dotenv
 
+load_dotenv()
 # Global vars
 # Colors:  https://materializecss.com/color.html
 COLOR       = os.environ["COLOR"].replace('"', '').lower()

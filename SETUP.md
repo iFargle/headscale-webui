@@ -5,11 +5,32 @@
 * Containers are published to [GHCR](https://github.com/users/iFargle/packages/container/package/headscale-webui) and [Docker Hub](https://hub.docker.com/r/ifargle/headscale-webui)
 
 # Contents
+  * [Bare Metal](#bare-metal)
   * [Docker Compose](#docker-compose)
   * [Reverse Proxies](#reverse-proxies)
   * [Authentication](#authentication)
 
 ---
+# Bare Metal
+
+1. Install dependencies:
+
+```bash
+# Debian/Ubuntu
+apt install gcc python3-poetry --yes
+poetry install --only main
+```
+
+2. Configurations: rename `.env.sample` -> `.env` and edit `.env` as per your requirements.
+
+3. Run server
+
+```bash
+poetry run gunicorn -b 0.0.0.0:5000 server:app
+```
+
+That's it. Cheers.
+
 # Docker Compose
 ## Environment Settings
   * `TZ` - Set this to your current timezone.  Example:  `Asia/Tokyo`
@@ -81,7 +102,7 @@ https://[DOMAIN] {
         reverse_proxy * [HS_SERVER]
 }
 ```
-* Example:  
+* Example:
 ```
 https://example.com {
         reverse_proxy /admin* http://headscale-webui:5000
@@ -90,7 +111,7 @@ https://example.com {
 }
 ```
 
---- 
+---
 # Authentication
 *If your OIDC provider isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on.*
 

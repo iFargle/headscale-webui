@@ -5,7 +5,9 @@ from cryptography.fernet import Fernet
 from datetime            import timedelta, date
 from dateutil            import parser
 from flask               import Flask
+from dotenv              import load_dotenv
 
+load_dotenv()
 LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
 # Initiate the Flask application and logging:
 app = Flask(__name__, static_url_path="/static")
