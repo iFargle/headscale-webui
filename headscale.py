@@ -9,6 +9,7 @@ from dotenv              import load_dotenv
 
 load_dotenv()
 LOG_LEVEL = os.environ["LOG_LEVEL"].replace('"', '').upper()
+DATA_DIRECTORY = os.environ["DATA_DIRECTORY"].replace('"', '') if os.environ["DATA_DIRECTORY"] else "/data"
 # Initiate the Flask application and logging:
 app = Flask(__name__, static_url_path="/static")
 match LOG_LEVEL:
@@ -41,7 +42,7 @@ def set_api_key(api_key):
     # User-set encryption key
     encryption_key = os.environ['KEY']                      
     # Key file on the filesystem for persistent storage
-    key_file       = open("/data/key.txt", "wb+")
+    key_file       = open(os.path.join(DATA_DIRECTORY, "key.txt"), "wb+")
     # Preparing the Fernet class with the key
     fernet         = Fernet(encryption_key)                 
     # Encrypting the key
@@ -50,11 +51,11 @@ def set_api_key(api_key):
     return True if key_file.write(encrypted_key) else False 
 
 def get_api_key():
-    if not os.path.exists("/data/key.txt"): return False
+    if not os.path.exists(os.path.join(DATA_DIRECTORY, "key.txt")): return False
     # User-set encryption key
     encryption_key = os.environ['KEY']                      
     # Key file on the filesystem for persistent storage
-    key_file       = open("/data/key.txt", "rb+")           
+    key_file       = open(os.path.join(DATA_DIRECTORY, "key.txt"), "rb+")           
     # The encrypted key read from the file
     enc_api_key    = key_file.read()                        
     if enc_api_key == b'': return "NULL"
