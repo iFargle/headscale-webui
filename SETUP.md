@@ -5,17 +5,39 @@
 * Containers are published to [GHCR](https://github.com/users/iFargle/packages/container/package/headscale-webui) and [Docker Hub](https://hub.docker.com/r/ifargle/headscale-webui)
 
 # Contents
+  * [Bare Metal](#bare-metal)
   * [Docker Compose](#docker-compose)
   * [Reverse Proxies](#reverse-proxies)
   * [Authentication](#authentication)
 
 ---
+# Bare Metal
+
+1. Install dependencies:
+
+```bash
+# Debian/Ubuntu
+apt install gcc python3-poetry --yes
+poetry install --only main
+```
+
+2. Configurations: rename `.env.sample` -> `.env` and edit `.env` as per your requirements.
+
+3. Run server
+
+```bash
+poetry run gunicorn -b 0.0.0.0:5000 server:app
+```
+
+That's it. Cheers.
+
 # Docker Compose
 ## Environment Settings
   * `TZ` - Set this to your current timezone.  Example:  `Asia/Tokyo`
   * `COLOR` Set this to your preferred color scheme.  See the [MaterializeCSS docs](https://materializecss.github.io/materialize/color.html#palette) for examples.  Only set the "base" color -- ie, instead of `blue-gray darken-1`, just use `blue-gray`.
   * `HS_SERVER` is the URL for your Headscale control server.
   * `SCRIPT_NAME` is your "Base Path" for hosting.  For example, if you want to host on http://localhost/admin, set this to `/admin`, otherwise remove this variable entirely.
+  * `DATA_DIRECTORY` is your "Data Path". This is there the application will create and store data. Only applicable for bare metal installations.
   * `KEY` is your encryption key.  Set this to a random value generated from `openssl rand -base64 32`
   * `AUTH_TYPE` can be set to `Basic` or `OIDC`.  See the [Authentication](#Authentication) section below for more information.
   * `LOG_LEVEL` can be one of `Debug`, `Info`, `Warning`, `Error`, or `Critical` for decreasing verbosity.  Default is `Info` if removed from your Environment.
@@ -81,7 +103,7 @@ https://[DOMAIN] {
         reverse_proxy * [HS_SERVER]
 }
 ```
-* Example:  
+* Example:
 ```
 https://example.com {
         reverse_proxy /admin* http://headscale-webui:5000
@@ -90,7 +112,7 @@ https://example.com {
 }
 ```
 
---- 
+---
 # Authentication
 *If your OIDC provider isn't listed or doesn't work, please open up a [new issue](https://github.com/iFargle/headscale-webui/issues/new) and it will be worked on.*
 
