@@ -46,6 +46,7 @@ ENV TZ="UTC"
 ENV COLOR="blue-grey"
 ENV HS_SERVER=http://localhost/
 ENV KEY=""
+ENV DATA_DIRECTORY=/data
 # ENV SCRIPT_NAME=/
 ENV DOMAIN_NAME=http://localhost
 ENV AUTH_TYPE=""
