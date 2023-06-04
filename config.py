@@ -386,9 +386,9 @@ class Config(BaseSettings):
         ),
     )
 
-    app_data_dir: Path = Field(
+    data_directory: Path = Field(
         Path("/data"),
-        env="APP_DATA_DIR",
+        env="DATA_DIRECTORY",
         description="Application data path.",
     )
 
@@ -466,16 +466,16 @@ class Config(BaseSettings):
             return ""
         return value
 
-    @validator("app_data_dir")
+    @validator("data_directory")
     @classmethod
-    def validate_app_data_dir(cls, value: Path):
+    def validate_data_directory(cls, value: Path):
         """Validate application data format and basic filesystem access."""
         err = InitCheckError()
 
         if not os.access(value, os.R_OK):
             err.append_error(
                 InitCheckErrorModel(
-                    f"Data ({value}) folder not readable.",
+                    f"Data directory ({value}) not readable.",
                     f'"{value}" is not readable. Please ensure your permissions are '
                     "correct. Data should be readable by UID/GID 1000:1000.",
                 )
@@ -484,7 +484,7 @@ class Config(BaseSettings):
         if not os.access(value, os.W_OK):
             err.append_error(
                 InitCheckErrorModel(
-                    f"Data ({value}) folder not writable.",
+                    f"Data directory ({value}) not writable.",
                     f'"{value}" is not writable. Please ensure your permissions are '
                     "correct. Data should be writable by UID/GID 1000:1000.",
                 )
@@ -493,7 +493,7 @@ class Config(BaseSettings):
         if not os.access(value, os.X_OK):
             err.append_error(
                 InitCheckErrorModel(
-                    f"Data ({value}) folder not executable.",
+                    f"Data directory ({value}) not executable.",
                     f'"{value}" is not executable. Please ensure your permissions are '
                     "correct. Data should be executable by UID/GID 1000:1000.",
                 )
@@ -542,4 +542,4 @@ class Config(BaseSettings):
     @property
     def key_file(self):
         """Get key file path."""
-        return self.app_data_dir / "key.txt"
+        return self.data_directory / "key.txt"

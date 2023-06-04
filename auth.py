@@ -160,14 +160,14 @@ class AuthManager:
 
                 # Make the best effort to create the data directory.
                 try:
-                    config.app_data_dir.mkdir(parents=True, exist_ok=True)
+                    config.data_directory.mkdir(parents=True, exist_ok=True)
                 except PermissionError:
                     current_app.logger.warning(
                         "Tried and failed to create data directory %s.",
-                        config.app_data_dir,
+                        config.data_directory,
                     )
 
-                oidc_secrets_path = config.app_data_dir / "secrets.json"
+                oidc_secrets_path = config.data_directory / "secrets.json"
                 with open(oidc_secrets_path, "w+", encoding="utf-8") as secrets_file:
                     secrets_file.write(client_secrets.json())
 
