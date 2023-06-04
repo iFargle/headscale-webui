@@ -1,3 +1,5 @@
+Please pull 0.6.1 for now -- 0.7.x isn't working.  My apologies!  I will remove this when we have it working.  Thank you for your patience.
+
 <p align="center">
   <a href="https://github.com/juanfont/headscale">
     <img src="static/img/headscale3-dots.png" width="250">
