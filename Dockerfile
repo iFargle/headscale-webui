@@ -81,5 +81,5 @@ VOLUME /data
 EXPOSE 5000/tcp
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Temporarily reduce to 1 workerd
-CMD gunicorn -w 1 -b 0.0.0.0:5000 server:app
+# Temporarily reduce to 1 worker
+CMD gunicorn -w 1 -b 0.0.0.0:5000 server:headscale_webui
