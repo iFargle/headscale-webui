@@ -32,6 +32,10 @@ def create_tainted_app(app: Flask, error: InitCheckError) -> Flask:
         "restart the server."
     )
 
+    @app.route("/")
+    def root_redirect():
+        return redirect(url_for("error_page"))
+
     @app.route("/<path:path>")
     def catchall_redirect(path: str):  # pylint: disable=unused-argument
         return redirect(url_for("error_page"))
