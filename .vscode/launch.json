@@ -11,7 +11,7 @@
             "module": "server",
             "justMyCode": false,
             "env": {
-                "APP_DATA_DIR": "${workspaceFolder}/data",
+                "DATA_DIRECTORY": "${workspaceFolder}/data",
                 "KEY": "CHANGEME",
                 "AUTH_TYPE": "basic",
                 "BASIC_AUTH_USER": "headscale",
