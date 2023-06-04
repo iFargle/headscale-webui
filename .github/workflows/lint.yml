@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types:
+      - published
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tool:
+          - "black --check --diff"
+          - "isort --check --diff"
+          - "pydocstyle"
+          - "pylint --disable=fixme"
+          - "ruff"
+          - "mypy"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+      - name: Install dependencies
+        run: poetry install --only main,dev
+      - name: Run formatter
+        run: poetry run ${{ matrix.tool }} *.py

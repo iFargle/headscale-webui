@@ -165,55 +165,54 @@ document.addEventListener('DOMContentLoaded', function () {
 //-----------------------------------------------------------
 function test_key() {
     document.getElementById('test_modal_results').innerHTML = loading()
+    var api_key = document.getElementById('api_key').value;
     var data = $.ajax({
-        type: "GET",
+        type: "POST",
         url: "api/test_key",
+        data: JSON.stringify({ "api_key": api_key }),
+        contentType: "application/json",
         success: function (response) {
-            if (response == "Unauthenticated") {
-                html = `
+            document.getElementById('test_modal_results').innerHTML = `
                 <ul class="collection">
                     <li class="collection-item avatar">
-                        <i class="material-icons circle red">warning</i>
-                        <span class="title">Error</span>
-                        <p>Key authentication failed.  Check your key.</p>
+                        <i class="material-icons circle green">check</i>
+                        <span class="title">Success</span>
+                        <p>Key authenticated with the Headscale server.</p>
                     </li>
                 </ul>
+                <h6>Key Information</h6>
+                <table class="highlight">
+                    <tbody>
+                        <tr>
+                            <td><b>Key ID</b></td>
+                            <td>${response.id}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Prefix</b></td>
+                            <td>${response.prefix}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Expiration Date</b></td>
+                            <td>${response.expiration}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Creation Date</b></td>
+                            <td>${response.createdAt}</td>
+                        </tr>
+                    </tbody>
+                </table>
                 `
-                document.getElementById('test_modal_results').innerHTML = html
-            } else {
-                json = JSON.parse(response)
-                var html = `
-                    <ul class="collection">
-                        <li class="collection-item avatar">
-                            <i class="material-icons circle green">check</i>
-                            <span class="title">Success</span>
-                            <p>Key authenticated with the Headscale server.</p>
-                        </li>
-                    </ul>
-                    <h6>Key Information</h6>
-                    <table class="highlight">
-                        <tbody>
-                            <tr>
-                                <td><b>Key ID</b></td>
-                                <td>${json['id']}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Prefix</b></td>
-                                <td>${json['prefix']}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Expiration Date</b></td>
-                                <td>${json['expiration']}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Creation Date</b></td>
-                                <td>${json['createdAt']}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    `
-                document.getElementById('test_modal_results').innerHTML = html
-            }
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            document.getElementById('test_modal_results').innerHTML = `
+            <ul class="collection">
+                <li class="collection-item avatar">
+                    <i class="material-icons circle red">warning</i>
+                    <span class="title">Error</span>
+                    <p>Key authentication failed.  Check your key.</p>
+                </li>
+            </ul>
+            `
         }
     })
 
@@ -241,7 +240,11 @@ function save_key() {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            M.toast({ html: 'Key saved.  Testing...' });
+            M.toast({ html: 'Testing key and saving...' });
+            test_key();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            M.toast({ html: xhr.responseText })
             test_key();
         }
     })
@@ -328,8 +331,8 @@ function load_modal_add_preauth_key(user_name) {
                 <p>
                     <ul>
                         <li>Pre-Auth keys can be used to authenticate to Headscale without manually registering a machine.  Use the flag <code>--auth-key</code> to do so.</li>
-                        <li>"Ephemeral" keys can be used to register devices that frequently come on and drop off the newtork (for example, docker containers)</li>
-                        <li>Keys that are "Reusable" can be used multiple times.  Keys that are "One Time Use" will expire after their first use.</li> 
+                        <li>"Ephemeral" keys can be used to register devices that frequently come on and drop off the network (for example, docker containers)</li>
+                        <li>Keys that are "Reusable" can be used multiple times.  Keys that are "One Time Use" will expire after their first use.</li>
                     </ul>
                 </p>
             </li>
@@ -390,7 +393,7 @@ function load_modal_move_machine(machine_id) {
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Move"
 
-    var data = { "id": machine_id }
+    var data = { "machine_id": machine_id }
     $.ajax({
         type: "POST",
         url: "api/machine_information",
@@ -400,6 +403,8 @@ function load_modal_move_machine(machine_id) {
             $.ajax({
                 type: "POST",
                 url: "api/get_users",
+                data: "{}",
+                contentType: "application/json",
                 success: function (response) {
                     modal = document.getElementById('card_modal');
                     modal_title = document.getElementById('modal_title');
@@ -458,7 +463,7 @@ function load_modal_delete_machine(machine_id) {
     document.getElementById('modal_confirm').className = "red btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Delete"
 
-    var data = { "id": machine_id }
+    var data = { "machine_id": machine_id }
     $.ajax({
         type: "POST",
         url: "api/machine_information",
@@ -508,7 +513,7 @@ function load_modal_rename_machine(machine_id) {
     document.getElementById('modal_title').innerHTML = "Loading..."
     document.getElementById('modal_confirm').className = "green btn-flat white-text"
     document.getElementById('modal_confirm').innerText = "Rename"
-    var data = { "id": machine_id }
+    var data = { "machine_id": machine_id }
     $.ajax({
         type: "POST",
         url: "api/machine_information",
@@ -562,6 +567,8 @@ function load_modal_add_machine() {
     $.ajax({
         type: "POST",
         url: "api/get_users",
+        data: "{}",
+        contentType: "application/json",
         success: function (response) {
             modal_body = document.getElementById('default_add_new_machine_modal');
             modal_confirm = document.getElementById('new_machine_modal_confirm');
@@ -613,8 +620,7 @@ function delete_chip(machine_id, chipsData) {
     for (let tag in chipsData) {
         formattedData[tag] = '"tag:' + chipsData[tag].tag + '"'
     }
-    var tags_list = '{"tags": [' + formattedData + ']}'
-    var data = { "id": machine_id, "tags_list": tags_list }
+    var data = { "machine_id": machine_id, "tags": formattedData }
 
     $.ajax({
         type: "POST",
@@ -636,8 +642,7 @@ function add_chip(machine_id, chipsData) {
     for (let tag in chipsData) {
         formattedData[tag] = '"tag:' + chipsData[tag].tag + '"'
     }
-    var tags_list = '{"tags": [' + formattedData + ']}'
-    var data = { "id": machine_id, "tags_list": tags_list }
+    var data = { "machine_id": machine_id, "tags": formattedData }
 
     $.ajax({
         type: "POST",
@@ -670,19 +675,17 @@ function add_machine() {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.machine) {
-                window.location.reload()
-                return
-            }
-            load_modal_generic("error", "Error adding machine", response.message)
-            return
+            window.location.reload()
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error adding machine", JSON.parse(xhr.responseText).message)
         }
     })
 }
 
 function rename_machine(machine_id) {
     var new_name = document.getElementById('new_name_form').value;
-    var data = { "id": machine_id, "new_name": new_name };
+    var data = { "machine_id": machine_id, "new_name": new_name };
 
     // String to test against
     var regexIT = /[`!@#$%^&*()_+\=\[\]{};':"\\|,.<>\/?~]/;
@@ -700,24 +703,22 @@ function rename_machine(machine_id) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-            if (response.status == "True") {
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
-
-                document.getElementById(machine_id + '-name-container').innerHTML = machine_id + ". " + escapeHTML(new_name)
-                M.toast({ html: 'Machine ' + machine_id + ' renamed to ' + escapeHTML(new_name) });
-            } else {
-                load_modal_generic("error", "Error setting the machine name", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            document.getElementById(machine_id + '-name-container').innerHTML = machine_id + ". " + escapeHTML(new_name)
+            M.toast({ html: 'Machine ' + machine_id + ' renamed to ' + escapeHTML(new_name) });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error setting the machine name", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
 
 function move_machine(machine_id) {
     new_user = document.getElementById('move-select').value
-    var data = { "id": machine_id, "new_user": new_user };
+    var data = { "machine_id": machine_id, "user": new_user };
 
     $.ajax({
         type: "POST",
@@ -742,7 +743,7 @@ function move_machine(machine_id) {
 }
 
 function delete_machine(machine_id) {
-    var data = { "id": machine_id };
+    var data = { "machine_id": machine_id };
     $.ajax({
         type: "POST",
         url: "api/delete_machine",
@@ -757,6 +758,9 @@ function delete_machine(machine_id) {
             document.getElementById(machine_id + '-main-collapsible').className = "collapsible popout hide";
 
             M.toast({ html: 'Machine deleted.' });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error deleting machine", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
@@ -865,6 +869,7 @@ function get_routes() {
         async: false,
         type: "POST",
         url: "api/get_routes",
+        data: "{}",
         contentType: "application/json",
         success: function (response) {
             console.log("Got all routes.")
@@ -889,8 +894,8 @@ function toggle_failover_route_routespage(routeid, current_state, prefix, route_
 
     var disabledTooltip = "Click to enable"
     var enabledTooltip = "Click to disable"
-    var disableState = "False"
-    var enableState = "True"
+    var disableState = false
+    var enableState = true
     var action_taken = "unchanged."
 
     $.ajax({
@@ -1029,25 +1034,24 @@ function rename_user(user_id, old_name) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.status == "True") {
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-                // Rename the user on the page:
-                document.getElementById(user_id + '-name-span').innerHTML = escapeHTML(new_name)
+            // Rename the user on the page:
+            document.getElementById(user_id + '-name-span').innerHTML = escapeHTML(new_name)
 
-                // Set the button to use the NEW name as the OLD name for both buttons
-                var rename_button_sm = document.getElementById(user_id + '-rename-user-sm')
-                rename_button_sm.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
-                var rename_button_lg = document.getElementById(user_id + '-rename-user-lg')
-                rename_button_lg.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
+            // Set the button to use the NEW name as the OLD name for both buttons
+            var rename_button_sm = document.getElementById(user_id + '-rename-user-sm')
+            rename_button_sm.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
+            var rename_button_lg = document.getElementById(user_id + '-rename-user-lg')
+            rename_button_lg.setAttribute('onclick', 'load_modal_rename_user(' + user_id + ', "' + new_name + '")')
 
-                // Send the completion toast
-                M.toast({ html: "User '" + old_name + "' renamed to '" + new_name + "'." })
-            } else {
-                load_modal_generic("error", "Error setting user name", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            // Send the completion toast
+            M.toast({ html: "User '" + old_name + "' renamed to '" + new_name + "'." })
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error setting user name", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
@@ -1060,19 +1064,17 @@ function delete_user(user_id, user_name) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.status == "True") {
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-                // When the machine is deleted, hide its collapsible:
-                document.getElementById(user_id + '-main-collapsible').className = "collapsible popout hide";
+            // When the machine is deleted, hide its collapsible:
+            document.getElementById(user_id + '-main-collapsible').className = "collapsible popout hide";
 
-                M.toast({ html: 'User deleted.' });
-            } else {
-                // We errored.  Decipher the error Headscale sent us and display it:
-                load_modal_generic("error", "Error deleting user", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            M.toast({ html: 'User deleted.' });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error deleting user", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
@@ -1086,18 +1088,16 @@ function add_user() {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.status == "True") {
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-                // Send the completion toast
-                M.toast({ html: "User '" + user_name + "' added to Headscale.  Refreshing..." })
-                window.location.reload()
-            } else {
-                // We errored.  Decipher the error Headscale sent us and display it:
-                load_modal_generic("error", "Error adding  user", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            // Send the completion toast
+            M.toast({ html: "User '" + user_name + "' added to Headscale.  Refreshing..." })
+            window.location.reload()
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error adding user", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
@@ -1110,7 +1110,7 @@ function add_preauth_key(user_name) {
 
     // If there is no date, error:
     if (!date) { load_modal_generic("error", "Invalid Date", "Please enter a valid date"); return }
-    var data = { "user": user_name, "reusable": reusable, "ephemeral": ephemeral, "expiration": expiration }
+    var data = { "user": user_name, "reusable": reusable, "ephemeral": ephemeral, "expiration": expiration, "acl_tags": [] }
 
     $.ajax({
         type: "POST",
@@ -1118,33 +1118,31 @@ function add_preauth_key(user_name) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.status == "True") {
-                // Send the completion toast
-                M.toast({ html: 'PreAuth key created in user ' + user_name })
-                // If this is successfull, we should reload the table and close the modal:
-                var user_data = { "name": user_name }
-                $.ajax({
-                    type: "POST",
-                    url: "api/build_preauthkey_table",
-                    data: JSON.stringify(user_data),
-                    contentType: "application/json",
-                    success: function (table_data) {
-                        table = document.getElementById(user_name + '-preauth-keys-collection')
-                        table.innerHTML = table_data
-                        // The tooltips need to be re-initialized afterwards:
-                        M.Tooltip.init(document.querySelectorAll('.tooltipped'))
-                    }
-                })
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
+            // Send the completion toast
+            M.toast({ html: 'PreAuth key created in user ' + user_name })
+            // If this is successful, we should reload the table and close the modal:
+            var user_data = { "user": user_name }
+            $.ajax({
+                type: "POST",
+                url: "api/build_preauthkey_table",
+                data: JSON.stringify(user_data),
+                contentType: "application/json",
+                success: function (table_data) {
+                    table = document.getElementById(user_name + '-preauth-keys-collection')
+                    table.innerHTML = table_data
+                    // The tooltips need to be re-initialized afterwards:
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'))
+                }
+            })
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-                // The tooltips need to be re-initialized afterwards:
-                M.Tooltip.init(document.querySelectorAll('.tooltipped'))
-
-            } else {
-                load_modal_generic("error", "Error adding a pre-auth key", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            // The tooltips need to be re-initialized afterwards:
+            M.Tooltip.init(document.querySelectorAll('.tooltipped'))
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error adding a pre-auth key", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
@@ -1158,33 +1156,31 @@ function expire_preauth_key(user_name, key) {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.status == "True") {
-                // Send the completion toast
-                M.toast({ html: 'PreAuth expired in ' + user_name })
-                // If this is successfull, we should reload the table and close the modal:
-                var user_data = { "name": user_name }
-                $.ajax({
-                    type: "POST",
-                    url: "api/build_preauthkey_table",
-                    data: JSON.stringify(user_data),
-                    contentType: "application/json",
-                    success: function (table_data) {
-                        table = document.getElementById(user_name + '-preauth-keys-collection')
-                        table.innerHTML = table_data
-                        // The tooltips need to be re-initialized afterwards:
-                        M.Tooltip.init(document.querySelectorAll('.tooltipped'))
-                    }
-                })
-                // Get the modal element and close it
-                modal_element = document.getElementById('card_modal')
-                M.Modal.getInstance(modal_element).close()
+            // Send the completion toast
+            M.toast({ html: 'PreAuth expired in ' + user_name })
+            // If this is successful, we should reload the table and close the modal:
+            var user_data = { "user": user_name }
+            $.ajax({
+                type: "POST",
+                url: "api/build_preauthkey_table",
+                data: JSON.stringify(user_data),
+                contentType: "application/json",
+                success: function (table_data) {
+                    table = document.getElementById(user_name + '-preauth-keys-collection')
+                    table.innerHTML = table_data
+                    // The tooltips need to be re-initialized afterwards:
+                    M.Tooltip.init(document.querySelectorAll('.tooltipped'))
+                }
+            })
+            // Get the modal element and close it
+            modal_element = document.getElementById('card_modal')
+            M.Modal.getInstance(modal_element).close()
 
-                // The tooltips need to be re-initialized afterwards:
-                M.Tooltip.init(document.querySelectorAll('.tooltipped'))
-
-            } else {
-                load_modal_generic("error", "Error expiring a pre-auth key", "Headscale response:  " + JSON.stringify(response.body.message))
-            }
+            // The tooltips need to be re-initialized afterwards:
+            M.Tooltip.init(document.querySelectorAll('.tooltipped'))
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            load_modal_generic("error", "Error expiring a pre-auth key", "Headscale response: " + JSON.parse(xhr.responseText).message)
         }
     })
 }
