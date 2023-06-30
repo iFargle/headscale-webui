@@ -33,7 +33,8 @@
     * Enable / disable routes and exit nodes
     * Add and delete machine tags
 7.  Basic and OIDC Authentication
-    * OIDC Authentication tested with Authelia and Keycloak
+    -   OIDC Authentication tested with AzureAD, Authelia and Keycloak
+        -   AzureAD needs OIDC_CLOCK_SKEW set to 360
 8.  Change your color theme! See MaterializeCSS Documentation for Colors for examples.
 9.  Search your machines and users.
     * Machines have tags you can use to filter search:

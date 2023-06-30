@@ -60,6 +60,8 @@ ENV BASIC_AUTH_PASS=""
 ENV OIDC_AUTH_URL=https://localhost
 ENV OIDC_CLIENT_ID=Headscale-WebUI
 ENV OIDC_CLIENT_SECRET=secret
+# set do default value: https://flask-oidc.readthedocs.io/en/latest/
+ENV OIDC_CLOCK_SKEW=60
 
 # Jenkins build args
 ARG GIT_COMMIT_ARG=""

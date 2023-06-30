@@ -44,11 +44,12 @@ if AUTH_TYPE == "oidc":
     # https://github.com/steinarvk/flask_oidc_demo 
     app.logger.info("Loading OIDC libraries and configuring app...")
 
-    DOMAIN_NAME    = os.environ["DOMAIN_NAME"]
-    BASE_PATH      = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
-    OIDC_SECRET    = os.environ["OIDC_CLIENT_SECRET"]
-    OIDC_CLIENT_ID = os.environ["OIDC_CLIENT_ID"]
-    OIDC_AUTH_URL  = os.environ["OIDC_AUTH_URL"]
+    DOMAIN_NAME     = os.environ["DOMAIN_NAME"]
+    BASE_PATH       = os.environ["SCRIPT_NAME"] if os.environ["SCRIPT_NAME"] != "/" else ""
+    OIDC_SECRET     = os.environ["OIDC_CLIENT_SECRET"]
+    OIDC_CLIENT_ID  = os.environ["OIDC_CLIENT_ID"]
+    OIDC_AUTH_URL   = os.environ["OIDC_AUTH_URL"]
+    OIDC_CLOCK_SKEW = float(os.environ["OIDC_CLOCK_SKEW"])
 
     # Construct client_secrets.json:
     response = requests.get(str(OIDC_AUTH_URL))
@@ -86,7 +87,8 @@ if AUTH_TYPE == "oidc":
         'OIDC_USER_INFO_ENABLED': True,
         'OIDC_OPENID_REALM': 'Headscale-WebUI',
         'OIDC_SCOPES': ['openid', 'profile', 'email'],
-        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
+        'OIDC_CLOCK_SKEW': OIDC_CLOCK_SKEW,
     })
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
