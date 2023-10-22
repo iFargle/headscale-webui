@@ -75,7 +75,10 @@ if AUTH_TYPE == "oidc":
     with open("/app/instance/secrets.json", "r+") as secrets_json:
         app.logger.debug("/app/instances/secrets.json:")
         app.logger.debug(secrets_json.read())
-    
+    if DOMAIN_NAME:
+        OVERWRITE_REDIRECT_URI = DOMAIN_NAME + BASE_PATH + "/oidc_callback"
+    else:
+        OVERWRITE_REDIRECT_URI = False
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
         'TESTING': DEBUG_STATE,
@@ -86,7 +89,9 @@ if AUTH_TYPE == "oidc":
         'OIDC_USER_INFO_ENABLED': True,
         'OIDC_OPENID_REALM': 'Headscale-WebUI',
         'OIDC_SCOPES': ['openid', 'profile', 'email'],
-        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
+        'OVERWRITE_REDIRECT_URI': OVERWRITE_REDIRECT_URI
+        
     })
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
@@ -524,6 +529,12 @@ def get_route_info():
 
     return headscale.get_routes(url, api_key)
 
+########################################################################################
+# Health Check
+########################################################################################
+@app.route('/api/check', methods=['GET'])
+def check():
+    return '200'
 
 ########################################################################################
 # Main thread
