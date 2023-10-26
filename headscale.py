@@ -1,3 +1,4 @@
+## Patch "Machine" to "Node"
 # pylint: disable=wrong-import-order
 
 import requests, json, os, logging, yaml
@@ -29,7 +30,7 @@ def get_url(inpage=False):
     try:
         config_file = open("/etc/headscale/config.yml",  "r")
         app.logger.info("Opening /etc/headscale/config.yml")
-    except: 
+    except:
         config_file = open("/etc/headscale/config.yaml", "r")
         app.logger.info("Opening /etc/headscale/config.yaml")
     config_yaml = yaml.safe_load(config_file)
@@ -167,14 +168,14 @@ def get_api_key_info(url, api_key):
     return "Key not found"
 
 ##################################################################
-# Functions related to MACHINES
+# Functions related to NODES
 ##################################################################
 
-# register a new machine
-def register_machine(url, api_key, machine_key, user):
-    app.logger.info("Registering machine %s to user %s", str(machine_key), str(user))
+# register a new node
+def register_node(url, api_key, node_key, user):
+    app.logger.info("Registering node %s to user %s", str(node_key), str(user))
     response = requests.post(
-        str(url)+"/api/v1/machine/register?user="+str(user)+"&key="+str(machine_key),
+        str(url)+"/api/v1/node/register?user="+str(user)+"&key="+str(node_key),
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -183,11 +184,11 @@ def register_machine(url, api_key, machine_key, user):
     return response.json()
 
 
-# Sets the machines tags
-def set_machine_tags(url, api_key, machine_id, tags_list):
-    app.logger.info("Setting machine_id %s tag %s", str(machine_id), str(tags_list))
+# Sets the nodes tags
+def set_node_tags(url, api_key, node_id, tags_list):
+    app.logger.info("Setting node_id %s tag %s", str(node_id), str(tags_list))
     response = requests.post(
-        str(url)+"/api/v1/machine/"+str(machine_id)+"/tags",
+        str(url)+"/api/v1/node/"+str(node_id)+"/tags",
         data=tags_list,
         headers={
             'Accept': 'application/json',
@@ -197,11 +198,11 @@ def set_machine_tags(url, api_key, machine_id, tags_list):
     )
     return response.json()
 
-# Moves machine_id to user "new_user"
-def move_user(url, api_key, machine_id, new_user):
-    app.logger.info("Moving machine_id %s to user %s", str(machine_id), str(new_user))
+# Moves node_id to user "new_user"
+def move_user(url, api_key, node_id, new_user):
+    app.logger.info("Moving node_id %s to user %s", str(node_id), str(new_user))
     response = requests.post(
-        str(url)+"/api/v1/machine/"+str(machine_id)+"/user?user="+str(new_user),
+        str(url)+"/api/v1/node/"+str(node_id)+"/user?user="+str(new_user),
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -229,11 +230,11 @@ def update_route(url, api_key, route_id, current_state):
     )
     return response.json()
 
-# Get all machines on the Headscale network
-def get_machines(url, api_key):
-    app.logger.info("Getting machine information")
+# Get all nodes on the Headscale network
+def get_nodes(url, api_key):
+    app.logger.info("Getting node information")
     response = requests.get(
-        str(url)+"/api/v1/machine",
+        str(url)+"/api/v1/node",
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -241,11 +242,11 @@ def get_machines(url, api_key):
     )
     return response.json()
 
-# Get machine with "machine_id" on the Headscale network
-def get_machine_info(url, api_key, machine_id):
-    app.logger.info("Getting information for machine ID %s", str(machine_id))
+# Get node with "node_id" on the Headscale network
+def get_node_info(url, api_key, node_id):
+    app.logger.info("Getting information for node ID %s", str(node_id))
     response = requests.get(
-        str(url)+"/api/v1/machine/"+str(machine_id),
+        str(url)+"/api/v1/node/"+str(node_id),
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -253,11 +254,11 @@ def get_machine_info(url, api_key, machine_id):
     )
     return response.json()
 
-# Delete a machine from Headscale
-def delete_machine(url, api_key, machine_id):
-    app.logger.info("Deleting machine %s", str(machine_id))
+# Delete a node from Headscale
+def delete_node(url, api_key, node_id):
+    app.logger.info("Deleting node %s", str(node_id))
     response = requests.delete(
-        str(url)+"/api/v1/machine/"+str(machine_id),
+        str(url)+"/api/v1/node/"+str(node_id),
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -265,16 +266,16 @@ def delete_machine(url, api_key, machine_id):
     )
     status = "True" if response.status_code == 200 else "False"
     if response.status_code == 200:
-        app.logger.info("Machine deleted.")
+        app.logger.info("Node deleted.")
     else:
-        app.logger.error("Deleting machine failed!  %s", str(response.json()))
+        app.logger.error("Deleting node failed!  %s", str(response.json()))
     return {"status": status, "body": response.json()}
 
-# Rename "machine_id" with name "new_name"
-def rename_machine(url, api_key, machine_id, new_name):
-    app.logger.info("Renaming machine %s", str(machine_id))
+# Rename "node_id" with name "new_name"
+def rename_node(url, api_key, node_id, new_name):
+    app.logger.info("Renaming node %s", str(node_id))
     response = requests.post(
-        str(url)+"/api/v1/machine/"+str(machine_id)+"/rename/"+str(new_name),
+        str(url)+"/api/v1/node/"+str(node_id)+"/rename/"+str(new_name),
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)
@@ -282,16 +283,16 @@ def rename_machine(url, api_key, machine_id, new_name):
     )
     status = "True" if response.status_code == 200 else "False"
     if response.status_code == 200:
-        app.logger.info("Machine renamed")
+        app.logger.info("Node renamed")
     else:
-        app.logger.error("Machine rename failed!  %s", str(response.json()))
+        app.logger.error("Node rename failed!  %s", str(response.json()))
     return {"status": status, "body": response.json()}
 
-# Gets routes for the passed machine_id
-def get_machine_routes(url, api_key, machine_id):
-    app.logger.info("Getting routes for machine %s", str(machine_id))
+# Gets routes for the passed node_id
+def get_node_routes(url, api_key, node_id):
+    app.logger.info("Getting routes for node %s", str(node_id))
     response = requests.get(
-        str(url)+"/api/v1/machine/"+str(machine_id)+"/routes",
+        str(url)+"/api/v1/node/"+str(node_id)+"/routes",
         headers={
             'Accept': 'application/json',
             'Authorization': 'Bearer '+str(api_key)

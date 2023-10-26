@@ -1,6 +1,6 @@
 {% extends 'template.html' %}
-{% set page = "Machines" %}
-{% set machines_active = "active" %}
+{% set page = "Nodes" %}
+{% set nodes_active = "active" %}
 
 {% block title  %} {{ page }} {% endblock %}
 {% block header %} {{ page }} {% endblock %}
@@ -29,14 +29,14 @@
     </div>
 </div>
 
-<!-- Add new machine modal -->
-<div id="new_machine_card_modal" class="modal">
+<!-- Add new node modal -->
+<div id="new_node_card_modal" class="modal">
     <div class="modal-content">
-        <h4 id="new_machine_modal_title">Add machine to Headscale</h4>
-        <p id="new_machine_modal_content">
+        <h4 id="new_node_modal_title">Add node to Headscale</h4>
+        <p id="new_node_modal_content">
             <div class="row">
                 <div class="col s12">
-                    <ul class="tabs" id="new_machine_tabs">
+                    <ul class="tabs" id="new_node_tabs">
                         <li class="tab col s4" id="default_tab" onclick="btn_toggle('show')">
                             <a href="#default">Default</a>
                         </li>
@@ -56,9 +56,9 @@
                             <p>Install Tailscale on your client.  To use your headscale server, use the flag <code>--login-server={{ headscale_server }}</code></p>
                         </li>
                     </ul>
-                    <div id="default_add_new_machine_modal">
+                    <div id="default_add_new_node_modal">
                     <!-- Display a field for the key and a dropdown for the user
-                         done in JavaScript (load_modal_add_machine) -->
+                         done in JavaScript (load_modal_add_node) -->
                     </div>
                 </div>
                 <div id="preauth" class="col s12">
@@ -70,7 +70,7 @@
                 </div>
                 <div id="oidc" class="col s12">
                     <ul class='browser-default'>
-                        <li>OIDC provides the ability to register an external authentication provider (such as <a href="https://www.keycloak.org/">Keycloak</a> or <a href="https://www.authelia.com/">Authelia</a>) machines to headscale.</li>
+                        <li>OIDC provides the ability to register an external authentication provider (such as <a href="https://www.keycloak.org/">Keycloak</a> or <a href="https://www.authelia.com/">Authelia</a>) nodes to headscale.</li>
                         <li>Configure Headscale to register with an authentication provider by adding the OIDC configuration to your Headscale "config.yml" file described <a href="https://github.com/juanfont/headscale/blob/main/config-example.yaml">here</a>.</li>
                     </ul>
                 </div>
@@ -78,16 +78,16 @@
         </p>
     </div>
     <div class="modal-footer">
-        <a href="#!" id="new_machine_modal_confirm" class="green btn-flat white-text" onclick="add_machine()">Add Machine</a>
+        <a href="#!" id="new_node_modal_confirm" class="green btn-flat white-text" onclick="add_node()">Add Node</a>
         <a href="#!" class="modal-close btn-flat">Cancel</a>
     </div>
 </div>
-<!-- FAB for adding new machines -->
+<!-- FAB for adding new nodes -->
 <div class="fixed-action-btn">
-    <a href="#new_machine_card_modal" 
-       onclick='load_modal_add_machine()' 
+    <a href="#new_node_card_modal"
+       onclick='load_modal_add_node()'
        class="modal-trigger waves-effect waves-light btn-floating btn-large tooltipped {{ COLOR_BTN }}"
-       data-tooltip="Add a new machine to the Tailnet" data-position="left">
+       data-tooltip="Add a new node to the Tailnet" data-position="left">
         <i class="large material-icons">add</i>
     </a>
 </div>

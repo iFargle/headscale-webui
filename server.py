@@ -1,3 +1,4 @@
+## Patch "Machine" to "Node"
 # pylint: disable=wrong-import-order
 
 import headscale, helper, json, os, pytz, renderer, secrets, requests, logging
@@ -75,7 +76,10 @@ if AUTH_TYPE == "oidc":
     with open("/app/instance/secrets.json", "r+") as secrets_json:
         app.logger.debug("/app/instances/secrets.json:")
         app.logger.debug(secrets_json.read())
-    
+    if DOMAIN_NAME:
+        OVERWRITE_REDIRECT_URI = DOMAIN_NAME + BASE_PATH + "/oidc_callback"
+    else:
+        OVERWRITE_REDIRECT_URI = False
     app.config.update({
         'SECRET_KEY': secrets.token_urlsafe(32),
         'TESTING': DEBUG_STATE,
@@ -86,7 +90,9 @@ if AUTH_TYPE == "oidc":
         'OIDC_USER_INFO_ENABLED': True,
         'OIDC_OPENID_REALM': 'Headscale-WebUI',
         'OIDC_SCOPES': ['openid', 'profile', 'email'],
-        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post'
+        'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
+        'OVERWRITE_REDIRECT_URI': OVERWRITE_REDIRECT_URI
+        
     })
     from flask_oidc import OpenIDConnect
     oidc = OpenIDConnect(app)
@@ -186,9 +192,9 @@ def routes_page():
     )
 
 
-@app.route('/machines', methods=('GET', 'POST'))
+@app.route('/nodes', methods=('GET', 'POST'))
 @oidc.require_login
-def machines_page():
+def nodes_page():
     # Some basic sanity checks:
     pass_checks = str(helper.load_checks())
     if pass_checks != "Pass": return redirect(url_for(pass_checks))
@@ -204,8 +210,8 @@ def machines_page():
         OIDC_NAV_DROPDOWN = renderer.oidc_nav_dropdown(user_name, email_address, name)
         OIDC_NAV_MOBILE   = renderer.oidc_nav_mobile(user_name, email_address, name)
     
-    cards = renderer.render_machines_cards()
-    return render_template('machines.html',
+    cards = renderer.render_nodes_cards()
+    return render_template('nodes.html',
         cards             = cards,
         headscale_server  = headscale.get_url(True),
         COLOR_NAV         = COLOR_NAV,
@@ -364,7 +370,7 @@ def save_key_page():
     else: return "Key did not save properly.  Check logs"
 
 ########################################################################################
-# Machine API Endpoints
+# Node API Endpoints
 ########################################################################################
 @app.route('/api/update_route', methods=['POST'])
 @oidc.require_login
@@ -377,69 +383,69 @@ def update_route_page():
 
     return headscale.update_route(url, api_key, route_id, current_state)
 
-@app.route('/api/machine_information', methods=['POST'])
+@app.route('/api/node_information', methods=['POST'])
 @oidc.require_login
-def machine_information_page():
+def node_information_page():
     json_response = request.get_json()
-    machine_id    = escape(json_response['id'])
+    node_id    = escape(json_response['id'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.get_machine_info(url, api_key, machine_id)
+    return headscale.get_node_info(url, api_key, node_id)
 
-@app.route('/api/delete_machine', methods=['POST'])
+@app.route('/api/delete_node', methods=['POST'])
 @oidc.require_login
-def delete_machine_page():
+def delete_node_page():
     json_response = request.get_json()
-    machine_id    = escape(json_response['id'])
+    node_id    = escape(json_response['id'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.delete_machine(url, api_key, machine_id)
+    return headscale.delete_node(url, api_key, node_id)
 
-@app.route('/api/rename_machine', methods=['POST'])
+@app.route('/api/rename_node', methods=['POST'])
 @oidc.require_login
-def rename_machine_page():
+def rename_node_page():
     json_response = request.get_json()
-    machine_id    = escape(json_response['id'])
+    node_id    = escape(json_response['id'])
     new_name      = escape(json_response['new_name'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.rename_machine(url, api_key, machine_id, new_name)
+    return headscale.rename_node(url, api_key, node_id, new_name)
 
 @app.route('/api/move_user', methods=['POST'])
 @oidc.require_login
 def move_user_page():
     json_response = request.get_json()
-    machine_id    = escape(json_response['id'])
+    node_id    = escape(json_response['id'])
     new_user      = escape(json_response['new_user'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.move_user(url, api_key, machine_id, new_user)
+    return headscale.move_user(url, api_key, node_id, new_user)
 
-@app.route('/api/set_machine_tags', methods=['POST'])
+@app.route('/api/set_node_tags', methods=['POST'])
 @oidc.require_login
-def set_machine_tags():
+def set_node_tags():
     json_response = request.get_json()
-    machine_id    = escape(json_response['id'])
-    machine_tags  = json_response['tags_list']
+    node_id    = escape(json_response['id'])
+    node_tags  = json_response['tags_list']
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.set_machine_tags(url, api_key, machine_id, machine_tags)
+    return headscale.set_node_tags(url, api_key, node_id, node_tags)
 
-@app.route('/api/register_machine', methods=['POST'])
+@app.route('/api/register_node', methods=['POST'])
 @oidc.require_login
-def register_machine():
+def register_node():
     json_response = request.get_json()
-    machine_key   = escape(json_response['key'])
+    node_key   = escape(json_response['key'])
     user          = escape(json_response['user'])
     url           = headscale.get_url()
     api_key       = headscale.get_api_key()
 
-    return headscale.register_machine(url, api_key, machine_key, user)
+    return headscale.register_node(url, api_key, node_key, user)
 
 ########################################################################################
 # User API Endpoints

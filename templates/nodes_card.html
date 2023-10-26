@@ -1,14 +1,14 @@
-<li id="{{ machine_id }}-main-collapsible" class="searchable">
+<li id="{{ node_id }}-main-collapsible" class="searchable">
     <div class="searchtags hide">
-        machine:{{given_name}}
+        node:{{given_name}}
         user:{{ns_name}}
         {{taglist}}
     </div>
     <div class="collapsible-header ">
         <div class="col s8 m6">
             {{ status_badge }}
-            <span class="truncate hover-container" id="{{ machine_id }}-name-container">
-                {{ machine_id }}. {{ given_name }}
+            <span class="truncate hover-container" id="{{ node_id }}-name-container">
+                {{ node_id }}. {{ given_name }}
             </span>
         </div>
             </span>
@@ -23,17 +23,17 @@
         <ul class="collection">
             <li class="collection-item avatar">
                 <i class="material-icons circle">settings</i>
-                <span class="title">Machine Actions</span>
+                <span class="title">Node Actions</span>
                 <p class="hide-on-small-only">
-                    <a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a>
-                    <a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a>
-                    <a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a>
+                    <a href="#card_modal" onclick='load_modal_rename_node( "{{ node_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this node.">Rename</a>
+                    <a href="#card_modal" onclick='load_modal_move_node  ( "{{ node_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this node to another user.">Move</a>
+                    <a href="#card_modal" onclick='load_modal_delete_node( "{{ node_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this node.">Delete</a>
                 </p>
                 <p class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
                     <ul class="show-on-small hide-on-med-and-up hide-on-large-only hide-on-med-only">
-                        <li><a href="#card_modal" onclick='load_modal_rename_machine( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this machine.">Rename</a></li>
-                        <li><a href="#card_modal" onclick='load_modal_move_machine  ( "{{ machine_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this machine to another user.">Move</a></li>
-                        <li><a href="#card_modal" onclick='load_modal_delete_machine( "{{ machine_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this machine.">Delete</a></li>
+                        <li><a href="#card_modal" onclick='load_modal_rename_node( "{{ node_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Rename this node.">Rename</a></li>
+                        <li><a href="#card_modal" onclick='load_modal_move_node  ( "{{ node_id }}" )' class="modal-trigger waves-effect waves-light btn-small tooltipped"     data-tooltip="Move this node to another user.">Move</a></li>
+                        <li><a href="#card_modal" onclick='load_modal_delete_node( "{{ node_id }}" )' class="modal-trigger red waves-effect waves-light btn-small tooltipped" data-tooltip="Remove this node.">Delete</a></li>
                     </ul>
                 </p>
             </li>
@@ -45,12 +45,12 @@
             <li class="collection-item avatar">
                 <i class="material-icons circle">language</i>
                 <span class="title">User</span>
-                <p id="{{ machine_id }}-user-container">{{ ns_name }}</p>
+                <p id="{{ node_id }}-user-container">{{ ns_name }}</p>
             </li>
             <li class="collection-item avatar">
                 <i class="material-icons circle">network_wifi</i>
                 <span class="title">IP Addresses</span>
-                <p>{{ machine_ips}}</p>
+                <p>{{ node_ips}}</p>
             </li>
             <li class="collection-item avatar">
                 <i class="material-icons circle">access_time</i>
@@ -78,7 +78,7 @@
                 <p>{{ preauth_key }}</p>
             </li>
             {{ advertised_routes }}
-            {{ machine_tags }}
+            {{ node_tags }}
         </ul>
     </div>
 </li>
