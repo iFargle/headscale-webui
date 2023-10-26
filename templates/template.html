@@ -83,8 +83,8 @@
                 <li role="menu-item" class="tooltipped {{ routes_active   }}" data-position="bottom" data-tooltip="Routes">
                    <a href="routes"><i class="material-icons">alt_route</i></a>
                 </li>
-                <li role="menu-item" class="tooltipped {{ machines_active    }}" data-position="bottom" data-tooltip="Machines">
-                   <a href="machines"><i class="material-icons">devices</i></a>
+                <li role="menu-item" class="tooltipped {{ nodes_active    }}" data-position="bottom" data-tooltip="Nodes">
+                   <a href="nodes"><i class="material-icons">devices</i></a>
                 </li>
                 <li role="menu-item" class="tooltipped {{ users_active }}" data-position="bottom" data-tooltip="Users">
                    <a href="users"><i class="material-icons">people</i></a>
@@ -100,7 +100,7 @@
        <ul class="sidenav" id="mobile">
          <li><a href="overview"><i class="material-icons left">map</i>Overview</a></li>
          <li><a href="routes"><i class="material-icons left">alt_route</i>Routes</a></li>
-         <li><a href="machines"><i class="material-icons left">devices</i>Machines</a></li>
+         <li><a href="nodes"><i class="material-icons left">devices</i>Nodes</a></li>
          <li><a href="users"><i class="material-icons left">people</i>Users</a></li>
          <li><a href="settings"><i class="material-icons left">settings</i>Settings</a></li>
          {% block OIDC_NAV_MOBILE %}{% endblock %}
@@ -123,7 +123,7 @@
     <script type="text/javascript" src="static/js/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="static/js/materialize.min.js"></script> 
    <script>M.AutoInit();</script>
-   <!-- Prevent the collapsibles on the Users and Machines pages from collapsing when another element is clicked -->
+   <!-- Prevent the collapsibles on the Users and Nodes pages from collapsing when another element is clicked -->
    <script> 
       var elem = document.querySelector('.collapsible.expandable');
       var instance = M.Collapsible.init(elem, {
