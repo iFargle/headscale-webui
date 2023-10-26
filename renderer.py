@@ -31,7 +31,7 @@ def render_overview():
     # Overview page will just read static information from the config file and display it
     # Open the config.yaml and parse it.
     config_file = ""
-    try:    
+    try:
         config_file = open("/etc/headscale/config.yml",  "r")
         app.logger.info("Opening /etc/headscale/config.yml")
     except: 
@@ -97,7 +97,7 @@ def render_overview():
     # OIDC Content variables:
     issuer, client_id, scope, use_expiry_from_token, expiry = "N/A", "N/A", "N/A", "N/A", "N/A"
     if "oidc" in config_yaml:
-        if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])                
+        if "issuer"                in config_yaml["oidc"] : issuer                = str(config_yaml["oidc"]["issuer"])
         if "client_id"             in config_yaml["oidc"] : client_id             = str(config_yaml["oidc"]["client_id"])             
         if "scope"                 in config_yaml["oidc"] : scope                 = str(config_yaml["oidc"]["scope"])                 
         if "use_expiry_from_token" in config_yaml["oidc"] : use_expiry_from_token = str(config_yaml["oidc"]["use_expiry_from_token"]) 

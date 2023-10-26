@@ -30,7 +30,7 @@ def get_url(inpage=False):
     try:
         config_file = open("/etc/headscale/config.yml",  "r")
         app.logger.info("Opening /etc/headscale/config.yml")
-    except: 
+    except:
         config_file = open("/etc/headscale/config.yaml", "r")
         app.logger.info("Opening /etc/headscale/config.yaml")
     config_yaml = yaml.safe_load(config_file)
