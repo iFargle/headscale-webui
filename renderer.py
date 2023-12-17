@@ -42,7 +42,7 @@ def render_overview():
     
     # Get all machines:
     machines = headscale.get_machines(url, api_key)
-    machines_count = len(machines["machines"])
+    machines_count = len(machines["nodes"])
 
     # Need to check if routes are attached to an active machine:
     # ISSUE:  https://github.com/iFargle/headscale-webui/issues/36 
@@ -487,7 +487,7 @@ def render_machines_cards():
 
     #########################################
     # Thread this entire thing.  
-    num_threads = len(machines_list["machines"])
+    num_threads = len(machines_list["nodes"])
     iterable = []
     machine_content = {}
     failover_pair_prefixes = []
@@ -503,10 +503,10 @@ def render_machines_cards():
 
     if LOG_LEVEL == "DEBUG":
         # DEBUG:  Do in a forloop:
-        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
+        for idx in iterable: thread_machine_content(machines_list["nodes"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
     else:
         app.logger.info("Starting futures")
-        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
+        futures = [executor.submit(thread_machine_content, machines_list["nodes"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
         # Wait for the executor to finish all jobs:
         wait(futures, return_when=ALL_COMPLETED)
         app.logger.info("Finished futures")
