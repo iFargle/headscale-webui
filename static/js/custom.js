@@ -406,7 +406,7 @@ function load_modal_move_machine(machine_id) {
                     modal_body = document.getElementById('modal_content');
                     modal_confirm = document.getElementById('modal_confirm');
 
-                    modal_title.innerHTML = "Move machine '" + headscale.machine.givenName + "'?"
+                    modal_title.innerHTML = "Move machine '" + headscale.node.givenName + "'?"
 
                     select_html = `<h6>Select a User</h6><select id='move-select'>`
                     for (let i = 0; i < response.users.length; i++) {
@@ -420,7 +420,7 @@ function load_modal_move_machine(machine_id) {
                         <li class="collection-item avatar">
                             <i class="material-icons circle">language</i>
                             <span class="title">Information</span>
-                            <p>You are about to move ${headscale.machine.givenName} to a new user.</p>
+                            <p>You are about to move ${headscale.node.givenName} to a new user.</p>
                         </li>
                     </ul>`
                     body_html = body_html + select_html
@@ -429,15 +429,15 @@ function load_modal_move_machine(machine_id) {
                         <tbody>
                             <tr>
                                 <td><b>Machine ID</b></td>
-                                <td>${headscale.machine.id}</td>
+                                <td>${headscale.node.id}</td>
                             </tr>
                             <tr>
                                 <td><b>Hostname</b></td>
-                                <td>${headscale.machine.name}</td>
+                                <td>${headscale.node.name}</td>
                             </tr>
                             <tr>
                                 <td><b>User</b></td>
-                                <td>${headscale.machine.user.name}</td>
+                                <td>${headscale.node.user.name}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -470,13 +470,13 @@ function load_modal_delete_machine(machine_id) {
             modal_body = document.getElementById('modal_content');
             modal_confirm = document.getElementById('modal_confirm');
 
-            modal_title.innerHTML = "Delete machine '" + response.machine.givenName + "'?"
+            modal_title.innerHTML = "Delete machine '" + response.node.givenName + "'?"
             body_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle red">warning</i>
                     <span class="title">Warning</span>
-                    <p>Are you sure you want to delete ${response.machine.givenName}?</p>
+                    <p>Are you sure you want to delete ${response.node.givenName}?</p>
                 </li>
             </ul>
             <h6>Machine Information</h6>
@@ -484,15 +484,15 @@ function load_modal_delete_machine(machine_id) {
                 <tbody>
                     <tr>
                         <td><b>Machine ID</b></td>
-                        <td>${response.machine.id}</td>
+                        <td>${response.node.id}</td>
                     </tr>
                     <tr>
                         <td><b>Hostname</b></td>
-                        <td>${response.machine.name}</td>
+                        <td>${response.node.name}</td>
                     </tr>
                     <tr>
                         <td><b>User</b></td>
-                        <td>${response.machine.user.name}</td>
+                        <td>${response.node.user.name}</td>
                     </tr>
                 </tbody>
             </table>
@@ -520,18 +520,18 @@ function load_modal_rename_machine(machine_id) {
             modal_body = document.getElementById('modal_content');
             modal_confirm = document.getElementById('modal_confirm');
 
-            modal_title.innerHTML = "Rename machine '" + response.machine.givenName + "'?"
+            modal_title.innerHTML = "Rename machine '" + response.node.givenName + "'?"
             body_html = `
             <ul class="collection">
                 <li class="collection-item avatar">
                     <i class="material-icons circle">devices</i>
                     <span class="title">Information</span>
-                    <p>You are about to rename ${response.machine.givenName}</p>
+                    <p>You are about to rename ${response.node.givenName}</p>
                 </li>
             </ul>
             <h6>New Name</h6>
             <div class="input-field">
-                <input value='${response.machine.givenName}' id="new_name_form" type="text">
+                <input value='${response.node.givenName}' id="new_name_form" type="text">
                 <label for="new_name_form" class="active">New Machine Name</label>
             </div>
             <h6>Machine Information</h6>
@@ -539,15 +539,15 @@ function load_modal_rename_machine(machine_id) {
                 <tbody>
                     <tr>
                         <td><b>Machine ID</b></td>
-                        <td>${response.machine.id}</td>
+                        <td>${response.node.id}</td>
                     </tr>
                     <tr>
                         <td><b>Hostname</b></td>
-                        <td>${response.machine.name}</td>
+                        <td>${response.node.name}</td>
                     </tr>
                     <tr>
                         <td><b>User</b></td>
-                        <td>${response.machine.user.name}</td>
+                        <td>${response.node.user.name}</td>
                     </tr>
                 </tbody>
             </table>
@@ -670,7 +670,7 @@ function add_machine() {
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            if (response.machine) {
+            if (response.node) {
                 window.location.reload()
                 return
             }
@@ -729,14 +729,14 @@ function move_machine(machine_id) {
             modal_element = document.getElementById('card_modal')
             M.Modal.getInstance(modal_element).close()
 
-            document.getElementById(machine_id + '-user-container').innerHTML = response.machine.user.name
-            document.getElementById(machine_id + '-ns-badge').innerHTML = response.machine.user.name
+            document.getElementById(machine_id + '-user-container').innerHTML = response.node.user.name
+            document.getElementById(machine_id + '-ns-badge').innerHTML = response.node.user.name
 
             // Get the color and set it
-            var user_color = get_color(response.machine.user.id)
+            var user_color = get_color(response.node.user.id)
             document.getElementById(machine_id + '-ns-badge').className = "badge ipinfo " + user_color + " white-text hide-on-small-only"
 
-            M.toast({ html: "'" + response.machine.givenName + "' moved to user " + response.machine.user.name });
+            M.toast({ html: "'" + response.node.givenName + "' moved to user " + response.node.user.name });
         }
     })
 }
