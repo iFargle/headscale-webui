@@ -53,19 +53,19 @@ def render_overview():
 
     total_routes = 0
     for route in routes["routes"]:
-        if int(route['machine']['id']) != 0: 
+        if int(route["node"]['id']) != 0: 
             total_routes += 1
 
     enabled_routes = 0
     for route in routes["routes"]:
-        if route["enabled"] and route['advertised'] and int(route['machine']['id']) != 0: 
+        if route["enabled"] and route['advertised'] and int(route["node"]['id']) != 0: 
             enabled_routes += 1
 
     # Get a count of all enabled exit routes
     exits_count = 0
     exits_enabled_count = 0
     for route in routes["routes"]:
-        if route['advertised'] and int(route['machine']['id']) != 0:
+        if route['advertised'] and int(route["node"]['id']) != 0:
             if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                 exits_count +=1
                 if route["enabled"]:
@@ -349,7 +349,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
             for route in pulled_routes["routes"]:
                 # Get the remaining routes - No exits or failover pairs
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] not in failover_pair_prefixes:
-                    app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                    app.logger.debug("Route:  ["+str(route["node"]['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                     route_enabled = "red"
                     route_tooltip = 'enable'
                     if route["enabled"]:
@@ -683,8 +683,8 @@ def render_routes():
     all_routes_id_list = []
     for route in all_routes["routes"]:
         all_routes_id_list.append(route["id"])
-        if route["machine"]["name"]:
-            app.logger.info("Found route %s / machine: %s", str(route["id"]), route["machine"]["name"])
+        if route["node"]["name"]:
+            app.logger.info("Found route %s / machine: %s", str(route["id"]), route["node"]["name"])
         else: 
             app.logger.info("Route id %s has no machine associated.", str(route["id"]))
 
@@ -729,7 +729,7 @@ def render_routes():
     for route in all_routes["routes"]:
         # Get relevant info:
         route_id    = route["id"]
-        machine     = route["machine"]["givenName"]
+        machine     = route["node"]["givenName"]
         prefix      = route["prefix"]
         is_enabled  = route["enabled"]
         is_primary  = route["isPrimary"]
@@ -827,8 +827,8 @@ def render_routes():
             for route_id in route_id_list:
                 idx = all_routes_id_list.index(route_id)
 
-                machine    = all_routes["routes"][idx]["machine"]["givenName"]
-                machine_id = all_routes["routes"][idx]["machine"]["id"]
+                machine    = all_routes["routes"][idx]["node"]["givenName"]
+                machine_id = all_routes["routes"][idx]["node"]["id"]
                 is_primary = all_routes["routes"][idx]["isPrimary"]
                 is_enabled = all_routes["routes"][idx]["enabled"]
 
@@ -866,8 +866,8 @@ def render_routes():
     for route in all_routes["routes"]:
         # For every exit route found, store the machine name in an array:
         if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
-            if route["machine"]["givenName"] not in exit_node_list: 
-                exit_node_list.append(route["machine"]["givenName"])
+            if route["node"]["givenName"] not in exit_node_list: 
+                exit_node_list.append(route["node"]["givenName"])
 
     # Exit node display building:
     # Display by machine, not by route
@@ -889,9 +889,9 @@ def render_routes():
         machine_id = 0
         for route in all_routes["routes"]:
             if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
-                if route["machine"]["givenName"] == node:
+                if route["node"]["givenName"] == node:
                     node_exit_route_ids.append(route["id"])
-                    machine_id = route["machine"]["id"]
+                    machine_id = route["node"]["id"]
                     exit_available = True
                     if route["enabled"]:
                         exit_enabled = True
